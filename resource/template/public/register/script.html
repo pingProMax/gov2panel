@@ -1,0 +1,81 @@
+<script>
+    $(function () {
+        getCaptcha()
+    })
+
+    //获取验证码
+    function getCaptcha() {
+        $.ajax({
+            type: "get",// get或者post
+            url: "/captcha",// 请求的url地址
+            data: {},//请求的参数
+            dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+            beforeSend: function () {
+                // 发送之前就会进入这个函数
+                // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+            },
+            success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+                $('#captchaID').val(data.data.captcha_id)
+                $('#captchaImg').attr('src', data.data.captcha_image)
+            },
+            error: function () {//失败的函数
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+            }
+        })
+    }
+
+
+    function register() {
+        const registrationForm = document.getElementById("registrationForm");
+        const passwordInput = document.querySelector('input[name="Passwd"]');
+        const confirmPasswordInput = document.querySelector('input[cname="Passwd"]');
+
+        confirmPasswordInput.setCustomValidity("");
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordInput.setCustomValidity("两次密码输入不一致");
+            confirmPasswordInput.reportValidity();
+            return
+        }
+
+        if (!registrationForm.checkValidity()) {
+            registrationForm.reportValidity();
+            return
+        }
+
+        let d = {}
+        let t = $("#registrationForm").serializeArray();
+        $.each(t, function () {
+            d[this.name] = this.value;
+        });
+        console.log(d)
+
+        $.ajax({
+            type: "post",// get或者post
+            url: "/register",// 请求的url地址
+            data: d,//请求的参数
+            dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+            beforeSend: function () {
+                // 发送之前就会进入这个函数
+                // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+            },
+            success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+                if (data == null || data.code != 0) {
+                    notify('danger', data.message)
+                    return
+                }
+                notify('success', "注册成功")
+            },
+            error: function () {//失败的函数
+                notify('danger', data.message)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+                getCaptcha()
+            }
+        })
+
+    }
+
+</script>

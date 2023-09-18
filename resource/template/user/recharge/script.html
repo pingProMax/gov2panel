@@ -1,0 +1,80 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+<script>
+  const $table = $('#table')
+  $(function () {
+    initTable()
+  })
+
+  function pay() {
+    let checkedData = $table.bootstrapTable('getSelections')[0]
+    $.ajax({
+        type: "post",
+        url: "/user/pay_redirection",
+        data: {'payment_id':checkedData.id,'amount':$("#recharge_id").val()},
+        dataType: "json",
+        success: function(data) {
+            if (data.code == 0) {
+                location.href=data.data.url
+                
+            } else {
+                notify('danger', data.message)
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            notify('danger', errorThrown)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+            
+        }
+    });
+  }
+
+  //初始化表格
+  function initTable() {
+    $table.bootstrapTable({
+      columns: [
+          {
+            radio: true,
+            formatter: function (value, row, index) {
+                if (index == 0) {
+                    return true
+                }
+            }
+          },{
+            field: 'name',
+            title: '名称',
+          }, {
+            field: 'handling_fee_percent',
+            title: '手续费',
+            formatter: function (value, row, index) {
+                return row.handling_fee_percent + "%"
+            }
+          }, {
+            field: 'handling_fee_fixed',
+            title: '固定手续费',
+          }
+      ], //列
+      clickToSelect:true,
+      url: '/user/pay_list',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      pagination: false, //是否显示页码
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.data
+        };
+      },
+      onEditableInit: function (res) {  
+        console.log(res)
+      },
+
+    })
+  }
+</script>

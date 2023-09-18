@@ -1,0 +1,36 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      
+      <!-- Card stats -->
+      <div class="row">
+        <div class="col mt-4">
+          <div class="card">
+            
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header">
+          <h3 class="mb-0">{{(index (index .data 0).Data 0).Title}}</h3>
+          <p class="mb-0">{{(index (index .data 0).Data 0).UpdatedAt}}</p>
+        </div>
+        <div class="card-body">
+          {{(index (index .data 0).Data 0).Body}}
+        </div>
+        
+
+      </div>
+    </div>
+  </div>
+</div>

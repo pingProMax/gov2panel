@@ -1,0 +1,122 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+          <div class="header-body">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row card-wrapper">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">{{.data.Name}}</h3>
+          <input type="hidden" id="plan_id_id" value="{{.data.Id}}">
+        </div>
+        <div class="card-body">
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">套餐类型</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="heading mb-0">{{if eq .data.ResetTrafficMethod 1}}会覆盖原有套餐{{else}}{{if eq .data.ResetTrafficMethod 2}}在原有的套餐上叠加{{end}}{{end}}</h3>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">时长</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="heading mb-0">{{.data.Expired}} 天</h3>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">流量</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="heading mb-0">{{.data.TransferEnable}} GB</h3>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">速度限制</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="mb-0">{{if eq .data.SpeedLimit 0}}无限制{{else}}{{.data.SpeedLimit}} Mbp/s{{end}} </h3>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">是否允许续购</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="mb-0">{{if eq .data.Renew 1}}允许{{else}}不允许{{end}} </h3>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">描述</small>
+            </div>
+            <div class="col-sm-9">
+              <div>
+                {{.data.Content}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">账单</h3>
+        </div>
+        <div class="card-body">
+            
+          <div>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="请输入优惠码" aria-label="请输入优惠码" id="code_input_id">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="checkCode()" id="code_but_id">验证</button>
+              </div>
+            </div>
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">原价</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="heading-title mb-0">{{.data.Price}}</h3>
+            </div>
+          </div>
+          <hr style="margin-top: 0;margin-bottom: 0;">
+          <div id="zxzk_id">
+          </div>
+          <div id="zk_id">
+          </div>
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">总价</small>
+            </div>
+            <div class="col-sm-9">
+              <h3 class="heading-title text-warning mb-0" id="totle_id">{{.data.Price}}</h3>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="buy()">购买</button>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+
+</div>

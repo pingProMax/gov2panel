@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
+  <meta name="author" content="bootstrapmb">
+  <title>Argon Dashboard PRO - Premium Bootstrap 4 Admin Template</title>
+  <!-- Favicon -->
+  <link rel="icon" href="/resource/assets/img/brand/favicon.png" type="image/png">
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+  <!-- Icons -->
+  <link rel="stylesheet" href="/resource/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+  <link rel="stylesheet" href="/resource/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <!-- Argon CSS -->
+  <link rel="stylesheet" href="/resource/assets/css/argon.css?v=1.1.0" type="text/css">
+  {{include .headTpl .}}
+  <script>
+
+    function notify(type,message){
+      $.notify({
+        icon: 'ni ni-bell-55',
+        title: '信息',
+        message: message,
+        url: ''
+      }, {
+        element: 'body',
+        type: type,
+        allow_dismiss: true,
+        placement: {
+          from: 'top',
+          align: 'center'
+        },
+        offset: {
+          x: 15, // Keep this as default
+          y: 15 // Unless there'll be alignment issues as this value is targeted in CSS
+        },
+        spacing: 10,
+        z_index: 1080,
+        delay: 3000,
+        timer: 1000,
+        url_target: '_blank',
+        mouse_over: false,
+        animate: {
+          // enter: animIn,
+          // exit: animOut
+          enter: true,
+          exit: true
+        },
+        template: '<div data-notify="container" class="alert alert-dismissible alert-{0} alert-notify" role="alert">' +
+          '<span class="alert-icon" data-notify="icon"></span> ' +
+          '<div class="alert-text"</div> ' +
+          '<span class="alert-title" data-notify="title">{1}</span> ' +
+          '<span data-notify="message">{2}</span>' +
+          '</div>' +
+          // '<div class="progress" data-notify="progressbar">' +
+          // '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+          // '</div>' +
+          // '<a href="{3}" target="{4}" data-notify="url"></a>' +
+          '<button type="button" class="close" data-notify="dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+          '</div>'
+      });
+    }
+
+    
+  </script>
+</head>
+
+<body class="bg-default">
+  <!-- Navbar -->
+  <nav id="navbar-main" class="navbar navbar-horizontal navbar-transparent navbar-main navbar-expand-lg navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/resource/assets/img/brand/white.png">
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+        aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse navbar-custom-collapse collapse" id="navbar-collapse">
+        <div class="navbar-collapse-header">
+          <div class="row">
+            <div class="col-6 collapse-brand">
+              <a href="/">
+                <img src="/resource/assets/img/brand/blue.png">
+              </a>
+            </div>
+            <div class="col-6 collapse-close">
+              <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse"
+                aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a href="/" class="nav-link">
+              <span class="nav-link-inner--text">个人中心</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/login" class="nav-link">
+              <span class="nav-link-inner--text">登录</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/register" class="nav-link">
+              <span class="nav-link-inner--text">注册</span>
+            </a>
+          </li>
+
+        </ul>
+        <hr class="d-lg-none" />
+        <ul class="navbar-nav align-items-lg-center ml-lg-auto">
+
+          <li class="nav-item d-none d-lg-block ml-lg-4">
+            <a href="http://www.bootstrapmb.com/product/argon-dashboard-pro" target="_blank"
+              class="btn btn-neutral btn-icon">
+              <span class="btn-inner--icon">
+                <i class="fas fa-shopping-basket mr-2"></i>
+              </span>
+              <span class="nav-link-inner--text">查看价格</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Main content -->
+  {{include .mainTpl .}}
+  <!-- Footer -->
+  <footer class="py-5" id="footer-main">
+    <div class="container">
+      <div class="row align-items-center justify-content-xl-between">
+        <div class="col-xl-6">
+          <div class="copyright text-center text-xl-left text-muted">
+            &copy; 2023 <a href="/" class="font-weight-bold ml-1" target="_blank">v2ray节点购买</a>
+          </div>
+        </div>
+        <div class="col-xl-6">
+          <ul class="nav nav-footer justify-content-center justify-content-xl-end">
+            <li class="nav-item">
+              <a href="" class="nav-link" target="_blank">关于我们</a>
+            </li>
+            <li class="nav-item">
+              <a href="" class="nav-link" target="_blank">博客</a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- Argon Scripts -->
+  <!-- Core -->
+  <script src="/resource/assets/vendor/jquery/dist/jquery.min.js"></script>
+  <script src="/resource/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/resource/assets/vendor/js-cookie/js.cookie.js"></script>
+  <script src="/resource/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+  <script src="/resource/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+  
+  <script src="/resource/assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+  <script src="/resource/assets/vendor/bootstrap-notify/bootstrap-notify.min.js"></script>
+  <!-- Argon JS -->
+  <script src="/resource/assets/js/argon.js?v=1.1.0"></script>
+  <!-- Demo JS - remove this in your project -->
+  <script src="/resource/assets/js/demo.min.js"></script>
+  {{include .scriptTpl .}}
+
+</body>
+
+</html>

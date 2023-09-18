@@ -1,0 +1,162 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+          <div class="header-body">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 card-wrapper">
+      <!-- Grid system -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">钱包</h3>
+        </div>
+        <div class="card-body">
+          
+          <div class="row">
+            <div class="col">
+              <div class="card card-stats">
+                <!-- Card body -->
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">余额（不可提现）</h5>
+                      <span class="h2 font-weight-bold mb-0">{{.user.Balance}}</span>
+                    </div>
+                    <div class="col-auto">
+                        <a type="button" href="/user/recharge" class="btn btn-outline-primary">充值</a>
+                    </div>
+                  </div>
+                    
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card card-stats">
+                <!-- Card body -->
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">邀请佣金（可提现）</h5>
+                      <span class="h2 font-weight-bold mb-0">{{.user.CommissionBalance}}</span>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-info">转余额</button>
+                        <button type="button" class="btn btn-outline-info">提现</button>
+                    </div>
+                  </div>
+                 
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="mb-0">充值消费记录</h3>
+            </div>
+            <div class="card-body">
+              <div class="row row-example">
+                <div class="table-responsive">
+                  <table id="recharge_records_table"></table>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">信息</h3>
+        </div>
+        <div class="card-body">
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">已邀请用户数</small>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0">{{.inviteCount}}</p>
+            </div>
+          </div>
+
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">佣金类型</small>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0">{{if eq .cType 1}}循环{{else}}一次性{{end}}</p>
+            </div>
+          </div>
+
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">佣金比例</small>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0">{{.cRate}}%</p>
+            </div>
+          </div>
+
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">邀请码</small>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0">{{.user.CommissionCode}}</p>
+            </div>
+          </div>
+
+          <div class="row py-3 align-items-center">
+            <div class="col-sm-3">
+              <small class="text-uppercase text-muted font-weight-bold">专享折扣</small>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0">{{.user.Discount}}%</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="mb-0">邀请收入记录</h3>
+            </div>
+            <div class="card-body">
+              <div class="row row-example">
+                <div class="table-responsive">
+                  <table id="invitation_records_table"></table>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+     
+    </div>
+  </div>
+ 
+</div>

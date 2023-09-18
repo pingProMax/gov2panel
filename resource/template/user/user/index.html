@@ -1,0 +1,71 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+          <div class="header-body">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 card-wrapper">
+      <!-- Grid system -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">修改密码</h3>
+        </div>
+        <div class="card-body">
+          <form id="up_passwod_form_id" >
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <span class="alert-icon"><i class="fas fa-exclamation"></i></span>
+              <span class="alert-text"><strong>警告!</strong> 请记住新密码，切勿泄露账号和密码，不支持账号和密码找回！</span>
+              <!-- <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button> -->
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">旧密码</label>
+              <input class="form-control form-control-lg" type="text" placeholder="旧密码" name="old_passwd" required minlength="6" maxlength="20">
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">新密码</label>
+              <input class="form-control" type="password" placeholder="新密码" name="new_passwd" required minlength="6" maxlength="20">
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">新密码</label>
+              <input class="form-control form-control-sm" type="password" placeholder="新密码" cname="new_passwd2" required minlength="6" maxlength="20">
+            </div>
+            <button type="button" class="btn btn-outline-primary" onclick="upPasswd()">修改密码</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">重置订阅信息（待开发）</h3>
+        </div>
+        <div class="card-body">
+          
+          <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+            <span class="alert-icon"><i class="fas fa-mitten"></i></span>
+            <span class="alert-text"><strong>提示!</strong> 当你的订阅地址或账户发生泄漏被他人盗用时，可以在此重置订阅信息。避免带来不必要的损失。</span>
+            <!-- <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button> -->
+          </div>
+          <button type="button" class="btn btn-outline-primary">重置订阅信息</button>
+        </div>
+      </div>
+
+     
+    </div>
+  </div>
+ 
+</div>

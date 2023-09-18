@@ -1,0 +1,51 @@
+<script>
+    function upPasswd() {
+        const up_passwod_form_id = document.getElementById("up_passwod_form_id");
+        const passwordInput = document.querySelector('input[name="new_passwd"]');
+        const confirmPasswordInput = document.querySelector('input[cname="new_passwd2"]');
+
+        confirmPasswordInput.setCustomValidity("");
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordInput.setCustomValidity("两次密码输入不一致");
+            confirmPasswordInput.reportValidity();
+            return
+        }
+
+        if (!up_passwod_form_id.checkValidity()) {
+            up_passwod_form_id.reportValidity();
+            return
+        }
+
+        let d = {}
+        let t = $("#up_passwod_form_id").serializeArray();
+        $.each(t, function () {
+            d[this.name] = this.value;
+        });
+
+        $.ajax({
+            type: "post",// get或者post
+            url: "/user/up_passwd",// 请求的url地址
+            data: d,//请求的参数
+            dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+            beforeSend: function () {
+                // 发送之前就会进入这个函数
+                // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+            },
+            success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+                if (data == null || data.code != 0) {
+                    notify('danger', data.message)
+                    return
+                }
+                notify('success', "修改成功")
+            },
+            error: function () {//失败的函数
+                notify('danger', data.message)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+                
+            }
+        })
+
+    }
+</script>

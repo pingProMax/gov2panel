@@ -1,0 +1,373 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+<div id="toolbar">
+  <div class="btn-group ml-3" role="group" aria-label="Basic example">
+    
+    <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#creat_tickeet_modal_id">创建工单</button>
+  </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="creat_tickeet_modal_id" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">创建工单</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="creat_ticket_form_id">
+          <div class="position-relative form-group">
+            <label>工单等级</label>
+            <select class="custom-select" name="level">
+              <option value="1">低</option>
+              <option value="2">中</option>
+              <option value="3">高</option>
+            </select>
+          </div>
+          <div class="position-relative form-group">
+            <label>主题</label>
+            <textarea name="subject" class="form-control" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="createdTicket()">提交工单</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="show_ticket_modal_id" tabindex="-1" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">对话框</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <div class="list-group list-group-flush" id="msg_id">
+
+        </div>
+      </div>
+      <div class="row px-3">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-row="" onclick="Subjectajax()">发送</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+  const $table = $('#table')
+  $(function () {
+    initTable()
+  })
+
+  //创建工单
+  function createdTicket() {
+    let d = {}
+    let t = $("#creat_ticket_form_id").serializeArray();
+    $.each(t, function() {
+        d[this.name] = this.value;
+    });
+
+    $.ajax({
+        type: "POST",
+        url: "/user/ticket/create",
+        data: d,
+        dataType: "json",
+        success: function(data) {
+            if (data.code == 0) {
+              notify('success', "提交成功")
+              $('#creat_tickeet_modal_id').modal('hide')
+            } else {
+              notify('danger', data.message)
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(errorThrown)
+            notify('danger', errorThrown)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+          
+          $("#table").bootstrapTable('refresh');
+        }
+    });
+  }
+
+  //查看消息
+  function TicketMsg(row) {
+    let uid = {{.user.Id}};
+    $("#msg_id").empty()
+    $.ajax({
+      type: "POST",
+      url: "/user/ticket/ticket_msg",
+      data: {ticket_id:row.ticket.id},
+      async:false,
+      dataType: "json",
+      success: function (data) {
+
+        data.data.data.forEach(element => {
+          if (element.user.id == uid) {
+            $("#msg_id").append(`
+            <a class="list-group-item list-group-item-action flex-column align-items-start py-4 px-4">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <div class="d-flex w-100 align-items-center">
+                    <i class="fas fa-user avatar avatar-xs mr-2"></i>
+                    <h5 class="mb-1">${element.user.user_name}</h5>
+                  </div>
+                </div>
+                <small>${element.ticket.created_at}</small>
+              </div>
+              <h4 class="mt-3 mb-1">${element.ticket.message}</h4>
+            </a>
+          `)
+          }else{
+            $("#msg_id").append(`
+            <a class="list-group-item list-group-item-action flex-column align-items-start py-4 px-4">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <div class="d-flex w-100 align-items-center">
+                    <i class="fas fa-user-shield avatar avatar-xs mr-2"></i>
+                    <h5 class="mb-1">${element.user.user_name}</h5>
+                  </div>
+                </div>
+                <small>${element.ticket.created_at}</small>
+              </div>
+              <h4 class="mt-3 mb-1"><span class="text-info">●</span> ${element.ticket.message}</h4>
+              </p>
+            </a>
+          `)
+          }
+          
+        });
+        $('#button-addon2').attr('data-row',JSON.stringify(row))
+        $('#show_ticket_modal_id').modal('show')
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        
+      }
+    });
+    
+  }
+
+  //提交
+  function Subjectajax() {
+    
+    if ($("#msg_data").val() == "") {
+      notify('danger', "请输入内容")
+      return
+    }
+    
+    let row = JSON.parse($('#button-addon2').attr('data-row'))
+    $.ajax({
+      type: "POST",
+      url: "/user/ticket/ticket_msg/add",
+      data: {message:$("#msg_data").val(),ticket_id:row.ticket.id},
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          $("#msg_data").val("")
+          notify('success', "提交成功")
+          TicketMsg(row)
+          $("#table").bootstrapTable('refresh');
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+      }
+    });
+  }
+
+  //关闭工单
+  function Close(id) {
+    // let delData = $table.bootstrapTable('getSelections')
+    // if (delData.length == 0) {
+    //   notify('danger', '请选择！')
+    //   return
+    // }
+    // let ids = []
+    // delData.forEach(function (v, i) {
+    //   ids.push(v.ticket.id)
+    // })
+    let ids = [id]
+
+    $.ajax({
+      type: "post",
+      url: "/user/ticket/close",
+      data: { 'ids': ids },
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          notify('success', "关闭成功")
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        $("#table").bootstrapTable('refresh');
+      }
+    });
+
+  }
+
+
+  //初始化表格
+  function initTable() {
+    $table.bootstrapTable({
+      columns: [
+          {
+            field: 'ticket.id',
+            title: 'id',
+            visible:false,//隐藏
+          }, 
+          {
+            field: 'ticket.subject',
+            title: '标题',
+          }, {
+            field: 'user.user_name',
+            title: '等级',
+            formatter: function (value, row, index) {
+              switch (row.ticket.level) {
+                case 1:
+                  return `低`
+                  break;
+                case 2:
+                  return `中`
+                  break;
+                case 3:
+                  return `高`
+                  break;
+                default:
+                  break;
+              }
+            },
+          }, {
+            field: 'ticket.status',
+            title: '工单状态',
+            formatter: function (value, row, index) {
+              if (row.ticket.status == 0) {
+                return `<span class="badge badge-dot mr-4">
+                        <i class="bg-warning"></i>
+                        <span class="status">开启</span>
+                      </span>`
+              }
+              return `<span class="badge badge-dot mr-4">
+                        <i class="bg-success"></i>
+                        <span class="status">关闭</span>
+                      </span>`;
+            }
+          },{
+            field: 'ticket.reply_status',
+            title: '回复状态',
+            formatter: function (value, row, index) {
+              if (row.ticket.reply_status == 0) {
+                return `待回复`
+              }
+              return `已回复`;
+            }
+          }, {
+            field: 'ticket.created_at',
+            title: '创建时间',
+          }, {
+            field: 'operate',
+            title: '操作',
+            width:120,
+            events: {
+              'click #edit': function (e, value, row, index) {
+                TicketMsg(row)
+              },
+              'click #close': function (e, value, row, index) {
+                Close(row.ticket.id)
+              },
+            },
+            formatter: function (value, row, index) {
+              if (row.ticket.status == 0) {
+                return `
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-comments"></i></span></button>
+                <button id="close" type="button" class="btn btn-outline-warning btn-icon-only"><span class="btn-inner--icon">关闭</span></button>
+              </div>`;
+              }
+
+              return `
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-comments"></i></span></button>
+              </div>`;
+              
+            }
+          }
+      ], //列
+      url: '/user/ticket',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      toolbar: '#toolbar',
+      pagination: true, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      showRefresh: true,  //显示刷新按钮
+      showColumns: true, //是否显示列下拉列表按钮
+      showFullscreen: true, //是否显示全屏按钮
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.data,
+          "total": res.data.totle,
+        };
+      },
+
+      //搜索
+      queryParams: function (x) {
+
+        $("select[data-function='search']").each(function (i, domEle) {
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+        $("input[data-function='search']").each(function (i, domEle) {
+          const bindingDomID = $(domEle).attr("data-select-binding")
+          if (bindingDomID != undefined) {
+            x[$(bindingDomID).attr("name")] = $(bindingDomID).val()
+          }
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+
+        return x
+      },
+
+    })
+  }
+</script>

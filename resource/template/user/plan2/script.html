@@ -1,0 +1,108 @@
+
+<script src="/resource/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/resource/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+
+<!-- Demo JS - remove this in your project -->
+<script src="/resource/assets/js/demo.min.js"></script>
+
+<script>
+    let userExclusiveDiscount = {{.user.Discount}};
+
+    let price = {{.data.Price}};
+
+    $(function(){
+        if (userExclusiveDiscount > 0 ) {
+            price = price - (price * userExclusiveDiscount / 100)
+            $("#zxzk_id").html("")
+            $("#zxzk_id").append(`
+            <div class="row py-3 align-items-center">
+                <div class="col-sm-3">
+                <small class="text-uppercase text-muted font-weight-bold">专享折扣</small>
+                </div>
+                <div class="col-sm-9">
+                <h3 class="heading-title mb-0">${userExclusiveDiscount}%</h3>
+                </div>
+            </div>
+            <hr style="margin-top: 0;margin-bottom: 0;">`)
+            $("#totle_id").text(price)
+        }
+        
+    })
+
+    function checkCode() {
+        $.ajax({
+            type: "post",
+            url: "/user/coupon",
+            data: {'code':$("#code_input_id").val(),plan_id:$("#plan_id_id").val()},
+            dataType: "json",
+            success: function(data) {
+                if (data.code == 0) {
+                    notify('success', "优惠码有效")
+                    
+                    let totleId = $("#totle_id")
+
+                    let typeStr = ""
+                    let fhStr = ""
+                    if (data.data.data.type == 1) {
+                        typeStr = "金额"
+                        fhStr = "-"
+                        data.data.data.valueT = data.data.data.value
+                        let totleNumber = price - data.data.data.value
+                        totleId.html(totleNumber > 0 ?totleNumber:0)
+                    }else if (data.data.data.type == 2) {
+                        typeStr = "百分比"
+                        fhStr = ""
+                        data.data.data.valueT = data.data.data.value + "%"
+                        totleId.html(price - (price * data.data.data.value / 100)) 
+                    }
+
+                    $("#zk_id").html("")
+                    $("#zk_id").append(`
+                    <div class="row py-3 align-items-center">
+                        <div class="col-sm-3">
+                        <small class="text-uppercase text-muted font-weight-bold">${typeStr}折扣</small>
+                        </div>
+                        <div class="col-sm-9">
+                        <h3 class="heading-title mb-0">${fhStr} ${data.data.data.valueT}</h3>
+                        </div>
+                    </div>
+                    <hr style="margin-top: 0;margin-bottom: 0;">`)
+
+                    $("#code_input_id").attr('disabled','disabled')
+                    $("#code_but_id").attr('disabled','disabled')
+                } else {
+                    notify('danger', data.message)
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                notify('danger', errorThrown)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+                
+            }
+        });
+    }
+
+    function buy() {
+        $.ajax({
+            type: "post",
+            url: "/user/buy",
+            data: {'code':$("#code_input_id").val(),plan_id:$("#plan_id_id").val()},
+            dataType: "json",
+            success: function(data) {
+                if (data.code == 0) {
+                    location.href='/user'
+                    
+                } else {
+                    notify('danger', data.message)
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                notify('danger', errorThrown)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+                
+            }
+        });
+    }
+</script>

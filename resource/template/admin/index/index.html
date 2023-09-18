@@ -1,0 +1,281 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      
+      <!-- Card stats -->
+      <div class="row">
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">收入</h5>
+                  <span class="h2 font-weight-bold mb-0">2300</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                    <i class="ni ni-money-coins"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm">
+                <span class="text-success mr-2"></span>
+                <span class="text-nowrap">支付数据</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">未处理工单数量</h5>
+                  <span class="h2 font-weight-bold mb-0">10</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                    <i class="ni ni-chat-round"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm">
+                <span class="text-success mr-2"></span>
+                <span class="text-nowrap">工单数据</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">节点数量</h5>
+                  <span class="h2 font-weight-bold mb-0">924</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                    <i class="ni ni-atom"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm">
+                <span class="text-success mr-2"></span>
+                <span class="text-nowrap">节点数据</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">注册量</h5>
+                  <span class="h2 font-weight-bold mb-0">1000</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                    <i class="ni ni-single-02"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm">
+                <span class="text-success mr-2"></span>
+                <span class="text-nowrap">用户数据</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col">
+              <h6 class="text-light text-uppercase ls-1 mb-1">数据</h6>
+              <h5 class="h3 text-white mb-0">日报</h5>
+            </div>
+            <div class="col">
+              <ul class="nav nav-pills justify-content-end">
+                <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales-dark" data-update='{"data":{"datasets":[{"data":[0, 20, 10, 30, 15, 40, 20, 60, 60]}]}}' data-prefix="$" data-suffix="k">
+                  <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
+                    <span class="d-none d-md-block">收入</span>
+                    <span class="d-md-none">M</span>
+                  </a>
+                </li>
+                <li class="nav-item" data-toggle="chart" data-target="#chart-sales-dark" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                  <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                    <span class="d-none d-md-block">注册量</span>
+                    <span class="d-md-none">W</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Chart -->
+          <div class="chart">
+            <!-- Chart wrapper -->
+            <canvas id="chart-sales-dark" class="chart-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div class="row">
+   
+    <div class="col-xl-12">
+      <!-- Progress track -->
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header">
+          <!-- Title -->
+          <h5 class="h3 mb-0">昨日节点流量排行</h5>
+        </div>
+        <!-- Card body -->
+        <div class="card-body">
+          <!-- List group -->
+          <ul class="list-group list-group-flush list my--3">
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Argon Design System</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5>Angular Now UI Kit PRO</h5>
+                  <div class="progress progress-xs mb-0">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Footer -->
+  <footer class="footer pt-0">
+    <div class="row align-items-center justify-content-lg-between">
+      <div class="col-lg-6">
+        <div class="copyright text-center text-lg-left text-muted">
+          &copy; 2023 <a href="/" class="font-weight-bold ml-1" target="_blank">v1.0</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+          <li class="nav-item">
+            <a href="" class="nav-link" target="_blank">使用文档</a>
+          </li>
+          <li class="nav-item">
+            <a href="" class="nav-link" target="_blank">提交bug</a>
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,126 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      
+      <!-- Card stats -->
+      <div class="row">
+        <div class="col mt-4">
+          <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+              <!-- Title -->
+              <h5 class="h3 mb-0">必看公告</h5>
+            </div>
+            <!-- Card image -->
+            <!-- List group -->
+            <!-- Card body -->
+            <div class="card-body">
+              {{.setting.user_page_html}}
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col ">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header">
+          <!-- Title -->
+          <h5 class="h3 mb-0">我的订阅信息</h5>
+        </div>
+        <!-- Card image -->
+        <!-- List group -->
+        <!-- Card body -->
+        <div class="card-body">
+          {{if .data}}
+            <h2>{{.data.Name}}</h2>
+            <p class="card-text" id="expired_at_id">到期时间:{{.user.ExpiredAt}}</p>
+            <div class="progress">
+              <div id="jdt" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+            </div>
+            <p class="card-text">已用：{{.total_used_traffic}}GB / 总计：{{.transfer_enable}}GB</p>
+          {{else}}
+            <a href="/user/plan">请购买订阅</a>
+          {{end}}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container-fluid ">
+  <div class="row">
+  <div class="col">
+    <div class="card">
+      <!-- Card header -->
+      <div class="card-header border-0">
+        <h3 class="mb-0">订阅地址</h3>
+      </div>
+      <!-- Light table -->
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">软件</th>
+              <th scope="col">地址</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody class="list">
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <a href="#" class="avatar rounded-circle mr-3">
+                    <img alt="Image placeholder" src="../../assets/img/theme/bootstrap.jpg">
+                  </a>
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">v2rayN</span>
+                  </div>
+                </div>
+              </th>
+              <td class="budget">
+                https://www.google.com/api/dy?token=dsfdsfdsfdfsfdsfsdfds
+              </td>
+              
+              <td class="text-right">
+                复制
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <a href="#" class="avatar rounded-circle mr-3">
+                    <img alt="Image placeholder" src="../../assets/img/theme/angular.jpg">
+                  </a>
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">ClashX</span>
+                  </div>
+                </div>
+              </th>
+              <td class="budget">
+                https://www.google.com/api/dy?token=dsfdsfdsfdfsfdsfsdfds
+              </td>
+              
+              <td class="text-right">
+                复制
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+     
+    </div>
+  </div>
+</div>
+</div>

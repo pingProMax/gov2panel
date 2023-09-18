@@ -1,0 +1,35 @@
+
+<script>
+    $(function () {
+        let y = {{.total_used_traffic}};
+        let z = {{.transfer_enable}};
+        let t = 0;        
+        if (z != 0) {
+            t = (y/z)*100
+        }
+        if (t >= 80) {
+            
+        }
+        $("#jdt").css("width",t + "%");
+        $("#jdt").addClass('bg-warning');
+
+        let expiredAt='{{.user.ExpiredAt}}';
+        // 获取当前时间的日期对象
+        let currentDate = new Date();
+
+        // 将给定的日期字符串转换为日期对象
+        let expirationDate = new Date(expiredAt);
+
+        // 计算时间差（以毫秒为单位）
+        let timeDifference = expirationDate - currentDate;
+
+        // 计算5天的毫秒数
+        let fiveDaysInMillis = 5 * 24 * 60 * 60 * 1000;
+
+        if (timeDifference < fiveDaysInMillis) {
+            $("#expired_at_id").css('color','red')
+        } 
+
+    })
+
+</script>

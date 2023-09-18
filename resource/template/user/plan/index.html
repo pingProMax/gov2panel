@@ -1,0 +1,45 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+          <div class="header-body">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row card-wrapper">
+
+    {{range $kk, $vv := .data}}
+    <div class="col">
+    
+      <!-- Pricing card -->
+      <div class="card card-pricing border-0 text-center mb-4">
+        <div class="card-header bg-transparent">
+          <h4 class="text-uppercase ls-1 text-primary py-3 mb-0">{{$vv.Name}}</h4>
+        </div>
+        <div class="card-body px-lg-7">
+          <div class="display-2">{{$vv.Price}} $</div>
+          <span class=" text-muted">{{$vv.Expired}}天 / {{$vv.TransferEnable}}GB</span>
+          <div class="my-4">
+            {{$vv.Content}}
+          </div>
+          <a href="/user/plan2?id={{$vv.Id}}" class="btn btn-primary">购买</a>
+        </div>
+        <div class="card-footer">
+          <a href="#!" class=" text-muted">{{if eq $vv.ResetTrafficMethod 1}}会覆盖原有套餐{{else}}{{if eq $vv.ResetTrafficMethod 2}}在原有的套餐上叠加{{end}}{{end}}</a>
+        </div>
+      </div>
+      
+    </div>
+    {{end}}
+  </div>
+ 
+
+</div>

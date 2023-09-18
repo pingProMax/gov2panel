@@ -1,0 +1,384 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+<div id="toolbar">
+  <div class="btn-group ml-3" role="group" aria-label="Basic example">
+    
+    <button type="button" class="btn btn-danger " onclick="Close()">关闭</button>
+  </div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="AEModal" tabindex="-1" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="AEModalLongTitle">对话框</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body" id="msg_id">
+        <div class="d-flex justify-content-end">...</div>
+      </div>
+      <div class="row px-3">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-row="" onclick="Subjectajax()">发送</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+  const $table = $('#table')
+  $(function () {
+    initTable()
+  })
+
+  //搜索
+  function search() {
+    $("#table").bootstrapTable('refresh');
+  }
+  //清除搜索
+  function cleanSearch() {
+    $("select[data-function='search']").each(function (i, domEle) {
+      // 选择第一个选项
+      $(this).val($(this).find('option:first').val());
+    })
+    $("input[data-function='search']").each(function (i, domEle) {
+      $(domEle).val("")
+    })
+    $("#table").bootstrapTable('refresh');
+  }
+
+  //AE表单
+  function AE(row) {
+    let uid = {{.user.Id}};
+    $("#msg_id").empty()
+    $.ajax({
+      type: "POST",
+      url: "/{{.setting.admin_path}}/ticket_msg",
+      data: {ticket_id:row.ticket.id},
+      async:false,
+      dataType: "json",
+      success: function (data) {
+        data.data.data.forEach(element => {
+          if (element.user.id != uid) {
+            $("#msg_id").append(`
+            <a class="list-group-item list-group-item-action flex-column align-items-start py-4 px-4">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <div class="d-flex w-100 align-items-center">
+                    <i class="fas fa-user avatar avatar-xs mr-2"></i>
+                    <h5 class="mb-1">${element.user.user_name}</h5>
+                  </div>
+                </div>
+                <small>${element.ticket.created_at}</small>
+              </div>
+              <h4 class="mt-3 mb-1">${element.ticket.message}</h4>
+            </a>
+          `)
+          }else{
+            $("#msg_id").append(`
+            <a class="list-group-item list-group-item-action flex-column align-items-start py-4 px-4">
+              <div class="d-flex w-100 justify-content-between">
+                <div>
+                  <div class="d-flex w-100 align-items-center">
+                    <i class="fas fa-user-shield avatar avatar-xs mr-2"></i>
+                    <h5 class="mb-1">${element.user.user_name}</h5>
+                  </div>
+                </div>
+                <small>${element.ticket.created_at}</small>
+              </div>
+              <h4 class="mt-3 mb-1"><span class="text-info">●</span> ${element.ticket.message}</h4>
+              </p>
+            </a>
+          `)
+          }
+        });
+        $('#button-addon2').attr('data-row',JSON.stringify(row))
+        $('#AEModal').modal('show')
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        
+      }
+    });
+    
+  }
+
+  //提交
+  function Subjectajax() {
+    
+    if ($("#msg_data").val() == "") {
+      notify('danger', "请输入内容")
+      return
+    }
+    
+    let row = JSON.parse($('#button-addon2').attr('data-row'))
+    $.ajax({
+      type: "POST",
+      url: "/{{.setting.admin_path}}/ticket_msg/add",
+      data: {message:$("#msg_data").val(),ticket_id:row.ticket.id},
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          $("#msg_data").val("")
+          notify('success', "提交成功")
+          AE(row)
+          $("#table").bootstrapTable('refresh');
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+      }
+    });
+  }
+
+  //删除数据
+  function Close() {
+    let delData = $table.bootstrapTable('getSelections')
+    if (delData.length == 0) {
+      notify('danger', '请选择！')
+      return
+    }
+    let ids = []
+    delData.forEach(function (v, i) {
+      ids.push(v.ticket.id)
+    })
+
+    $.ajax({
+      type: "post",
+      url: "/{{.setting.admin_path}}/ticket/close",
+      data: { 'ids': ids },
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          notify('success', "关闭成功")
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        $("#table").bootstrapTable('refresh');
+      }
+    });
+
+  }
+
+
+  //初始化表格
+  function initTable() {
+    $table.bootstrapTable({
+      columns: [
+        [
+          {
+
+          }, {
+            title: '<input type="text"  placeholder="ID" class="form-control" name="id" data-function="search" data-type="eq"  />',
+          }, {
+            title: '<input type="number"  placeholder="用户id" class="form-control" name="user_id" data-function="search" data-type="eq" />',
+          },{
+            title: '<input type="text"  placeholder="用户名" class="form-control" name="user_name" data-function="search" data-type="like" />',
+          },{
+            title: '<input type="text"  placeholder="标题" class="form-control" name="subject" data-function="search" data-type="like" />',
+          }, {
+            title:  `
+                  <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="level">
+                      <option selected value="-1">全部</option>
+                      <option value="1">低</option>
+                      <option value="2">中</option>
+                      <option value="3">高</option>
+                    </select>
+                  </div>
+          `,
+          }, {
+            title:  `
+                  <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="status">
+                      <option selected value="-1">全部</option>
+                      <option value="0">已开启</option>
+                      <option value="1">已关闭</option>
+                    </select>
+                  </div>
+          `,
+          }, {
+            title:  `
+                  <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="reply_status">
+                      <option selected value="-1">全部</option>
+                      <option value="0">待回复</option>
+                      <option value="1">已回复</option>
+                    </select>
+                  </div>
+          `,
+          }, {
+          }, {
+            title: `
+
+                  <div class="input-group">
+                    <button type="button" class="btn btn-twitter btn-icon-only" onclick="search()">
+                      <span class="btn-inner--icon"><i class="fas fa-search"></i></span>
+                    </button>
+                    <button type="button" class="btn btn-google-plus btn-icon-only" onclick="cleanSearch()">
+                      <span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
+                    </button>
+                  </div>
+          `,
+          },
+        ], [
+          {
+            checkbox: true,
+          }, {
+            field: 'ticket.id',
+            sortName:'id',
+            title: 'ID',
+            width: 80,
+          }, {
+            field: 'ticket.user_id',
+            sortName:'user_id',
+            title: '用户',
+            formatter: function (value, row, index) {
+              return row.ticket.user_id
+            },
+          }, {
+            field: 'user.user_name',
+            title: '用户',
+            formatter: function (value, row, index) {
+              return row.user.user_name
+            },
+          }, {
+            field: 'ticket.subject',
+            sortName:'subject',
+            title: '标题',
+          }, {
+            field: 'ticket.level',
+            sortName:'level',
+            title: '等级',
+            formatter: function (value, row, index) {
+              switch (row.ticket.level) {
+                case 1:
+                  return `低`
+                  break;
+                case 2:
+                  return `中`
+                  break;
+                case 3:
+                  return `高`
+                  break;
+                default:
+                  break;
+              }
+              
+              
+            },
+          }, {
+            field: 'ticket.status',
+            sortName:'status',
+            title: '工单状态',
+            formatter: function (value, row, index) {
+              if (row.ticket.status == 0) {
+                return `<span class="badge badge-dot mr-4">
+                        <i class="bg-warning"></i>
+                        <span class="status">开启</span>
+                      </span>`
+              }
+              return `<span class="badge badge-dot mr-4">
+                        <i class="bg-success"></i>
+                        <span class="status">关闭</span>
+                      </span>`;
+            }
+          },{
+            field: 'ticket.reply_status',
+            sortName:'reply_status',
+            title: '回复状态',
+            formatter: function (value, row, index) {
+              if (row.ticket.reply_status == 0) {
+                return `待回复`
+              }
+              return `已回复`;
+            }
+          }, {
+            field: 'ticket.created_at',
+            sortName: 'created_at',
+            title: '创建时间',
+          }, {
+            field: 'operate',
+            title: '操作',
+            width:120,
+            events: {
+              'click #edit': function (e, value, row, index) {
+                AE(row)
+              },
+            },
+            formatter: function (value, row, index) {
+              return `
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-comments"></i></span></button>
+              </div>`;
+            }
+          }
+        ]
+      ], //列
+      url: '/{{.setting.admin_path}}/ticket',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      toolbar: '#toolbar',
+      pagination: true, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      showRefresh: true,  //显示刷新按钮
+      showColumns: true, //是否显示列下拉列表按钮
+      showFullscreen: true, //是否显示全屏按钮
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.data,
+          "total": res.data.totle,
+        };
+      },
+
+      //搜索
+      queryParams: function (x) {
+
+        $("select[data-function='search']").each(function (i, domEle) {
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+        $("input[data-function='search']").each(function (i, domEle) {
+          const bindingDomID = $(domEle).attr("data-select-binding")
+          if (bindingDomID != undefined) {
+            x[$(bindingDomID).attr("name")] = $(bindingDomID).val()
+          }
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+
+        return x
+      },
+
+    })
+  }
+</script>

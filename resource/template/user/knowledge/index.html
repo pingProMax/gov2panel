@@ -1,0 +1,68 @@
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      
+      <!-- Card stats -->
+      <div class="row">
+        <div class="col mt-4">
+          <div class="card">
+            <!-- Card header -->
+            <div class="card-header">
+              <!-- Title -->
+              <h5 class="h3 mb-0">必看公告</h5>
+            </div>
+            <!-- Card image -->
+            <!-- List group -->
+            <!-- Card body -->
+            <div class="card-body">
+              {{.setting.user_page_html}}
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{{range $key, $value := .data}}
+<div class="container-fluid {{if eq $key 0}}mt--6{{end}}">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header border-0">
+          <h3 class="mb-0">{{$value.Category}}</h3>
+        </div>
+        <!-- Light table -->
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            
+            <tbody class="list">
+              {{range $kk, $vv := $value.Data}}
+              <tr>
+                <th scope="row">
+                  <div class="media align-items-center">
+                    <div class="media-body">
+                      <span class="name mb-0 text-sm"><a href="/user/knowledge?id={{$vv.Id}}">{{$vv.Title}}</a></span>
+                    </div>
+                  </div>
+                </th>
+                <td class="budget">
+                  {{$vv.UpdatedAt}}
+                </td>
+              </tr>
+              {{end}}
+              
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

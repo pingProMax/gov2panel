@@ -1,0 +1,165 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+<script>
+  const $table1 = $('#recharge_records_table')
+  const $table2 = $('#invitation_records_table')
+  
+    $(function () {
+        initRechargeRecordsTable()
+        initInvitationRecords()
+    })
+
+    
+  //初始化表格
+  function initRechargeRecordsTable() {
+    $table1.bootstrapTable({
+      columns: [
+           {
+            field: 'amount',
+            title: '金额',
+            
+          },{
+            field: 'operate_type',
+            sortName:'operate_type',
+            title: '类型',
+            
+            formatter: function (value, row, index) {
+              switch (row.operate_type) {
+                case 1:
+                  return `充值`;
+                  break;
+                case 2:
+                  return `消费`;
+                  break;
+                default:
+                  break;
+              }
+              
+            }
+          }, {
+            field: 'recharge_name',
+            sortName:'recharge_name',
+            title: '充值类型',
+          }, {
+            field: 'consumption_name',
+            sortName:'consumption_name',
+            title: '消费类型',
+          },{
+            field: 'transaction_id',
+            sortName:'transaction_id',
+            title: '订单号',
+          },{
+            field: 'created_at',
+            sortName: 'created_at',
+            title: '创建时间',
+          }
+      ], //列
+      url: '/user/recharge_records',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      pagination: true, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.recharge_records,
+          "total": res.data.recharge_records_totle,
+        };
+      },
+
+    })
+  }
+
+  //初始化表格
+  function initInvitationRecords() {
+    $table2.bootstrapTable({
+      columns: [
+           {
+            field: 'invitation_records.amount',
+            title: '金额',
+            
+          },{
+            field: 'invitation_records.operate_type',
+            title: '类型',
+            formatter: function (value, row, index) {
+              switch (row.invitation_records.operate_type) {
+                case 1:
+                  return `佣金`;
+                  break;
+                case 2:
+                  return `提现`;
+                  break;
+                default:
+                  break;
+              }
+              
+            }
+          },{
+            field: 'from_user.user_name',
+            title: '邀请者账号',
+           
+          }, {
+            field: 'invitation_records.commission_rate',
+            title: '佣金比例',
+            formatter: function (value, row, index) {
+              return row.invitation_records.commission_rate + "%"
+            }
+          },{
+            field: 'invitation_records.state',
+            title: '状态',
+            formatter: function (value, row, index) {
+              switch (row.invitation_records.state) {
+                case 0:
+                  return `未审核`;
+                  break;
+                case 1:
+                  return `<span class="badge badge-dot">
+                        <i class="bg-success"></i>
+                        <span class="status">已审核</span>
+                      </span>`;
+                  break;
+                case 2:
+                  return `<span class="badge badge-dot">
+                        <i class="bg-warning"></i>
+                        <span class="status">已拒绝</span>
+                      </span>`;
+                  break;
+                default:
+                  break;
+              }
+              
+            }
+          },{
+            field: 'invitation_records.created_at',
+            title: '创建时间',
+          }
+      ], //列
+      url: '/user/invitation_records',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      pagination: true, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.data,
+          "total": res.data.totle,
+        };
+      },
+
+    })
+  }
+
+
+
+</script>

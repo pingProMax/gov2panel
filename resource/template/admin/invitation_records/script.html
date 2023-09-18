@@ -1,0 +1,292 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+<div id="toolbar">
+  <div class="btn-group ml-3" role="group" aria-label="Basic example">
+    <!-- <button type="button" class="btn btn-info " onclick="">添加</button> -->
+  </div>
+</div>
+
+<script>
+  let planData;
+  const $table = $('#table')
+  $(function () {
+    initTable()
+
+  })
+
+  
+  function state(id,state) {
+    
+    $.ajax({
+      type: "POST",
+      url: "/{{.setting.admin_path}}/invitation_records/state",
+      data: {id:id,state:state},
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          notify('success', "审核成功")
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        $("#table").bootstrapTable('refresh');
+      }
+    });
+  }
+  
+  //搜索
+  function search() {
+    $("#table").bootstrapTable('refresh');
+  }
+  //清除搜索
+  function cleanSearch() {
+    $("select[data-function='search']").each(function (i, domEle) {
+      // 选择第一个选项
+      $(this).val($(this).find('option:first').val());
+    })
+    $("input[data-function='search']").each(function (i, domEle) {
+      $(domEle).val("")
+    })
+    $("#table").bootstrapTable('refresh');
+  }
+
+
+  //初始化表格
+  function initTable() {
+    $table.bootstrapTable({
+      columns: [
+        [
+          {
+          }, {
+
+          },{
+            title: `<div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="operate_type">
+                      <option selected value="0">全部</option>
+                      <option value="1">邀请</option>
+                      <option value="2">提现</option>
+                    </select>
+                  </div>`,
+          },{
+            
+          }, {
+            title: '<input type="number"  placeholder="邀请者用户id" class="form-control" name="user_id" data-function="search" data-type="eq" />',
+          }, {
+            title: '<input type="text"  placeholder="邀请者账号" class="form-control" name="user_name" data-function="search" data-type="like" />',
+          }, {
+            title: '<input type="number"  placeholder="被邀请者用户id" class="form-control" name="from_user_id" data-function="search" data-type="eq" />',
+          }, {
+            title: '<input type="text"  placeholder="被邀请者账号" class="form-control" name="from_user_name" data-function="search" data-type="like" />',
+          }, {
+            title: '<input type="number"  placeholder="佣金比例" class="form-control" name="commission_rate" data-function="search" data-type="eq" />',
+            
+          }, {
+            title: '<input type="number"  placeholder="订单id" class="form-control" name="recharge_records_id" data-function="search" data-type="eq" />',
+          }, {
+            title:`<div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="state">
+                      <option selected value="-1">全部</option>
+                      <option value="0">待审核</option>
+                      <option value="1">已审核</option>
+                      <option value="2">已拒绝</option>
+                    </select>
+                  </div>`,
+          },  {
+            
+          }, {
+            title: `<div class="input-group">
+                    <button type="button" class="btn btn-twitter btn-icon-only" onclick="search()">
+                      <span class="btn-inner--icon"><i class="fas fa-search"></i></span>
+                    </button>
+                    <button type="button" class="btn btn-google-plus btn-icon-only" onclick="cleanSearch()">
+                      <span class="btn-inner--icon"><i class="fas fa-trash"></i></span>
+                    </button>
+                  </div>`,
+          },
+        ], [
+          {
+            checkbox: true,
+          }, {
+            field: 'invitation_records.id',
+            sortName:'id',
+            title: 'ID',
+            width: 80,
+            sortable: true, //是否允许排序
+            visible:false,//隐藏
+
+          }, {
+            field: 'invitation_records.operate_type',
+            sortName:'amount',
+            title: '类型',
+            sortable: true, //是否允许排序
+            formatter: function (value, row, index) {
+              switch (row.invitation_records.operate_type) {
+                case 1:
+                  return `邀请`;
+                  break;
+                case 2:
+                  return `提现`;
+                  break;
+                default:
+                  break;
+              }
+              
+            }
+          }, {
+            field: 'invitation_records.amount',
+            sortName:'amount',
+            title: '金额',
+            sortable: true, //是否允许排序
+          },{
+            field: 'invitation_records.user_id',
+            sortName:'user_id',
+            title: '邀请者',
+            sortable: true, //是否允许排序
+          }, {
+            field: 'user.user_name',
+            title: '邀请者账号',
+            sortable: false, //是否允许排序
+          }, {
+            field: 'invitation_records.from_user_id',
+            sortName:'from_user_id',
+            title: '被邀请者',
+            sortable: true, //是否允许排序
+          }, {
+            field: 'from_user.user_name',
+            title: '被邀请者账号',
+            sortable: false, //是否允许排序
+          }, {
+            field: 'invitation_records.commission_rate',
+            sortName:'commission_rate',
+            title: '佣金比例',
+            sortable: true, //是否允许排序
+          }, {
+            field: 'invitation_records.recharge_records_id',
+            sortName:'recharge_records_id',
+            title: '订单id',
+            sortable: true, //是否允许排序
+          },{
+            field: 'invitation_records.state',
+            sortName: 'state',
+            title: '状态',
+            sortable: true, //是否允许排序
+            formatter: function (value, row, index) {
+              switch (row.invitation_records.state) {
+                case 0:
+                  return `未审核`;
+                  break;
+                case 1:
+                  return `<span class="badge badge-dot">
+                        <i class="bg-success"></i>
+                        <span class="status">已审核</span>
+                      </span>`;
+                  break;
+                case 2:
+                  return `<span class="badge badge-dot">
+                        <i class="bg-warning"></i>
+                        <span class="status">已拒绝</span>
+                      </span>`;
+                  break;
+                default:
+                  break;
+              }
+              
+            }
+          },{
+            field: 'invitation_records.created_at',
+            sortName: 'created_at',
+            title: '创建时间',
+            sortable: true, //是否允许排序
+          },{
+            field: 'operate',
+            title: '操作',
+            width:120,
+            events: {
+              'click #ok': function (e, value, row, index) {
+                state(row.invitation_records.id,1)
+              },
+              'click #no': function (e, value, row, index) {
+                state(row.invitation_records.id,2)
+              },
+            },
+            formatter: function (value, row, index) {
+              switch (row.invitation_records.state) {
+                case 0:
+                  return `<div class="btn-group" role="group" aria-label="Basic example">
+                <button id="ok" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-check-circle"></i></span></button>
+                <button id="no" type="button" class="btn btn-danger btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-times"></i></span></button>
+              </div>`;
+                  break;
+                case 1:
+                  return `<div class="btn-group" role="group" aria-label="Basic example">
+                <button id="no" type="button" class="btn btn-danger btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-times"></i></span></button>
+              </div>`;
+                  break;
+                case 2:
+                  return `<div class="btn-group" role="group" aria-label="Basic example">
+                <button id="ok" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-check-circle"></i></span></button>
+              </div>`;
+                  break;
+                default:
+                  break;
+              }
+
+              
+            }
+          }
+          
+        ]
+      ], //列
+      url: '/{{.setting.admin_path}}/invitation_records',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      toolbar: '#toolbar',
+      pagination: true, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      showRefresh: true,  //显示刷新按钮
+      showColumns: true, //是否显示列下拉列表按钮
+      showFullscreen: true, //是否显示全屏按钮
+
+      responseHandler: function (res) {  //response数据处理
+        return {
+          "rows": res.data.data,
+          "total": res.data.totle,
+        };
+      },
+
+      //搜索
+      queryParams: function (x) {
+
+        $("select[data-function='search']").each(function (i, domEle) {
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+        $("input[data-function='search']").each(function (i, domEle) {
+          const bindingDomID = $(domEle).attr("data-select-binding")
+          if (bindingDomID != undefined) {
+            x[$(bindingDomID).attr("name")] = $(bindingDomID).val()
+          }
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+
+        return x
+      },
+
+    })
+  }
+</script>
