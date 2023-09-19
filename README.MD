@@ -4,6 +4,9 @@ Quick Start:
 - https://goframe.org/pages/viewpage.action?pageId=1114399
 
 
+git commit -m "up"
+git push -u origin master
+
 http://127.0.0.1:8080/pay/e_pay_notify?pid=1040&trade_no=2023091415451087211&out_trade_no=1694677507984&type=wxpay&name=product&money=12.11&trade_status=TRADE_SUCCESS&param=10.00|6|3787|1694680294-12.11-6-95751&sign=b710567e1e26bc1d52547ae0cee51b1d&sign_type=MD5
 
 
