@@ -54,6 +54,15 @@ func (s *sPlan) DelPlan(ids []int) error {
 		return errors.New("订阅有节点在使用，无法删除！")
 	}
 
+	userCount, err := service.User().GetUserCountByGroupIds(ids)
+	if err != nil {
+		return err
+	}
+
+	if userCount > 0 {
+		return errors.New("订阅有用户在使用，无法删除！")
+	}
+
 	return s.Cornerstone.DelByIds(ids)
 }
 
@@ -87,7 +96,16 @@ func (s *sPlan) GetPlanShowAndResetTrafficMethod1List() (m []*entity.V2Plan, err
 	return m, err
 }
 
-// 删除
+// 获取可覆盖的订阅
+func (s *sPlan) GetPlanResetTrafficMethod1List() (m []*entity.V2Plan, err error) {
+	m = make([]*entity.V2Plan, 0)
+	err = s.Cornerstone.GetDB().
+		Where(dao.V2Plan.Columns().ResetTrafficMethod, 1).
+		OrderDesc("order_id").Scan(&m)
+	return m, err
+}
+
+// 根据id获取
 func (s *sPlan) GetPlanById(id int) (d *entity.V2Plan, err error) {
 	d = new(entity.V2Plan)
 	err = s.Cornerstone.GetOneById(id, d)

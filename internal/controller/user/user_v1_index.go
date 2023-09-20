@@ -17,7 +17,7 @@ func (c *ControllerV1) Index(ctx context.Context, req *v1.IndexReq) (res *v1.Ind
 		g.RequestFromCtx(ctx).Response.Write(err.Error())
 		return
 	}
-	plan, err := service.Plan().GetPlanById(user.GroupId)
+	plan, _ := service.Plan().GetPlanById(user.GroupId)
 	setTplUser(ctx,
 		"index",
 		g.Map{

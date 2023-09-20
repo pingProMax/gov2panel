@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	v1 "gov2panel/api/admin/v1"
 	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/dao"
@@ -18,6 +19,7 @@ import (
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/google/uuid"
 )
 
@@ -192,6 +194,9 @@ func (s *sUser) UpUserBanned1(ids []int) (err error) {
 
 // AE设置
 func (s *sUser) AEUser(data *entity.V2User) (err error) {
+	data.U = utils.GBToBytes(float64(data.U))
+	data.D = utils.GBToBytes(float64(data.D))
+	data.TransferEnable = utils.GBToBytes(float64(data.TransferEnable))
 	if data.Id != 0 {
 		if data.Password != "" {
 			user, err := s.GetUserByIdAndCheck(data.Id)
@@ -213,6 +218,15 @@ func (s *sUser) AEUser(data *entity.V2User) (err error) {
 func (s *sUser) GetUserById(id int) (u *entity.V2User, err error) {
 	u = new(entity.V2User)
 	err = s.Cornerstone.GetOneById(id, u)
+	return u, err
+}
+
+// 获取用户
+func (s *sUser) GetUserByTokenAndUDAndGTExpiredAt(token string) (u *entity.V2User, err error) {
+	u = new(entity.V2User)
+	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().Token, token).
+		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
+		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).Scan(u)
 	return u, err
 }
 
@@ -239,6 +253,64 @@ func (s *sUser) GetUserByIdAndCheck(id int) (u *entity.V2User, err error) {
 		return nil, errors.New("用户状态异常")
 	}
 	return
+}
+
+// 获取用户 订阅组下的用户数据
+func (s *sUser) GetUserListByGroupIds(groupIds []int) (u []*entity.V2User, err error) {
+	u = make([]*entity.V2User, 0)
+	err = s.Cornerstone.GetDB().
+		Where(dao.V2User.Columns().GroupId, groupIds).
+		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
+		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).
+		Where(dao.V2User.Columns().Banned, 0).
+		Wheref("`%s` != ''", dao.V2User.Columns().Uuid).
+		Scan(&u)
+	return
+}
+
+// 获取用户数量 订阅组下的用户数据
+func (s *sUser) GetUserCountByGroupIds(groupIds []int) (totle int, err error) {
+	totle, err = s.Cornerstone.GetDB().
+		Where(dao.V2User.Columns().GroupId, groupIds).
+		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
+		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).
+		Where(dao.V2User.Columns().Banned, 0).
+		Wheref("`%s` != ''", dao.V2User.Columns().Uuid).
+		Count()
+	return
+}
+
+// 更新用户 流量使用情况
+func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
+	colId := dao.V2User.Columns().Id
+	colU := dao.V2User.Columns().U
+	colD := dao.V2User.Columns().D
+	sql := fmt.Sprintf("UPDATE `%s` SET ", s.Cornerstone.Table)
+	sqlSetU := fmt.Sprintf("`%s` = CASE `%s` ", colU, colId)
+	sqlSetD := fmt.Sprintf("`%s` = CASE `%s` ", colD, colId)
+	sqlWhere := ""
+
+	for i, u := range data {
+		sqlSetU = sqlSetU + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colU, strconv.FormatInt(u.Upload, 10))
+		sqlSetD = sqlSetD + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colD, strconv.FormatInt(u.Download, 10))
+
+		if i != 0 {
+			sqlWhere = "," + sqlWhere
+		}
+
+		sqlWhere = sqlWhere + strconv.Itoa(u.UID)
+	}
+
+	sqlSetU = sqlSetU + "END, "
+	sqlSetD = sqlSetD + "END "
+
+	sqlWhere = fmt.Sprintf("WHERE `%s` IN (%s)", colId, sqlWhere)
+
+	sql = sql + sqlSetU + sqlSetD + sqlWhere
+	fmt.Println(sql)
+	_, err = g.DB().Exec(gctx.New(), sql)
+	return
+
 }
 
 // 用户登录

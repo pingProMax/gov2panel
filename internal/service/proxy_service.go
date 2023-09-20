@@ -24,7 +24,13 @@ type (
 		// 查询服务器中的订阅数量 根据订阅id
 		GetServiceCountByPlanId(PlanId []int) (int, error)
 		// id和type 获取节点信息
-		GetServiceById(id int) (data *entity.V2ProxyService, planList []*entity.V2Plan, routeList []*entity.V2ServerRoute, err error)
+		GetServiceAndRouteListById(id int) (data *entity.V2ProxyService, routeList []*entity.V2ServerRoute, err error)
+		// id 获取节点信息和订阅信息
+		GetServicePlanIdsById(id int) (data *entity.V2ProxyService, planIds []int, err error)
+		// id 获取节点信息 和订阅信息
+		GetServicePlanListById(id int) (data *entity.V2ProxyService, planList []*entity.V2Plan, err error)
+		// planId 获取节点信息
+		GetServiceListByPlanIdAndShow1(planId int) (data []*entity.V2ProxyService, err error)
 	}
 )
 

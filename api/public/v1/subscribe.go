@@ -5,7 +5,9 @@ import (
 )
 
 type SubscribeReq struct {
-	g.Meta `path:"/subscribe" tags:"Pay" method:"get" summary:"订阅"`
+	g.Meta `path:"/api/subscribe" tags:"Pay" method:"get" summary:"订阅"`
+	Token  string `json:"token"`
+	Flag   string `json:"flag"`
 }
 
 type SubscribeRes struct {

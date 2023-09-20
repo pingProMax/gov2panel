@@ -218,6 +218,9 @@
     console.log(data)
     $('#AEForm')[0].reset();
     if (data != null) {
+
+        
+        
         $("#AEModalLongTitle").text("编辑")
         $("#AEForm input[type='hidden'],#AEForm input[type='number'],#AEForm input[type='text'],#AEForm input[type='datetime-local'],#AEForm select,#AEForm textarea").each(function (i, v) {
 
@@ -239,8 +242,13 @@
                 }
             }
         })
-        
+
         $("#AEForm input[name='password']").val("")
+
+        $("#AEForm input[name='u']").val((data.user.u / 1073741824).toFixed(2))
+        $("#AEForm input[name='d']").val((data.user.d / 1073741824).toFixed(2))
+        $("#AEForm input[name='transfer_enable']").val((data.user.transfer_enable / 1073741824).toFixed(2))
+
 
     } else {
         $("#AEModalLongTitle").text("添加")
@@ -648,6 +656,7 @@
       showColumns: true, //是否显示列下拉列表按钮
       showFullscreen: true, //是否显示全屏按钮
       responseHandler: function (res) {  //response数据处理
+
         return {
           "total": res.data.totle,
           "rows": res.data.user_list

@@ -24,7 +24,7 @@
       </div>
       <div class="modal-body">
         <form id="AEForm">
-          <input name="id" type="hidden">
+          <input name="id" id="aeid" type="hidden">
           <div class="row">
             <div class="col">
               <div class="position-relative form-group">
@@ -120,9 +120,9 @@
         }
       })
 
-      $("#ae_code_id").attr('readonly', 'true')
     } else {
       $("#AEModalLongTitle").text("添加")
+      $("#aeid").val("")
 
       
     }

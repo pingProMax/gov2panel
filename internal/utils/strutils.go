@@ -32,7 +32,7 @@ func RechargeOrderNo(price float64, payId int) string {
 
 // bytes 转 GB
 func BytesToGB(bytes int64) float64 {
-	gigabytes := float64(bytes) / 1073741824
+	gigabytes := Decimal(float64(bytes) / 1073741824)
 	return gigabytes
 }
 

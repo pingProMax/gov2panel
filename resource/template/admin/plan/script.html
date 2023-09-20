@@ -47,7 +47,7 @@
             <div class="col">
               <div class="position-relative form-group">
                 <label>速度限制(Mbps)</label>
-                <input name="speed_limit" placeholder="速度限制(Mbps)" type="number" class="form-control">
+                <input name="speed_limit" placeholder="小于等于0不限制" type="number" class="form-control">
               </div>
             </div>
             <div class="col">
@@ -92,7 +92,7 @@
           </div>
           <div class="position-relative form-group">
             <label>最大用户数量</label>
-            <input name="capacity_limit" placeholder="最大用户数量" type="number" class="form-control">
+            <input name="capacity_limit" placeholder="小于等于0不限制" type="number" class="form-control">
           </div>
           <div class="position-relative form-group">
             <label>备注</label>
@@ -160,7 +160,6 @@
         }
       })
 
-      $("#ae_code_id").attr('readonly', 'true')
     } else {
       $("#AEModalLongTitle").text("添加")
       $("#aeid").val("")

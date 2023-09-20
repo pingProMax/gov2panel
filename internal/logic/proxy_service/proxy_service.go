@@ -164,7 +164,54 @@ func (s *sProxyService) GetServiceCountByPlanId(PlanId []int) (int, error) {
 }
 
 // id和type 获取节点信息
-func (s *sProxyService) GetServiceById(id int) (data *entity.V2ProxyService, planList []*entity.V2Plan, routeList []*entity.V2ServerRoute, err error) {
+func (s *sProxyService) GetServiceAndRouteListById(id int) (data *entity.V2ProxyService, routeList []*entity.V2ServerRoute, err error) {
+	data = new(entity.V2ProxyService)
+	err = s.Cornerstone.GetOneById(id, data)
+	if err != nil {
+		return
+	}
+
+	var routeIdStrSlice []string
+	json.Unmarshal([]byte(data.RouteId), &routeIdStrSlice)
+
+	if len(routeIdStrSlice) > 0 {
+		routeList = make([]*entity.V2ServerRoute, 0)
+		err = s.Cornerstone.GetDBT(dao.V2ServerRoute.Table()).Where(dao.V2ServerRoute.Columns().Id, routeIdStrSlice).Scan(&routeList)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+// id 获取节点信息和订阅信息
+func (s *sProxyService) GetServicePlanIdsById(id int) (data *entity.V2ProxyService, planIds []int, err error) {
+	data = new(entity.V2ProxyService)
+	err = s.Cornerstone.GetOneById(id, data)
+	if err != nil {
+		return
+	}
+
+	var planIdStrSlice []string
+	err = json.Unmarshal([]byte(data.PlanId), &planIdStrSlice)
+
+	planIds = make([]int, len(planIdStrSlice))
+
+	// 遍历 []string 切片并将每个字符串转换为整数
+	for i, str := range planIdStrSlice {
+		num, err := strconv.Atoi(str)
+		if err != nil {
+			continue
+		}
+		planIds[i] = num
+	}
+
+	return
+}
+
+// id 获取节点信息 和订阅信息
+func (s *sProxyService) GetServicePlanListById(id int) (data *entity.V2ProxyService, planList []*entity.V2Plan, err error) {
 	data = new(entity.V2ProxyService)
 	err = s.Cornerstone.GetOneById(id, data)
 	if err != nil {
@@ -182,16 +229,14 @@ func (s *sProxyService) GetServiceById(id int) (data *entity.V2ProxyService, pla
 		}
 	}
 
-	var routeIdStrSlice []string
-	json.Unmarshal([]byte(data.RouteId), &routeIdStrSlice)
+	return
+}
 
-	if len(routeIdStrSlice) > 0 {
-		routeList = make([]*entity.V2ServerRoute, 0)
-		err = s.Cornerstone.GetDBT(dao.V2ServerRoute.Table()).Where(dao.V2ServerRoute.Columns().Id, routeIdStrSlice).Scan(&routeList)
-		if err != nil {
-			return
-		}
-	}
+// planId 获取节点信息
+func (s *sProxyService) GetServiceListByPlanIdAndShow1(planId int) (data []*entity.V2ProxyService, err error) {
+	whereSqlStr := dao.V2ProxyService.Columns().PlanId + " like " + "'%\"" + strconv.Itoa(planId) + "\"%'"
+	data = make([]*entity.V2ProxyService, 0)
 
+	err = s.Cornerstone.GetDB().Where(whereSqlStr).Where(dao.V2ProxyService.Columns().Show, 1).Scan(&data)
 	return
 }

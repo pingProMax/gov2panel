@@ -39,15 +39,15 @@
         <!-- List group -->
         <!-- Card body -->
         <div class="card-body">
-          {{if .data}}
+          {{if eq .data.Id 0}}
+            <a href="/user/plan">请购买订阅</a>
+          {{else}}
             <h2>{{.data.Name}}</h2>
             <p class="card-text" id="expired_at_id">到期时间:{{.user.ExpiredAt}}</p>
             <div class="progress">
               <div id="jdt" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
             </div>
             <p class="card-text">已用：{{.total_used_traffic}}GB / 总计：{{.transfer_enable}}GB</p>
-          {{else}}
-            <a href="/user/plan">请购买订阅</a>
           {{end}}
           
         </div>
@@ -57,7 +57,7 @@
 </div>
 
 
-
+{{if ne .data.Id 0}}
 <div class="container-fluid ">
   <div class="row">
   <div class="col">
@@ -81,7 +81,7 @@
               <th scope="row">
                 <div class="media align-items-center">
                   <a href="#" class="avatar rounded-circle mr-3">
-                    <img alt="Image placeholder" src="../../assets/img/theme/bootstrap.jpg">
+                    <img alt="Image placeholder" src="https://raw.githubusercontent.com/2dust/v2rayN/master/v2rayN/v2rayN/Resources/NotifyIcon1.ico">
                   </a>
                   <div class="media-body">
                     <span class="name mb-0 text-sm">v2rayN</span>
@@ -89,32 +89,14 @@
                 </div>
               </th>
               <td class="budget">
-                https://www.google.com/api/dy?token=dsfdsfdsfdfsfdsfsdfds
+                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayn
               </td>
               
               <td class="text-right">
                 复制
               </td>
             </tr>
-            <tr>
-              <th scope="row">
-                <div class="media align-items-center">
-                  <a href="#" class="avatar rounded-circle mr-3">
-                    <img alt="Image placeholder" src="../../assets/img/theme/angular.jpg">
-                  </a>
-                  <div class="media-body">
-                    <span class="name mb-0 text-sm">ClashX</span>
-                  </div>
-                </div>
-              </th>
-              <td class="budget">
-                https://www.google.com/api/dy?token=dsfdsfdsfdfsfdsfsdfds
-              </td>
-              
-              <td class="text-right">
-                复制
-              </td>
-            </tr>
+            
             
           </tbody>
         </table>
@@ -124,3 +106,4 @@
   </div>
 </div>
 </div>
+{{end}}

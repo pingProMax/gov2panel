@@ -22,6 +22,8 @@ type (
 		GetPlanShowList() (m []*entity.V2Plan, err error)
 		// 获取显示的订阅 可覆盖的
 		GetPlanShowAndResetTrafficMethod1List() (m []*entity.V2Plan, err error)
+		// 获取可覆盖的订阅
+		GetPlanResetTrafficMethod1List() (m []*entity.V2Plan, err error)
 		// 删除
 		GetPlanById(id int) (d *entity.V2Plan, err error)
 		// 用户购买套餐处理

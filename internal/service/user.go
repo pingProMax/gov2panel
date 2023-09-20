@@ -38,10 +38,18 @@ type (
 		AEUser(data *entity.V2User) (err error)
 		// 获取用户
 		GetUserById(id int) (u *entity.V2User, err error)
+		// 获取用户
+		GetUserByTokenAndUDAndGTExpiredAt(token string) (u *entity.V2User, err error)
 		// 邀请码获取 邀请用户id
 		GetUserByCommissionCode(commissionCode string) (u *entity.V2User, err error)
 		// 获取用户并且检测用户装
 		GetUserByIdAndCheck(id int) (u *entity.V2User, err error)
+		// 获取用户 订阅组下的用户数据
+		GetUserListByGroupIds(groupIds []int) (u []*entity.V2User, err error)
+		// 获取用户数量 订阅组下的用户数据
+		GetUserCountByGroupIds(groupIds []int) (totle int, err error)
+		// 更新用户 流量使用情况
+		UpUserUAndDBy(data []model.UserTraffic) (err error)
 		// 用户登录
 		Login(userName, passwd string) (user *entity.V2User, err error)
 		// 获取用户数据

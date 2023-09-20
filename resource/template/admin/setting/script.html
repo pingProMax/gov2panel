@@ -86,10 +86,10 @@
                 }
             }
         })
-        
+        $("#ae_code_id").attr('readonly', 'readonly')
     } else {
+        $("#ae_code_id").removeAttr('readonly')
         $("#AEModalLongTitle").text("添加")
-        
         
     }
     $('#AEModal').modal('show')

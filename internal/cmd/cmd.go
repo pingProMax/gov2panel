@@ -49,7 +49,7 @@ var (
 				)
 				group.Middleware(user.Middleware().CORS) //跨域处理
 
-				group.Group("/api", func(group *ghttp.RouterGroup) {
+				group.Group("/api/server", func(group *ghttp.RouterGroup) {
 					group.Middleware(func(r *ghttp.Request) { //设置参数
 						// 中间件处理逻辑
 						d, err := service.Setting().GetSettingAllMap()

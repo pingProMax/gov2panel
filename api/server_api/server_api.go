@@ -11,7 +11,8 @@ import (
 )
 
 type IServerApiV1 interface {
-	Api(ctx context.Context, req *v1.ApiReq) (res *v1.ApiRes, err error)
+	Config(ctx context.Context, req *v1.ConfigReq) (res *v1.ConfigRes, err error)
+	User(ctx context.Context, req *v1.UserReq) (res *v1.UserRes, err error)
 }
 
 
