@@ -1,6 +1,6 @@
-# GoFrame Template For SingleRepo 
+# GoFrame 开发的v2ray面板
 
-Quick Start:  
+开发文档:  
 - https://goframe.org/pages/viewpage.action?pageId=1114399  
 
 
