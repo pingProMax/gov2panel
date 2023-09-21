@@ -117,8 +117,8 @@
   function AE(data) {
     $('#AEForm')[0].reset();
     if (data != null) {
-      console.log(data.match)
-      data.match = JSON.parse(data.match).join('\r\n')
+      
+      
       $("#AEModalLongTitle").text("编辑")
       $("#AEForm input[type='hidden'],#AEForm input[type='number'],#AEForm input[type='text'],#AEForm select,#AEForm textarea").each(function (i, v) {
         for (let key in data) {
@@ -145,6 +145,9 @@
       }else{
         $("#action_value_div_id").show()
       }
+
+      $("#AEForm textarea[name='match']").val(JSON.parse(data.match).join('\r\n'))
+      
 
     } else {
 

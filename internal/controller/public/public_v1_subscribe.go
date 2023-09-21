@@ -11,6 +11,7 @@ import (
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error) {
@@ -37,16 +38,19 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 
 			s := map[string]string{
 				"v":    "2",
-				"add":  service.Host,
-				"ps":   service.Name,
-				"port": service.Port,
-				"id":   user.Uuid,
+				"add":  service.Host, //链接地址
+				"ps":   service.Name, //名字
+				"port": service.Port, //端口
+				"id":   user.Uuid,    //uuid
 				"aid":  "0",
-				"net":  serviceJson["network"].(string),
-				"type": "none",
-				"path": "",
-				"tls":  "",
-				"host": "",
+				"net":  gconv.String(serviceJson["net"]),
+				"type": gconv.String(serviceJson["type"]),
+				"tls":  gconv.String(serviceJson["tls"]),
+				"sni":  gconv.String(serviceJson["sni"]),
+				"alpn": gconv.String(serviceJson["alpn"]),
+				"host": gconv.String(serviceJson["host"]),
+				"path": gconv.String(serviceJson["path"]),
+				"scy":  gconv.String(serviceJson["scy"]),
 			}
 			ds, err := json.Marshal(s)
 			if err != nil {

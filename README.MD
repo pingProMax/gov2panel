@@ -5,21 +5,96 @@
 
 
 
-目前仅支持协议：  
-v2ray/vmess  
-
-数据：
+数据示例：
 ``` json  
+tcp:
 {
-	"server_port": 46419,
-	"network": "tcp",
-	"networkSettings": null,
-	"tls": 0,
-	"base_config": {
-		"push_interval": 60,
-		"pull_interval": 60
-	}
+  "port": "12345",
+  "scy": "auto",
+  "net": "tcp",
+  "type": "none",
+  "host": "",
+  "path": "",
+  "tls": "",
+  "sni": "",
+  "alpn": ""
 }
+
+tcp+tls:
+{
+  "port": "12345",
+  "scy": "auto",
+  "net": "tcp",
+  "type": "none",
+  "host": "",
+  "path": "",
+  "tls": "tls",
+  "sni": "xxxx.com",
+  "alpn": ""
+}
+
+tcp+http:
+{
+  "port": "12345",
+  "scy": "auto",
+  "net": "tcp",
+  "type": "http",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "",
+  "sni": "",
+  "alpn": "",
+  "header": {
+    "type": "http",
+    "request": {},
+    "response": {}
+  }
+}
+
+ws:
+{
+  "port": "12345",
+  "scy": "auto",
+  "net": "ws",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "",
+  "sni": "",
+  "alpn": ""
+}
+
+ws+tls:
+{
+  "port": "12345",
+  "scy": "auto",
+  "net": "ws",
+  "type": "none",
+  "host": "xxxx.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "xxxx.com",
+  "alpn": ""
+}
+
+shadowsocks2022
+{
+  "cypher_method": "12345",
+  "obfs": "",
+  "server_key":"",
+  "obfs_settings": {
+	"path":"",
+	"host":""
+  }
+}
+
+trojan
+{
+	"host":"",
+	"port":"",
+	"server_name":"sni.com",
+}
+
 ``` 
 
 
