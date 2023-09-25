@@ -91,6 +91,10 @@ func (c *ControllerV1) Push(ctx context.Context, req *v1.PushReq) (res *v1.PushR
 	decoder.Decode(&req.Data)
 
 	err = service.User().UpUserUAndDBy(req.Data)
+	if err != nil {
+		return
+	}
+	err = service.ProxyService().CacheServiceFlow(ghttp.RequestFromCtx(ctx).Get("node_id").Int(), req.Data)
 
 	return
 }

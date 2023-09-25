@@ -19,6 +19,7 @@ import (
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/google/uuid"
 )
@@ -294,11 +295,12 @@ func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 		sqlSetU = sqlSetU + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colU, strconv.FormatInt(u.Upload, 10))
 		sqlSetD = sqlSetD + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colD, strconv.FormatInt(u.Download, 10))
 
-		if i != 0 {
-			sqlWhere = "," + sqlWhere
+		if i == 0 {
+			sqlWhere = strconv.Itoa(u.UID)
+		} else {
+			sqlWhere = sqlWhere + "," + strconv.Itoa(u.UID)
 		}
 
-		sqlWhere = sqlWhere + strconv.Itoa(u.UID)
 	}
 
 	sqlSetU = sqlSetU + "END, "
@@ -309,6 +311,28 @@ func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 	sql = sql + sqlSetU + sqlSetD + sqlWhere
 	fmt.Println(sql)
 	_, err = g.DB().Exec(gctx.New(), sql)
+	if err != nil {
+		return
+	}
+
+	//用户流量使用缓存
+
+	ctx := gctx.New()
+	//服务器当天的流量使用情况 (记录7天的)
+	for _, v := range data {
+
+		ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(v.UID), utils.GetDateNowStr())
+		userFlow, err := gcache.Get(ctx, ketStr)
+		if err != nil {
+			return err
+		}
+
+		err = gcache.Set(ctx, ketStr, userFlow.Float64()+utils.BytesToGB(v.Upload+v.Download), 169*time.Hour)
+		if err != nil {
+			return err
+		}
+	}
+
 	return
 
 }
@@ -471,6 +495,66 @@ func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserU
 	}
 
 	_, err = s.Cornerstone.GetDB().Data(g.Map{dao.V2User.Columns().Password: req.NewPasswd}).Where(dao.V2User.Columns().Id, req.TUserID).Update()
+
+	return
+}
+
+// 获取当月注册量
+func (s *sUser) GetNowMonthCount() (count int, err error) {
+	timeNow := time.Now()
+
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s",
+		dao.V2RechargeRecords.Columns().CreatedAt,
+		strconv.Itoa(timeNow.Year()),
+		dao.V2RechargeRecords.Columns().CreatedAt,
+		strconv.Itoa(int(timeNow.Month())),
+	)
+	count, err = s.Cornerstone.GetDB().Where(sqlStr).Count()
+
+	return
+}
+
+// 获取当月每一天注册量
+func (s *sUser) GetNowMonthDayCount() (count []int, err error) {
+	count = make([]int, 0)
+	timeNow := time.Now()
+	createAt := dao.V2RechargeRecords.Columns().CreatedAt
+
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s and (",
+		createAt,
+		strconv.Itoa(timeNow.Year()),
+		createAt,
+		strconv.Itoa(int(timeNow.Month())),
+	)
+
+	for i := timeNow.Day(); i > 0; i-- {
+		sqlStr = sqlStr + fmt.Sprintf("DAY(%s) = %s ", createAt, strconv.Itoa(i))
+		if i != 1 {
+			sqlStr = sqlStr + "or "
+		}
+	}
+
+	sqlStr = sqlStr + ")"
+
+	result, err := s.Cornerstone.GetDB().
+		Fields(fmt.Sprintf("DAY(%s) AS creation_date, COUNT(*) AS daily_count", createAt)).
+		Where(sqlStr).
+		Group(fmt.Sprintf("DAY(%s)", createAt)).
+		OrderAsc("creation_date").All()
+	if err != nil {
+		return
+	}
+
+	for i := timeNow.Day(); i > 0; i-- {
+
+		var iDayCount int
+		for _, v := range result {
+			if v["creation_date"].Int() == i {
+				iDayCount = v["daily_count"].Int()
+			}
+		}
+		count = append(count, iDayCount)
+	}
 
 	return
 }

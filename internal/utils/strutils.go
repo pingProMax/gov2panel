@@ -66,3 +66,17 @@ func IgnoreErrNoRows(err error) error {
 		return err
 	}
 }
+
+// 获取当前日期字符串 2023922
+func GetDateNowStr() string {
+	timeNow := time.Now()
+	return fmt.Sprintf("%s%s%s", strconv.Itoa(timeNow.Year()), strconv.Itoa(int(timeNow.Month())), strconv.Itoa(timeNow.Day())) // = 2023922
+}
+
+// 获取当前日期字符串 2023922 - day
+func GetDateNowMinusDayStr(day int) string {
+	timeNow := time.Now()
+	timeNow = timeNow.Add(-time.Duration(day) * 24 * time.Hour)
+
+	return fmt.Sprintf("%s%s%s", strconv.Itoa(timeNow.Year()), strconv.Itoa(int(timeNow.Month())), strconv.Itoa(timeNow.Day())) // = 2023922
+}

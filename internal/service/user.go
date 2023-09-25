@@ -56,6 +56,10 @@ type (
 		GetUserList(req *v1.UserReq, orderBy, orderDirection string, offset, limit int) (items []*model.UserInfo, total int, err error)
 		// 修改密码
 		UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error)
+		// 获取当月注册量
+		GetNowMonthCount() (count int, err error)
+		// 获取当月每一天注册量
+		GetNowMonthDayCount() (count []int, err error)
 	}
 )
 

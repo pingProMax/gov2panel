@@ -253,6 +253,11 @@
     d['plan_id'] = $("#limit_plan_id").selectpicker('val')
     d['route_id'] = $("#limit_route_id").selectpicker('val')
 
+    if (d.agreement.split("/").length <2) {
+      notify('danger', '协议填写错误，请查看文档')
+      return
+    }
+
     $.ajax({
       type: "POST",
       url: "/{{.setting.admin_path}}/service/ae",

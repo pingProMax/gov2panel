@@ -2,10 +2,16 @@ package admin
 
 import (
 	"context"
+	"fmt"
+	"sort"
+	"strings"
 
+	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/util/gconv"
 
 	v1 "gov2panel/api/admin/v1"
 )
@@ -38,5 +44,69 @@ func (c *ControllerV1) ProxyServiceDel(ctx context.Context, req *v1.ProxyService
 	if err != nil {
 		return res, err
 	}
+	return res, err
+}
+
+// 服务器流量
+func (c *ControllerV1) ProxyServiceFlow(ctx context.Context, req *v1.ProxyServiceFlowReq) (res *v1.ProxyServiceFlowRes, err error) {
+	res = &v1.ProxyServiceFlowRes{}
+	res.ServiceFlowTop = make([]*model.ProxyServiceFlow, 0)
+	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+		Id:   999,
+		Name: "test1",
+		Flow: 3564444444000,
+	})
+	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+		Id:   998,
+		Name: "test2",
+		Flow: 6564444444000,
+	})
+	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+		Id:   998,
+		Name: "test3",
+		Flow: 5564444444000,
+	})
+
+	cacheKeyS, err := gcache.KeyStrings(ctx)
+	if err != nil {
+		return res, err
+	}
+
+	serviceList, err := service.ProxyService().GetProxyServiceAllList()
+	if err != nil {
+		return res, err
+	}
+
+	for _, v := range cacheKeyS {
+		if strings.HasSuffix(v, fmt.Sprintf("_%s_FLOW", req.Date)) {
+			idStr := strings.ReplaceAll(v, "SERVER_", "")
+			idStr = strings.ReplaceAll(idStr, fmt.Sprintf("_%s_FLOW", req.Date), "")
+			id := gconv.Int(idStr)
+
+			flow, err := gcache.Get(ctx, v)
+			if err != nil {
+				return res, err
+			}
+
+			for _, service := range serviceList {
+				if service.Id == id {
+					f := &model.ProxyServiceFlow{
+						Id:   id,
+						Name: service.Name,
+						Flow: flow.Int64(),
+					}
+					res.ServiceFlowTop = append(res.ServiceFlowTop, f)
+					break
+				}
+
+			}
+		}
+	}
+
+	// 使用 sort.Slice 函数进行排序
+	sort.Slice(res.ServiceFlowTop, func(i, j int) bool {
+		return res.ServiceFlowTop[i].Flow > res.ServiceFlowTop[j].Flow
+	})
+
 	return res, err
 }

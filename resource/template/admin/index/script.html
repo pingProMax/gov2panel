@@ -3,4 +3,150 @@
 <script src="/resource/assets/vendor/chart.js/dist/Chart.extension.js"></script>
 
 <!-- Demo JS - remove this in your project -->
-<script src="/resource/assets/js/demo.min.js"></script>
+<!-- <script src="/resource/assets/js/demo.min.js"></script> -->
+
+
+<script>
+    let nowFlowData ;
+    let reduce1FlowData ;
+
+    let chartLabels = {{.data.ChartLabels}};
+    let dayUserCount = {{.data.DayUserCount}};
+    let dayIncomeSum = {{.data.DayIncomeSum}};
+
+    $(function(){
+        var currentDate = new Date(); // 创建一个表示当前日期和时间的Date对象
+
+        var year = currentDate.getFullYear(); // 获取年份
+        var month = currentDate.getMonth() + 1; // 获取月份（注意月份是从0开始的，所以要加1）
+        var day = currentDate.getDate(); // 获取日期
+        var currentDateStr = `${year}${month}${day}`; // 将年、月、日拼接成字符串
+        nowFlowData = getFlow(currentDateStr,0)
+
+        // 将日期减去一天
+        var currentDate1 = new Date(); // 创建一个表示当前日期和时间的Date对象
+        currentDate1.setDate(currentDate1.getDate() - 1);
+
+        var year = currentDate1.getFullYear(); // 获取年份
+        var month = currentDate1.getMonth() + 1; // 获取月份（注意月份是从0开始的，所以要加1）
+        var day = currentDate1.getDate(); // 获取日期
+        var currentDate1Str = `${year}${month}${day}`; // 将年、月、日拼接成字符串
+        reduce1FlowData = getFlow(currentDate1Str,1)
+        
+
+        
+        
+
+        var ctx = document.getElementById("chart-sales-dark").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '# 收入',
+                    data: dayIncomeSum,
+                    backgroundColor: [
+                        'rgba(30,144,255, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(30,144,255, 0.2)',
+                    ],
+                    borderWidth: 1
+                },
+                {
+                    label: '# 注册量',
+                    data: dayUserCount,
+                    backgroundColor: [
+                        'rgba(255,0,0, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255,0,0, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                        }
+                    }]
+                }
+            }
+        });
+        
+    })
+
+    function reduce1Flow() {
+        flowHtml(reduce1FlowData)
+    }
+
+    function nowFlow() {
+        flowHtml(nowFlowData)
+    }
+
+    function flowHtml(data) {
+        $("#flow_top_ul").empty()
+        let top = 0 ;
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (index == 0) {
+                top = element.flow
+            }
+
+            let widthNumber = 0
+            widthNumber = (element.flow / top) * 100
+            $("#flow_top_ul").append(`
+                <li class="list-group-item px-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                    <h5>${element.name} <span class="float-right">${Math.round((element.flow / 1073741824) * 100) / 100 } GB</span></h5>
+                    <div class="progress progress-xs mb-0">
+                        <div class="progress-bar bg-green" role="progressbar" style="width: ${Math.round(widthNumber * 100) / 100 }%;"></div>
+                    </div>
+                    </div>
+                </div>
+                </li>
+            `)
+        }
+
+        
+    }
+
+    function getFlow(dateStr,types) {
+        $.ajax({
+            type: "POST",
+            data:{date:dateStr},
+            url: "/{{.setting.admin_path}}/service/flow",
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 0) {
+                    switch (types) {
+                        case 0:
+                            nowFlowData = data.data.service_flow_top
+                            flowHtml(nowFlowData)
+                            break;
+                        case 1:
+                            reduce1FlowData = data.data.service_flow_top
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    notify('danger', data.message)
+                }
+                
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                notify('danger', errorThrown)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+
+            }
+        });
+    }
+
+</script>

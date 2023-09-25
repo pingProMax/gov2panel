@@ -15,6 +15,8 @@ type (
 	IProxyService interface {
 		// 获取所有
 		GetProxyServiceList(req *v1.ProxyServiceReq, orderBy, orderDirection string, offset, limit int) (m []*model.ProxyServiceInfo, total int, err error)
+		// 获取所有服务器信息
+		GetProxyServiceAllList() (m []*entity.V2ProxyService, err error)
 		// AE设置
 		AEProxyService(data *entity.V2ProxyService) (err error)
 		// 删除
@@ -31,6 +33,10 @@ type (
 		GetServicePlanListById(id int) (data *entity.V2ProxyService, planList []*entity.V2Plan, err error)
 		// planId 获取节点信息
 		GetServiceListByPlanIdAndShow1(planId int) (data []*entity.V2ProxyService, err error)
+		// 获取节点数量
+		GetServiceCount() (data int, err error)
+		// 缓存 服务器当前用户数量
+		CacheServiceFlow(nodeId int, userTraffic []model.UserTraffic) (err error)
 	}
 )
 

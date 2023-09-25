@@ -14,6 +14,7 @@ type IUserV1 interface {
 	Coupon(ctx context.Context, req *v1.CouponReq) (res *v1.CouponRes, err error)
 	Index(ctx context.Context, req *v1.IndexReq) (res *v1.IndexRes, err error)
 	Knowledge(ctx context.Context, req *v1.KnowledgeReq) (res *v1.KnowledgeRes, err error)
+	Node(ctx context.Context, req *v1.NodeReq) (res *v1.NodeRes, err error)
 	Plan(ctx context.Context, req *v1.PlanReq) (res *v1.PlanRes, err error)
 	Plan2(ctx context.Context, req *v1.Plan2Req) (res *v1.Plan2Res, err error)
 	Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes, err error)

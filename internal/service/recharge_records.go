@@ -25,6 +25,10 @@ type (
 		GetRechargeRecordsListByUserId(userId int, orderBy, orderDirection string, offset, limit int) (m []*entity.V2RechargeRecords, total int, err error)
 		// 更新备注
 		UpRechargeRecordsRemarksById(id int, remarks string) (err error)
+		// 获取当月收入
+		GetNowMonthSumAmount() (amount float64, err error)
+		// 获取当月每一天的收入
+		GetNowMonthDaySum() (data []int, err error)
 	}
 )
 

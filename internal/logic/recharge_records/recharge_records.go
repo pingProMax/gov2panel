@@ -9,11 +9,14 @@ import (
 	d "gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
 	"gov2panel/internal/utils"
+	"strconv"
+	"time"
 
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -194,4 +197,69 @@ func (s *sRechargeRecords) GetRechargeRecordsListByUserId(userId int, orderBy, o
 func (s *sRechargeRecords) UpRechargeRecordsRemarksById(id int, remarks string) (err error) {
 	_, err = s.Cornerstone.GetDB().Data(dao.V2RechargeRecords.Columns().Remarks, remarks).Where(dao.V2RechargeRecords.Columns().Id, id).Update()
 	return err
+}
+
+// 获取当月收入
+func (s *sRechargeRecords) GetNowMonthSumAmount() (amount float64, err error) {
+	var amountSum *gvar.Var
+	timeNow := time.Now()
+
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s",
+		dao.V2RechargeRecords.Columns().CreatedAt,
+		strconv.Itoa(timeNow.Year()),
+		dao.V2RechargeRecords.Columns().CreatedAt,
+		strconv.Itoa(int(timeNow.Month())),
+	)
+	amountSum, err = s.Cornerstone.GetDB().Fields(fmt.Sprintf("SUM(%s)", dao.V2RechargeRecords.Columns().Amount)).Where(sqlStr).Value()
+	if err != nil {
+		return 0, err
+	}
+
+	amount = amountSum.Float64()
+
+	return
+}
+
+// 获取当月每一天的收入
+func (s *sRechargeRecords) GetNowMonthDaySum() (data []int, err error) {
+	data = make([]int, 0)
+	timeNow := time.Now()
+	createAt := dao.V2RechargeRecords.Columns().CreatedAt
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s and (",
+		createAt,
+		strconv.Itoa(timeNow.Year()),
+		createAt,
+		strconv.Itoa(int(timeNow.Month())),
+	)
+
+	for i := timeNow.Day(); i > 0; i-- {
+		sqlStr = sqlStr + fmt.Sprintf("DAY(%s) = %s ", createAt, strconv.Itoa(i))
+		if i != 1 {
+			sqlStr = sqlStr + "or "
+		}
+	}
+
+	sqlStr = sqlStr + ")"
+
+	result, err := s.Cornerstone.GetDB().
+		Fields(fmt.Sprintf("DAY(%s) AS creation_date, sum(%s) AS daily_amount", createAt, dao.V2RechargeRecords.Columns().Amount)).
+		Where(sqlStr).
+		Group(fmt.Sprintf("DAY(%s)", createAt)).
+		OrderAsc("creation_date").All()
+	if err != nil {
+		return
+	}
+
+	for i := timeNow.Day(); i > 0; i-- {
+
+		var iDayCount int
+		for _, v := range result {
+			if v["creation_date"].Int() == i {
+				iDayCount = v["daily_amount"].Int()
+			}
+		}
+		data = append(data, iDayCount)
+	}
+
+	return
 }

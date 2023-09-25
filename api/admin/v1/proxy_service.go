@@ -34,3 +34,11 @@ type ProxyServiceDelReq struct {
 type ProxyServiceDelRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
+
+type ProxyServiceFlowReq struct {
+	g.Meta `path:"/service/flow" tags:"ProxyService" method:"post" summary:"获取服务器流量使用排行榜"`
+	Date   string `json:"date"`
+}
+type ProxyServiceFlowRes struct {
+	ServiceFlowTop []*model.ProxyServiceFlow `json:"service_flow_top"`
+}

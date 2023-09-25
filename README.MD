@@ -8,6 +8,7 @@
 数据示例：
 ``` json  
 tcp:
+协议:v2ray/vmess
 {
   "port": "12345",
   "scy": "auto",
@@ -21,6 +22,7 @@ tcp:
 }
 
 tcp+tls:
+协议:v2ray/vmess
 {
   "port": "12345",
   "scy": "auto",
@@ -34,6 +36,7 @@ tcp+tls:
 }
 
 tcp+http:
+协议:v2ray/vmess
 {
   "port": "12345",
   "scy": "auto",
@@ -52,6 +55,7 @@ tcp+http:
 }
 
 ws:
+协议:v2ray/vmess
 {
   "port": "12345",
   "scy": "auto",
@@ -65,6 +69,7 @@ ws:
 }
 
 ws+tls:
+协议:v2ray/vmess
 {
   "port": "12345",
   "scy": "auto",
@@ -78,6 +83,7 @@ ws+tls:
 }
 
 shadowsocks2022
+协议:shadowsocks/ss2022
 {
   "cypher_method": "12345",
   "obfs": "",
@@ -88,6 +94,7 @@ shadowsocks2022
   }
 }
 
+协议:trojan/trojan
 trojan
 {
 	"host":"",

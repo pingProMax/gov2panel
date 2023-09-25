@@ -2,13 +2,19 @@ package proxy_service
 
 import (
 	"encoding/json"
+	"fmt"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
+	"gov2panel/internal/utils"
 	"strconv"
+	"time"
+
+	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/os/gctx"
 )
 
 type sProxyService struct {
@@ -115,6 +121,14 @@ func (s *sProxyService) GetProxyServiceList(req *v1.ProxyServiceReq, orderBy, or
 	}
 
 	return m, total, err
+}
+
+// 获取所有服务器信息
+func (s *sProxyService) GetProxyServiceAllList() (m []*entity.V2ProxyService, err error) {
+
+	m = make([]*entity.V2ProxyService, 0)
+	err = s.Cornerstone.GetDB().Scan(&m)
+	return m, err
 }
 
 // AE设置
@@ -237,6 +251,52 @@ func (s *sProxyService) GetServiceListByPlanIdAndShow1(planId int) (data []*enti
 	whereSqlStr := dao.V2ProxyService.Columns().PlanId + " like " + "'%\"" + strconv.Itoa(planId) + "\"%'"
 	data = make([]*entity.V2ProxyService, 0)
 
-	err = s.Cornerstone.GetDB().Where(whereSqlStr).Where(dao.V2ProxyService.Columns().Show, 1).Scan(&data)
+	err = s.Cornerstone.GetDB().Where(whereSqlStr).Where(dao.V2ProxyService.Columns().Show, 1).OrderDesc(dao.V2ProxyService.Columns().OrderId).Scan(&data)
+	return
+}
+
+// 获取节点数量
+func (s *sProxyService) GetServiceCount() (data int, err error) {
+
+	data, err = s.Cornerstone.GetDB().Count()
+	return
+}
+
+// 缓存 服务器当前用户数量
+func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []model.UserTraffic) (err error) {
+	timeNow := time.Now()
+	ctx := gctx.New()
+
+	//服务器当前在线数量
+	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_ONLINE_USER", strconv.Itoa(nodeId)), len(userTraffic), 3600*time.Second)
+	if err != nil {
+		return
+	}
+
+	//服务器最后提交数据时间
+	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(nodeId)), timeNow.Unix(), 3600*time.Second)
+	if err != nil {
+		return
+	}
+
+	var upload int64
+	var download int64
+	for _, v := range userTraffic {
+		upload = upload + v.Upload
+		download = download + v.Download
+	}
+
+	//服务器当天的流量使用情况 (记录两天的)
+	cacheServerFlowKey := fmt.Sprintf("SERVER_%s_%s_FLOW", strconv.Itoa(nodeId), utils.GetDateNowStr())
+	serverFlow, err := gcache.Get(ctx, cacheServerFlowKey)
+	if err != nil {
+		return
+	}
+
+	err = gcache.Set(ctx, cacheServerFlowKey, serverFlow.Int64()+upload+download, 49*time.Hour)
+	if err != nil {
+		return
+	}
+
 	return
 }

@@ -1,0 +1,103 @@
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<!-- Latest compiled and minified Locales -->
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+
+<script>
+  const $table = $('#table')
+  $(function () {
+    initTable()
+  })
+
+  //初始化表格
+  function initTable() {
+    $table.bootstrapTable({
+      columns: [
+          {
+            field: 'name',
+            title: '名称',
+          }, 
+          {
+            field: 'agreement',
+            title: '协议',
+          }, {
+            field: 'rate',
+            title: '状态',
+          }, {
+            field: 'rate',
+            title: '倍率',
+          }, {
+            field: 'updated_at',
+            title: '更新时间',
+          }, {
+            field: 'operate',
+            title: '操作',
+            width:120,
+            events: {
+              'click #edit': function (e, value, row, index) {
+                TicketMsg(row)
+              },
+              'click #close': function (e, value, row, index) {
+                Close(row.ticket.id)
+              },
+            },
+            formatter: function (value, row, index) {
+                return `
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only" data-toggle="tooltip" data-placement="left" title="复制URL"><span class="btn-inner--icon"><i class="fas fa-copy"></i></span></button>
+              </div>`;
+
+              
+            }
+          }
+      ], //列
+      url: '/user/node',
+      method: 'post', //请求方法
+      dataType: 'json',//数据格式
+      pagination: false, //是否显示页码
+      sidePagination: "server",//服务器处理分页
+      serverSort: "true",//是否服务器处理排序
+      sortName:'id',
+      sortOrder:'desc',
+      showRefresh: true,  //显示刷新按钮
+      showColumns: true, //是否显示列下拉列表按钮
+      showFullscreen: true, //是否显示全屏按钮
+      responseHandler: function (res) {  //response数据处理
+
+        return {
+          "rows": res.data.data,
+        };
+      },
+
+      //搜索
+      queryParams: function (x) {
+
+        $("select[data-function='search']").each(function (i, domEle) {
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+        $("input[data-function='search']").each(function (i, domEle) {
+          const bindingDomID = $(domEle).attr("data-select-binding")
+          if (bindingDomID != undefined) {
+            x[$(bindingDomID).attr("name")] = $(bindingDomID).val()
+          }
+          x[$(domEle).attr("name")] = domEle.value
+        })
+
+
+        return x
+      },
+      onLoadSuccess: function() {
+        $('[data-toggle="tooltip"]').tooltip()
+      },
+      formatNoMatches: function(){
+        return "当前订阅没有节点";
+      },
+
+    })
+  }
+</script>
