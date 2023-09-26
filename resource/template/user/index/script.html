@@ -32,4 +32,15 @@
 
     })
 
+
+    function myFunction(text) {
+        let input_dom = document.createElement('input');
+        input_dom.value = text;
+        document.body.appendChild(input_dom);//向页面底部追加输入框
+        input_dom.select();//选择input元素
+        document.execCommand("Copy");//执行复制命令
+        notify('success', "复制成功")
+        input_dom.remove();//删除动态创建的节点
+    }
+
 </script>

@@ -32,6 +32,8 @@ type IAdminV1 interface {
 	ProxyService(ctx context.Context, req *v1.ProxyServiceReq) (res *v1.ProxyServiceRes, err error)
 	ProxyServiceAE(ctx context.Context, req *v1.ProxyServiceAEReq) (res *v1.ProxyServiceAERes, err error)
 	ProxyServiceDel(ctx context.Context, req *v1.ProxyServiceDelReq) (res *v1.ProxyServiceDelRes, err error)
+	ProxyServiceFlow(ctx context.Context, req *v1.ProxyServiceFlowReq) (res *v1.ProxyServiceFlowRes, err error)
+	OnlineUserCountAndLastPushAt(ctx context.Context, req *v1.OnlineUserCountAndLastPushAtReq) (res *v1.OnlineUserCountAndLastPushAtRes, err error)
 	RechargeRecords(ctx context.Context, req *v1.RechargeRecordsReq) (res *v1.RechargeRecordsRes, err error)
 	RechargeRecordsAdd(ctx context.Context, req *v1.RechargeRecordsAddReq) (res *v1.RechargeRecordsAddRes, err error)
 	RechargeRecordsUpRemarks(ctx context.Context, req *v1.RechargeRecordsUpRemarksReq) (res *v1.RechargeRecordsUpRemarksRes, err error)

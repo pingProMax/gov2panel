@@ -11,10 +11,12 @@ import (
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 type sProxyService struct {
@@ -267,7 +269,7 @@ func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []model.UserTra
 	timeNow := time.Now()
 	ctx := gctx.New()
 
-	//服务器当前在线数量
+	//服务器当前用户在线数量
 	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_ONLINE_USER", strconv.Itoa(nodeId)), len(userTraffic), 3600*time.Second)
 	if err != nil {
 		return
@@ -299,4 +301,49 @@ func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []model.UserTra
 	}
 
 	return
+}
+
+// 获取所有服务器当前在线用户数量和服务器最后提交时间
+// map[服务器id][type 1在线数量、2服务器最后提交时间]int
+func (s *sProxyService) GetOnlineUserCountAndLastPushAt() (data map[int]map[int]int64, err error) {
+	data = make(map[int]map[int]int64, 0)
+
+	ctx := gctx.New()
+
+	cacheKeyS, err := gcache.KeyStrings(ctx)
+	if err != nil {
+		return data, err
+	}
+
+	for _, v := range cacheKeyS {
+		if strings.HasSuffix(v, "_ONLINE_USER") {
+			idStr := strings.ReplaceAll(v, "SERVER_", "")
+			idStr = strings.ReplaceAll(idStr, "_ONLINE_USER", "")
+			id := gconv.Int(idStr)
+			onlineUser, err := gcache.Get(ctx, v)
+			if err != nil {
+				return data, err
+			}
+
+			if data[id] == nil {
+				data[id] = make(map[int]int64)
+			}
+			data[id][1] = onlineUser.Int64()
+		} else if strings.HasSuffix(v, "_LAST_PUSH_AT") {
+			idStr := strings.ReplaceAll(v, "SERVER_", "")
+			idStr = strings.ReplaceAll(idStr, "_LAST_PUSH_AT", "")
+			id := gconv.Int(idStr)
+			lastPushAt, err := gcache.Get(ctx, v)
+			if err != nil {
+				return data, err
+			}
+
+			if data[id] == nil {
+				data[id] = make(map[int]int64)
+			}
+			data[id][2] = lastPushAt.Int64()
+		}
+	}
+
+	return data, nil
 }

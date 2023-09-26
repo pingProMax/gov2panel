@@ -327,7 +327,7 @@ func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 			return err
 		}
 
-		err = gcache.Set(ctx, ketStr, userFlow.Float64()+utils.BytesToGB(v.Upload+v.Download), 169*time.Hour)
+		err = gcache.Set(ctx, ketStr, userFlow.Int64()+v.Upload+v.Download, 169*time.Hour)
 		if err != nil {
 			return err
 		}
@@ -510,6 +510,19 @@ func (s *sUser) GetNowMonthCount() (count int, err error) {
 		strconv.Itoa(int(timeNow.Month())),
 	)
 	count, err = s.Cornerstone.GetDB().Where(sqlStr).Count()
+
+	return
+}
+
+// 重置用户的Token和uuid
+func (s *sUser) ResetTokenAndUuidById(id int) (err error) {
+
+	_, err = s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2User.Columns().Token: strings.ReplaceAll(uuid.New().String(), "-", ""),
+			dao.V2User.Columns().Uuid:  uuid.New().String(),
+		},
+	).Where(dao.V2User.Columns().Id, id).Update()
 
 	return
 }

@@ -122,6 +122,7 @@
 
 <script>
   let planData;
+  let onlineUserCountAndLastPushAt;
   const $table = $('#table')
   $.fn.selectpicker.Constructor.BootstrapVersion = '4';
   $(function () {
@@ -357,6 +358,7 @@
                   </div>
           `,
           }, {
+          }, {
             title:  ``,
           }, {
           }, {
@@ -429,13 +431,43 @@
               return `隐藏`;
             }
           },{
+            title: '在线和状态',
+            formatter: function (value, row, index) {
+              console.log(onlineUserCountAndLastPushAt[row.service.id])
+              if (onlineUserCountAndLastPushAt[row.service.id] == undefined) {
+                return `<span class="badge badge-dot">
+                        <i class="bg-warning"></i>
+                        <span class="status">离线</span>
+                      </span>`
+              }else{
+                let htmlStr = `${onlineUserCountAndLastPushAt[row.service.id][1]} | `
+
+                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.service.id][2]) < 300) {
+                  htmlStr = htmlStr + `<span class="badge badge-dot">
+                        <i class="bg-success"></i>
+                        <span class="status">正常</span>
+                      </span>`
+                }else{
+                  htmlStr = htmlStr + `<span class="badge badge-dot">
+                        <i class="bg-dark"></i>
+                        <span class="status">异常</span>
+                      </span>`
+                }
+                return  htmlStr
+                
+
+              }
+              
+            }
+          },{
             field: 'service.order_id',
             sortName:'order_id',
             title: '顺序',
-          }, {
+          },{
             field: 'service.created_at',
             sortName: 'created_at',
             title: '创建时间',
+            visible:false,//隐藏
           }, {
             field: 'operate',
             title: '操作',
@@ -475,7 +507,7 @@
 
       //搜索
       queryParams: function (x) {
-
+        GetOnlineUserCountAndLastPushAt()
         $("select[data-function='search']").each(function (i, domEle) {
           x[$(domEle).attr("name")] = domEle.value
         })
@@ -493,5 +525,32 @@
       },
 
     })
+  }
+
+  //获取所有服务器当前在线用户数量和服务器最后提交时间
+  function GetOnlineUserCountAndLastPushAt() {
+    if (onlineUserCountAndLastPushAt == undefined) {
+      $.ajax({
+        async: false,
+        type: "POST",
+        url: "/{{.setting.admin_path}}/service/online_user_count_and_last_push_at",
+        dataType: "json",
+        success: function (data) {
+          if (data.code == 0) {
+            onlineUserCountAndLastPushAt = data.data.data
+          } else {
+            notify('danger', data.message)
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          console.log(errorThrown)
+          notify('danger', errorThrown)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+          
+        }
+      });
+    }
+    
   }
 </script>

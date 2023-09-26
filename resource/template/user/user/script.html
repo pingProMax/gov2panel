@@ -1,4 +1,30 @@
 <script>
+    function resetTokenAndUuid() {
+        $.ajax({
+            type: "post",// get或者post
+            url: "/user/reset_token_uuid",// 请求的url地址
+            dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+            beforeSend: function () {
+                // 发送之前就会进入这个函数
+                // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+            },
+            success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+                if (data == null || data.code != 0) {
+                    notify('danger', data.message)
+                    return
+                }
+                notify('success', "重置成功")
+            },
+            error: function () {//失败的函数
+                notify('danger', data.message)
+            },
+            complete: function () {//不管成功还是失败 都会进这个函数
+                
+            }
+        })
+    }
+
     function upPasswd() {
         const up_passwod_form_id = document.getElementById("up_passwod_form_id");
         const passwordInput = document.querySelector('input[name="new_passwd"]');

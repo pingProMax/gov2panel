@@ -8,6 +8,7 @@
 
 
 <script>
+  let onlineUserCountAndLastPushAt;
   const $table = $('#table')
   $(function () {
     initTable()
@@ -25,8 +26,31 @@
             field: 'agreement',
             title: '协议',
           }, {
-            field: 'rate',
             title: '状态',
+            formatter: function (value, row, index) {
+              if (onlineUserCountAndLastPushAt[row.id] == undefined) {
+                return `<span class="badge badge-dot">
+                        <i class="bg-warning"></i>
+                        <span class="status">离线</span>
+                      </span>`
+              }else{
+                let htmlStr = `${onlineUserCountAndLastPushAt[row.id][1]} | `
+
+                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) > 300) {
+                  htmlStr = htmlStr + `<span class="badge badge-dot">
+                        <i class="bg-success">正常</i>
+                      </span>`
+                }else{
+                  htmlStr = htmlStr + `<span class="badge badge-dot">
+                        <i class="border-darker">异常</i>
+                      </span>`
+                }
+                return 
+                
+
+              }
+              
+            }
           }, {
             field: 'rate',
             title: '倍率',
@@ -75,7 +99,7 @@
 
       //搜索
       queryParams: function (x) {
-
+        GetOnlineUserCountAndLastPushAt()
         $("select[data-function='search']").each(function (i, domEle) {
           x[$(domEle).attr("name")] = domEle.value
         })
@@ -99,5 +123,31 @@
       },
 
     })
+  }
+
+  //获取所有服务器当前在线用户数量和服务器最后提交时间
+  function GetOnlineUserCountAndLastPushAt() {
+    if (onlineUserCountAndLastPushAt == undefined) {
+      $.ajax({
+        type: "POST",
+        url: "/user/node/online_user_count_and_last_push_at",
+        dataType: "json",
+        success: function (data) {
+          if (data.code == 0) {
+            onlineUserCountAndLastPushAt = data.data.data
+          } else {
+            notify('danger', data.message)
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          console.log(errorThrown)
+          notify('danger', errorThrown)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+          
+        }
+      });
+    }
+    
   }
 </script>

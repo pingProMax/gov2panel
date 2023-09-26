@@ -1,0 +1,53 @@
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="header bg-primary pb-6">
+        <div class="container-fluid">
+          <div class="header-body">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 card-wrapper">
+      <!-- Grid system -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">流量使用记录（最近7天）</h3>
+        </div>
+        <div class="card-body">
+          <table class="table align-items-center table-flush">
+            
+            <tbody class="list">
+              
+              {{range $k, $v := .data}}
+              <tr>
+                <th scope="row">
+                  <div class="media align-items-center">
+                    <div class="media-body">
+                      <span class="name mb-0 text-sm">> {{$v.date}}</span>
+                    </div>
+                  </div>
+                </th>
+                <td class="budget">
+                  {{$v.flow}} GB
+                </td>
+              </tr>
+              {{end}}
+              
+
+            </tbody>
+          </table>
+          
+        </div>
+      </div>
+
+     
+    </div>
+  </div>
+ 
+</div>

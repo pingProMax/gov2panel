@@ -42,3 +42,10 @@ type ProxyServiceFlowReq struct {
 type ProxyServiceFlowRes struct {
 	ServiceFlowTop []*model.ProxyServiceFlow `json:"service_flow_top"`
 }
+
+type OnlineUserCountAndLastPushAtReq struct {
+	g.Meta `path:"/service/online_user_count_and_last_push_at" tags:"ProxyService" method:"post" summary:"获取所有服务器当前在线用户数量和服务器最后提交时间"`
+}
+type OnlineUserCountAndLastPushAtRes struct {
+	Data map[int]map[int]int64 `json:"data"`
+}

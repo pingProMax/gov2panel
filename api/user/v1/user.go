@@ -24,3 +24,11 @@ type UserUpPasswdReq struct {
 type UserUpPasswdRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
+
+type ResetTokenAndUuidReq struct {
+	g.Meta  `path:"/reset_token_uuid" tags:"User" method:"post" summary:"重置token和uuid"`
+	TUserID int
+}
+type ResetTokenAndUuidRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+}

@@ -51,21 +51,21 @@ func (c *ControllerV1) ProxyServiceDel(ctx context.Context, req *v1.ProxyService
 func (c *ControllerV1) ProxyServiceFlow(ctx context.Context, req *v1.ProxyServiceFlowReq) (res *v1.ProxyServiceFlowRes, err error) {
 	res = &v1.ProxyServiceFlowRes{}
 	res.ServiceFlowTop = make([]*model.ProxyServiceFlow, 0)
-	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
-		Id:   999,
-		Name: "test1",
-		Flow: 3564444444000,
-	})
-	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
-		Id:   998,
-		Name: "test2",
-		Flow: 6564444444000,
-	})
-	res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
-		Id:   998,
-		Name: "test3",
-		Flow: 5564444444000,
-	})
+	// res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+	// 	Id:   999,
+	// 	Name: "test1",
+	// 	Flow: 3564444444000,
+	// })
+	// res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+	// 	Id:   998,
+	// 	Name: "test2",
+	// 	Flow: 6564444444000,
+	// })
+	// res.ServiceFlowTop = append(res.ServiceFlowTop, &model.ProxyServiceFlow{
+	// 	Id:   998,
+	// 	Name: "test3",
+	// 	Flow: 5564444444000,
+	// })
 
 	cacheKeyS, err := gcache.KeyStrings(ctx)
 	if err != nil {
@@ -107,6 +107,15 @@ func (c *ControllerV1) ProxyServiceFlow(ctx context.Context, req *v1.ProxyServic
 	sort.Slice(res.ServiceFlowTop, func(i, j int) bool {
 		return res.ServiceFlowTop[i].Flow > res.ServiceFlowTop[j].Flow
 	})
+
+	return res, err
+}
+
+// 获取所有服务器当前在线用户数量和服务器最后提交时间
+// map[服务器id][type 1在线数量、2服务器最后提交时间]int
+func (c *ControllerV1) OnlineUserCountAndLastPushAt(ctx context.Context, req *v1.OnlineUserCountAndLastPushAtReq) (res *v1.OnlineUserCountAndLastPushAtRes, err error) {
+	res = &v1.OnlineUserCountAndLastPushAtRes{}
+	res.Data, err = service.ProxyService().GetOnlineUserCountAndLastPushAt()
 
 	return res, err
 }
