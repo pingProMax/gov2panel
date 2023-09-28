@@ -27,6 +27,10 @@ type (
 		UpInvitationRecordsStateById(id, state int) (err error)
 		// 审核状态
 		AdminiUpStateById(id, state int) (err error)
+		// CommissionTransferBalance佣金转余额
+		CommissionTransferBalance(userId int) (err error)
+		// 佣金提现
+		WithdrawalBalance(userId int) (err error)
 	}
 )
 

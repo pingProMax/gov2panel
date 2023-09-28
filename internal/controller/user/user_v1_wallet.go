@@ -64,3 +64,17 @@ func (c *ControllerV1) PayRedirection(ctx context.Context, req *v1.PayRedirectio
 	res.Url, err = service.Payment().GetPayUrl(req)
 	return
 }
+
+// 佣金转余额
+func (c *ControllerV1) CommissionTransferBalance(ctx context.Context, req *v1.CommissionTransferBalanceReq) (res *v1.CommissionTransferBalanceRes, err error) {
+	res = &v1.CommissionTransferBalanceRes{}
+	err = service.InvitationRecords().CommissionTransferBalance(req.TUserID)
+	return
+}
+
+// 佣金转余额
+func (c *ControllerV1) WithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error) {
+	res = &v1.CWithdrawalBalanceRes{}
+	err = service.InvitationRecords().WithdrawalBalance(req.TUserID)
+	return
+}

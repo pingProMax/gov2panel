@@ -160,6 +160,63 @@
     })
   }
 
+  function CommissionTransferBalance(params) {
+    $.ajax({
+        type: "post",// get或者post
+        url: "/user/commission_transfer_balance",// 请求的url地址
+        dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+        beforeSend: function () {
+            // 发送之前就会进入这个函数
+            // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+        },
+        success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+            if (data == null || data.code != 0) {
+                notify('danger', data.message)
+                return
+            }else{
+              notify('success', "成功")
+              location.reload();
+            }
+            
+        },
+        error: function () {//失败的函数
+            notify('danger', data.message)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+            
+        }
+    })
+  }
+
+  function WithdrawalBalance(params) {
+    $.ajax({
+        type: "post",// get或者post
+        url: "/user/withdrawal_balance",// 请求的url地址
+        dataType: "json",//json写了jq会帮我们转换成数组或者对象 他已经用JSON.parse弄好了 
+        beforeSend: function () {
+            // 发送之前就会进入这个函数
+            // return false 这个ajax就停止了不会发 如果没有return false 就会继续
+
+        },
+        success: function (data) { // 成功拿到结果放到这个函数 data就是拿到的结果
+            if (data == null || data.code != 0) {
+                notify('danger', data.message)
+                return
+            }else{
+              notify('success', "成功")
+              location.href = "/user/ticket"
+            }
+            
+        },
+        error: function () {//失败的函数
+            notify('danger', data.message)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+            
+        }
+    })
+  }
 
 
 </script>

@@ -78,7 +78,7 @@ func (c *ControllerV1) ProxyServiceFlow(ctx context.Context, req *v1.ProxyServic
 	}
 
 	for _, v := range cacheKeyS {
-		if strings.HasSuffix(v, fmt.Sprintf("_%s_FLOW", req.Date)) {
+		if strings.HasPrefix(v, "SERVER_") && strings.HasSuffix(v, fmt.Sprintf("_%s_FLOW", req.Date)) {
 			idStr := strings.ReplaceAll(v, "SERVER_", "")
 			idStr = strings.ReplaceAll(idStr, fmt.Sprintf("_%s_FLOW", req.Date), "")
 			id := gconv.Int(idStr)

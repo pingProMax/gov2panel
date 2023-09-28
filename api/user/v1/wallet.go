@@ -69,3 +69,21 @@ type PayRedirectionRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 	Url    string `json:"url"`
 }
+
+type CommissionTransferBalanceReq struct {
+	g.Meta  `path:"/commission_transfer_balance" tags:"Wallet" method:"post" summary:"佣金转余额"`
+	TUserID int
+}
+
+type CommissionTransferBalanceRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+}
+
+type CWithdrawalBalanceReq struct {
+	g.Meta  `path:"/withdrawal_balance" tags:"Wallet" method:"post" summary:"佣金提现"`
+	TUserID int
+}
+
+type CWithdrawalBalanceRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+}

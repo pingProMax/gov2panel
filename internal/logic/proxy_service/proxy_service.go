@@ -316,7 +316,7 @@ func (s *sProxyService) GetOnlineUserCountAndLastPushAt() (data map[int]map[int]
 	}
 
 	for _, v := range cacheKeyS {
-		if strings.HasSuffix(v, "_ONLINE_USER") {
+		if strings.HasPrefix(v, "SERVER_") && strings.HasSuffix(v, "_ONLINE_USER") {
 			idStr := strings.ReplaceAll(v, "SERVER_", "")
 			idStr = strings.ReplaceAll(idStr, "_ONLINE_USER", "")
 			id := gconv.Int(idStr)
@@ -329,7 +329,7 @@ func (s *sProxyService) GetOnlineUserCountAndLastPushAt() (data map[int]map[int]
 				data[id] = make(map[int]int64)
 			}
 			data[id][1] = onlineUser.Int64()
-		} else if strings.HasSuffix(v, "_LAST_PUSH_AT") {
+		} else if strings.HasPrefix(v, "SERVER_") && strings.HasSuffix(v, "_LAST_PUSH_AT") {
 			idStr := strings.ReplaceAll(v, "SERVER_", "")
 			idStr = strings.ReplaceAll(idStr, "_LAST_PUSH_AT", "")
 			id := gconv.Int(idStr)

@@ -81,17 +81,17 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 	}
 
 	totaljs := 0
-	for i := 0; i < len(m); i++ {
-		if m[i].User == nil {
-			m = append(m[:i], m[i+1:]...)
-			i--
-			totaljs++
-		} else if m[i].FromUser == nil {
-			m = append(m[:i], m[i+1:]...)
-			i--
-			totaljs++
-		}
-	}
+	// for i := 0; i < len(m); i++ {
+	// 	if m[i].User == nil {
+	// 		m = append(m[:i], m[i+1:]...)
+	// 		i--
+	// 		totaljs++
+	// 	} else if m[i].FromUser == nil {
+	// 		m = append(m[:i], m[i+1:]...)
+	// 		i--
+	// 		totaljs++
+	// 	}
+	// }
 	total = total - totaljs
 
 	return m, total, err
@@ -124,7 +124,9 @@ func (s *sInvitationRecords) GetInvitationRecordsListByUserId(userId int, orderB
 	}
 
 	for i := 0; i < len(m); i++ {
-		m[i].FromUser.UserName = utils.MaskString(m[i].FromUser.UserName)
+		if m[i].FromUser != nil {
+			m[i].FromUser.UserName = utils.MaskString(m[i].FromUser.UserName)
+		}
 
 	}
 	return m, total, err
@@ -176,24 +178,26 @@ func (s *sInvitationRecords) AdminiUpStateById(id, state int) (err error) {
 			return errors.New("已提现无法审核")
 		}
 
-		switch state {
-		case 1: //审核 直接给用户加佣金
-			//给用户加佣金
-			_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(d.V2User.Columns().Id, ir.UserId).Increment(d.V2User.Columns().CommissionBalance, ir.Amount)
-			if err != nil {
-				return err
-			}
-
-		case 2: //拒绝
-			//如果原来已经审核再拒绝，则扣金额;
-			if ir.State == 1 {
-				//给用户扣佣金
-				_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(d.V2User.Columns().Id, ir.UserId).Decrement(d.V2User.Columns().CommissionBalance, ir.Amount)
+		if ir.OperateType == 1 { //如果是邀请
+			switch state {
+			case 1: //审核 直接给用户加佣金
+				//给用户加佣金
+				_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(d.V2User.Columns().Id, ir.UserId).Increment(d.V2User.Columns().CommissionBalance, ir.Amount)
 				if err != nil {
 					return err
 				}
-			}
 
+			case 2: //拒绝
+				//如果原来已经审核再拒绝，则扣金额;
+				if ir.State == 1 {
+					//给用户扣佣金
+					_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(d.V2User.Columns().Id, ir.UserId).Decrement(d.V2User.Columns().CommissionBalance, ir.Amount)
+					if err != nil {
+						return err
+					}
+				}
+
+			}
 		}
 
 		//更新审核
@@ -207,4 +211,124 @@ func (s *sInvitationRecords) AdminiUpStateById(id, state int) (err error) {
 	})
 
 	return err
+}
+
+// CommissionTransferBalance佣金转余额
+func (s *sInvitationRecords) CommissionTransferBalance(userId int) (err error) {
+	user, err := service.User().GetUserByIdAndCheck(userId)
+	if err != nil {
+		return err
+	}
+
+	if user.CommissionBalance <= 0 {
+		return errors.New("佣金为0，无法转余额")
+	}
+
+	g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
+
+		//余额 记录
+		rr := &entity.V2RechargeRecords{
+			Amount:          user.CommissionBalance,
+			UserId:          user.Id,
+			OperateType:     1,
+			RechargeName:    "佣金转余额",
+			ConsumptionName: "",
+			Remarks:         "",
+			TransactionId:   utils.RechargeOrderNo(user.CommissionBalance, 0),
+		}
+		_, err = tx.Ctx(ctx).Model(d.V2RechargeRecords.Table()).Save(rr)
+		if err != nil {
+			return err
+		}
+
+		//用户 aff佣金清0
+		_, err = tx.Ctx(ctx).
+			Model(d.V2User.Table()).
+			Data(g.Map{d.V2User.Columns().CommissionBalance: 0}).
+			Where(d.V2User.Columns().Id, user.Id).
+			Update()
+		if err != nil {
+			return err
+		}
+
+		//用户 余额加佣金
+		_, err = tx.Ctx(ctx).
+			Model(d.V2User.Table()).
+			Where(d.V2User.Columns().Id, user.Id).
+			Increment(d.V2User.Columns().Balance, user.CommissionBalance)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return
+}
+
+// 佣金提现
+func (s *sInvitationRecords) WithdrawalBalance(userId int) (err error) {
+	user, err := service.User().GetUserByIdAndCheck(userId)
+	if err != nil {
+		return err
+	}
+
+	if user.CommissionBalance <= 0 {
+		return errors.New("佣金为0，无法提现")
+	}
+
+	setting, err := service.Setting().GetSettingAllMap()
+	if err != nil {
+		return err
+	}
+
+	if user.CommissionBalance < setting["minimum_withdrawal_balance"].Float64() {
+		return errors.New("佣金低于最低提现额度，最低提现额度：" + setting["minimum_withdrawal_balance"].String())
+	}
+
+	g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
+
+		//邀请收入记录
+		ir := &entity.V2InvitationRecords{
+			Amount:            -user.CommissionBalance, //用户aff余额
+			UserId:            user.Id,
+			FromUserId:        0,
+			CommissionRate:    0,
+			RechargeRecordsId: 0,
+			OperateType:       2,
+			State:             0,
+		}
+		_, err := tx.Ctx(ctx).Model(d.V2InvitationRecords.Table()).Save(ir)
+		if err != nil {
+			return err
+		}
+
+		//用户 aff佣金清0
+		_, err = tx.Ctx(ctx).
+			Model(d.V2User.Table()).
+			Data(g.Map{d.V2User.Columns().CommissionBalance: 0}).
+			Where(d.V2User.Columns().Id, user.Id).
+			Update()
+		if err != nil {
+			return err
+		}
+
+		//创建一个[提现工单]
+		_, err = tx.Ctx(ctx).
+			Model(d.V2Ticket.Table()).
+			Save(&entity.V2Ticket{
+				UserId:      user.Id,
+				Subject:     "[提现工单]",
+				Level:       3,
+				Status:      0,
+				ReplyStatus: 0,
+			})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return
 }

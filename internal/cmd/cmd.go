@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gview"
 
 	"gov2panel/internal/controller/admin"
@@ -86,6 +87,15 @@ var (
 				})
 
 			})
+
+			//每天6点执行  更新过期用户的权限组和流量
+			_, err = gcron.Add(ctx, "0 0 6 * * *", func(ctx context.Context) {
+				service.User().ClearExpiredUserGroupIdAndUDTransferEnable()
+			}, "CEUP")
+			if err != nil {
+				panic(err)
+			}
+
 			s.Run()
 			return nil
 		},

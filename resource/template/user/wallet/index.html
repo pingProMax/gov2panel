@@ -25,6 +25,19 @@
           
           <div class="row">
             <div class="col">
+              <div class="card">
+                <!-- Card image -->
+                <!-- List group -->
+                <!-- Card body -->
+                <div class="card-body">
+                  {{.setting.wallet_page_html}}
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col">
               <div class="card card-stats">
                 <!-- Card body -->
                 <div class="card-body">
@@ -51,8 +64,8 @@
                       <span class="h2 font-weight-bold mb-0">{{.user.CommissionBalance}}</span>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-outline-info">转余额</button>
-                        <button type="button" class="btn btn-outline-info">提现</button>
+                        <button type="button" class="btn btn-outline-info" onclick="CommissionTransferBalance()">转余额</button>
+                        <button type="button" class="btn btn-outline-info" onclick="WithdrawalBalance()">提现</button>
                     </div>
                   </div>
                  

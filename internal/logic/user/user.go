@@ -132,6 +132,24 @@ func (s *sUser) UpUser(data *entity.V2User) (err error) {
 	return err
 }
 
+// 更新过期用户的权限组和流量
+func (s *sUser) ClearExpiredUserGroupIdAndUDTransferEnable() (err error) {
+
+	db := s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2User.Columns().GroupId:        0,
+			dao.V2User.Columns().U:              0,
+			dao.V2User.Columns().D:              0,
+			dao.V2User.Columns().TransferEnable: 0,
+		},
+	)
+
+	_, err =
+		db.WhereLT(dao.V2User.Columns().ExpiredAt, time.Now()).
+			Update()
+	return err
+}
+
 // 用户注册
 func (s *sUser) RegisterUser(UserName, Passwd, CommissionCode string) error {
 

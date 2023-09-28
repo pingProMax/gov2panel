@@ -26,6 +26,8 @@ type (
 		CalculateUserCommission(CType, CRate int, fromUserId int, val float64) (commission float64, err error)
 		// 更新
 		UpUser(data *entity.V2User) (err error)
+		// 更新过期用户的权限组和流量
+		ClearExpiredUserGroupIdAndUDTransferEnable() (err error)
 		// 用户注册
 		RegisterUser(UserName, Passwd, CommissionCode string) error
 		// 添加用户
