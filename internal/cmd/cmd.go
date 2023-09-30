@@ -71,7 +71,7 @@ var (
 				})
 
 				group.Group("/"+d["admin_path"].String(), func(group *ghttp.RouterGroup) {
-					group.Middleware(user.Middleware().Auth) //权限处理
+					group.Middleware(user.Middleware().AuthAdmin) //权限处理
 					group.Bind(
 						admin.NewV1(),
 					)
@@ -79,7 +79,7 @@ var (
 				})
 
 				group.Group("/user", func(group *ghttp.RouterGroup) {
-					group.Middleware(user.Middleware().Auth) //权限处理
+					group.Middleware(user.Middleware().AuthUser) //权限处理
 					group.Bind(
 						user_c.NewV1(),
 					)

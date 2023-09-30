@@ -6,10 +6,12 @@
 package service
 
 import (
+	"context"
 	v1 "gov2panel/api/admin/v1"
 	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
+	"time"
 )
 
 type (
@@ -64,6 +66,8 @@ type (
 		ResetTokenAndUuidById(id int) (err error)
 		// 获取当月每一天注册量
 		GetNowMonthDayCount() (count []int, err error)
+		Logout(ctx context.Context)
+		Refresh(ctx context.Context) (tokenString string, expire time.Time)
 	}
 )
 

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	v1 "gov2panel/api/admin/v1"
@@ -12,6 +13,7 @@ import (
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -30,11 +32,15 @@ type sUser struct {
 
 func init() {
 	service.RegisterUser(New())
+	jwtkey, err := g.Cfg().Get(gctx.New(), "jwtkey")
+	if err != nil {
+		panic(err.Error())
+	}
 	auth := jwt.New(&jwt.GfJWTMiddleware{
 		Realm:           "gov2panel",
-		Key:             []byte("secret key"),
-		Timeout:         time.Hour * 3,
-		MaxRefresh:      time.Hour * 1,
+		Key:             jwtkey.Bytes(),
+		Timeout:         time.Hour * 24,
+		MaxRefresh:      time.Hour * 24,
 		IdentityKey:     "TUserID",
 		TokenLookup:     "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName:   "Bearer",
@@ -364,13 +370,16 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 		return nil, err
 	}
 	if user == nil {
-		return nil, nil
+		return nil, errors.New("账号或密码错误")
 	}
 
 	passwd = utils.MD5V(passwd, user.PasswordSalt)
 
 	record, err := s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Where(dao.V2User.Columns().Password, passwd).One()
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("账号或密码错误")
+		}
 		return nil, err
 	}
 	err = record.Struct(&user)
@@ -590,6 +599,14 @@ func (s *sUser) GetNowMonthDayCount() (count []int, err error) {
 	return
 }
 
+func (s *sUser) Logout(ctx context.Context) {
+	authService.LogoutHandler(ctx)
+}
+
+func (s *sUser) Refresh(ctx context.Context) (tokenString string, expire time.Time) {
+	return authService.RefreshHandler(ctx)
+}
+
 // jwt 处理 ------------------------------------------------------------------
 var authService *jwt.GfJWTMiddleware
 
@@ -631,10 +648,15 @@ func IdentityHandler(ctx context.Context) interface{} {
 // Unauthorized用于定义自定义的Unauthorized回调函数。
 func Unauthorized(ctx context.Context, code int, message string) {
 	r := g.RequestFromCtx(ctx)
-	r.Response.WriteJson(g.Map{
-		"code":    code,
-		"message": message,
-	})
+	if r.RequestURI != "/login" {
+		r.Response.RedirectTo("/login", http.StatusFound)
+	} else {
+		r.Response.WriteJson(g.Map{
+			"code":    code,
+			"message": message,
+		})
+	}
+
 	r.ExitAll()
 }
 

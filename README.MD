@@ -115,4 +115,8 @@ windows 客户端
 安卓 客户端  
 
 
+# 安装教程  
+修改jwtkey
+manifest/config/config.yaml  jwtkey 随机填写
+
 
