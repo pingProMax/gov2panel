@@ -58,7 +58,7 @@ type UserUpBanned1Res struct {
 }
 
 type LogoutReq struct {
-	g.Meta  `path:"/logout" tags:"User" method:"post" summary:"退出登录"`
+	g.Meta  `path:"/logout" tags:"User" method:"get" summary:"退出登录"`
 	TUserID int
 }
 type LogoutRes struct {

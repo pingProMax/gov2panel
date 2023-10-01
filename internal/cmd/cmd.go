@@ -24,21 +24,24 @@ var (
 		Brief: "start http server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
+			adminiPath, err := g.Cfg().Get(ctx, "admini_path")
+			if err != nil {
+				panic(err.Error())
+			}
+
+			d, err := service.Setting().GetSettingAllMap()
+			if err != nil {
+				panic(err.Error())
+			}
+			d["admin_path"] = adminiPath
+
 			s.Group("/", func(group *ghttp.RouterGroup) {
 
-				d, err := service.Setting().GetSettingAllMap()
-				if err != nil {
-					print(err.Error())
-				}
 				group.Middleware(func(r *ghttp.Request) { //设置参数
-					// 中间件处理逻辑
-					d, err := service.Setting().GetSettingAllMap()
-					if err != nil {
-						print(err.Error())
-					}
 
 					r.Assigns(gview.Params{
-						"setting": d,
+						"setting":     d,
+						"admini_path": adminiPath,
 					})
 
 					r.Middleware.Next()
@@ -55,7 +58,7 @@ var (
 						// 中间件处理逻辑
 						d, err := service.Setting().GetSettingAllMap()
 						if err != nil {
-							print(err.Error())
+							panic(err.Error())
 						}
 
 						if r.Get("token").String() != d["api_key"].String() {

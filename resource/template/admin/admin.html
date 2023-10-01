@@ -6,17 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="bootstrapmb">
-  <title>后台管理</title>
+  <title>后台管理 - {{.setting.title}}</title>
   <!-- Favicon -->
-  <link rel="icon" href="/resource/assets/img/brand/favicon.png" type="image/png">
+  <link rel="icon" href="/resource/image/brand/favicon.png" type="image/png">
   <!-- Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <!-- Icons -->
-  <link rel="stylesheet" href="/resource/assets/vendor/nucleo/css/nucleo.css" type="text/css">
-  <link rel="stylesheet" href="/resource/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <link rel="stylesheet" href="/resource/nucleo/css/nucleo.css" type="text/css">
+  <link rel="stylesheet" href="/resource/fontawesome-free-5.15.4-web/css/all.min.css" type="text/css">
   <!-- Page plugins -->
   <!-- Argon CSS -->
-  <link rel="stylesheet" href="/resource/assets/css/argon.css?v=1.1.0" type="text/css">
+  <link rel="stylesheet" href="/resource/css/argon.css?v=1.1.0" type="text/css">
   {{include .headTpl .}}
 
 
@@ -80,7 +80,6 @@
       <div class="sidenav-header d-flex align-items-center">
         <a class="navbar-brand" href="/admin"  style="height: 75px;">
           <p>后台管理</p>
-          <!-- <img src="/resource/assets/img/brand/blue.png" class="navbar-brand-img" alt="..."> -->
         </a>
         <div class="ml-auto">
           <!-- Sidenav toggler -->
@@ -115,7 +114,7 @@
             <li class="nav-item">
               <a class="nav-link {{if eq .path (concat "/" .setting.admin_path "/service")}}active{{end}}" href="/{{.setting.admin_path}}/service" role="button" aria-controls="navbar-dashboards">
                 <i class="ni ni-atom text-primary"></i>
-                <span class="nav-link-text">节点管理（在开发）</span>
+                <span class="nav-link-text">节点管理</span>
               </a>
             </li>
             
@@ -220,7 +219,7 @@
           <!-- Navigation -->
           <ul class="navbar-nav mb-md-3">
             <li class="nav-item">
-              <a class="nav-link" href="/{{.setting.admin_path}}/logout" target="_blank">
+              <a class="nav-link" href="/{{.setting.admin_path}}/logout">
                 <i class="ni ni-button-power"></i>
                 <span class="nav-link-text">注销登录</span>
               </a>
@@ -265,7 +264,7 @@
                 aria-expanded="false">
                 <div class="media align-items-center">
                   <span class="avatar avatar-sm rounded-circle">
-                    <img alt="Image placeholder" src="/resource/assets/img/theme/team-4.jpg">
+                    <img alt="Image placeholder" src="/resource/image/theme/team-4.jpg">
                   </span>
                   <div class="media-body ml-2 d-none d-lg-block">
                     <span class="mb-0 text-sm  font-weight-bold">{{.user.UserName}}</span>
@@ -273,27 +272,8 @@
                 </div>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <div class="dropdown-header noti-title">
-                  <h6 class="text-overflow m-0">Welcome!</h6>
-                </div>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-single-02"></i>
-                  <span>My profile</span>
-                </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-settings-gear-65"></i>
-                  <span>Settings</span>
-                </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-calendar-grid-58"></i>
-                  <span>Activity</span>
-                </a>
-                <a href="#!" class="dropdown-item">
-                  <i class="ni ni-support-16"></i>
-                  <span>Support</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#!" class="dropdown-item">
+                
+                <a href="/{{.setting.admin_path}}/logout" class="dropdown-item">
                   <i class="ni ni-user-run"></i>
                   <span>Logout</span>
                 </a>
@@ -310,14 +290,13 @@
   </div>
   <!-- Argon Scripts -->
   <!-- Core -->
-  <script src="/resource/assets/vendor/jquery/dist/jquery.min.js"></script>
-  <script src="/resource/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/resource/assets/vendor/js-cookie/js.cookie.js"></script>
-  <script src="/resource/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
-  <script src="/resource/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+  <script src="/resource/js/jquery-3.7.1.min.js"></script>
+  <script src="/resource/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/resource/js/js.cookie.min.js"></script>
+  <script src="/resource/js/jquery.scrollbar.min.js"></script>
+  <script src="/resource/js/jquery-scrollLock.min.js"></script>
 
-  <!-- <script src="/resource/assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script> -->
-  <script src="/resource/assets/vendor/bootstrap-notify/bootstrap-notify.min.js"></script>
+  <script src="/resource/js/bootstrap-notify.min.js"></script>
   
   
 
@@ -325,7 +304,7 @@
 
 
   <!-- Argon JS -->
-  <script src="/resource/assets/js/argon.js?v=1.1.0"></script>
+  <script src="/resource/js/argon.js?v=1.1.0"></script>
   
 </body>
 

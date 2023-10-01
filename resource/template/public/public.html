@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="bootstrapmb">
-  <title>Argon Dashboard PRO - Premium Bootstrap 4 Admin Template</title>
+  <title>{{.setting.title}}</title>
   <!-- Favicon -->
-  <link rel="icon" href="/resource/assets/img/brand/favicon.png" type="image/png">
+  <link rel="icon" href="/resource/image/brand/favicon.png" type="image/png">
   <!-- Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <!-- Icons -->
-  <link rel="stylesheet" href="/resource/assets/vendor/nucleo/css/nucleo.css" type="text/css">
-  <link rel="stylesheet" href="/resource/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <link rel="stylesheet" href="/resource/nucleo/css/nucleo.css" type="text/css">
+  <link rel="stylesheet" href="/resource/fontawesome-free-5.15.4-web/css/all.min.css" type="text/css">
   <!-- Argon CSS -->
-  <link rel="stylesheet" href="/resource/assets/css/argon.css?v=1.1.0" type="text/css">
+  <link rel="stylesheet" href="/resource/css/argon.css?v=1.1.0" type="text/css">
   {{include .headTpl .}}
   <script>
 
@@ -73,7 +73,7 @@
   <nav id="navbar-main" class="navbar navbar-horizontal navbar-transparent navbar-main navbar-expand-lg navbar-light">
     <div class="container">
       <a class="navbar-brand" href="/">
-        <img src="/resource/assets/img/brand/white.png">
+        <img src="/resource/image/brand/white.png">
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
         aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
           <div class="row">
             <div class="col-6 collapse-brand">
               <a href="/">
-                <img src="/resource/assets/img/brand/blue.png">
+                <img src="/resource/image/brand/blue.png">
               </a>
             </div>
             <div class="col-6 collapse-close">
@@ -97,11 +97,6 @@
           </div>
         </div>
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a href="/" class="nav-link">
-              <span class="nav-link-inner--text">个人中心</span>
-            </a>
-          </li>
           <li class="nav-item">
             <a href="/login" class="nav-link">
               <span class="nav-link-inner--text">登录</span>
@@ -157,18 +152,17 @@
   </footer>
   <!-- Argon Scripts -->
   <!-- Core -->
-  <script src="/resource/assets/vendor/jquery/dist/jquery.min.js"></script>
-  <script src="/resource/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/resource/assets/vendor/js-cookie/js.cookie.js"></script>
-  <script src="/resource/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
-  <script src="/resource/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+  <script src="/resource/js/jquery-3.7.1.min.js"></script>
+  <script src="/resource/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/resource/js/js.cookie.min.js"></script>
+  <script src="/resource/js/jquery.scrollbar.min.js"></script>
+  <script src="/resource/js/jquery-scrollLock.min.js"></script>
   
-  <script src="/resource/assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
-  <script src="/resource/assets/vendor/bootstrap-notify/bootstrap-notify.min.js"></script>
+  <script src="/resource/js/bootstrap-notify.min.js"></script>
   <!-- Argon JS -->
-  <script src="/resource/assets/js/argon.js?v=1.1.0"></script>
+  <script src="/resource/js/argon.js?v=1.1.0"></script>
   <!-- Demo JS - remove this in your project -->
-  <script src="/resource/assets/js/demo.min.js"></script>
+  <script src="/resource/js/demo.min.js"></script>
   {{include .scriptTpl .}}
 
 </body>
