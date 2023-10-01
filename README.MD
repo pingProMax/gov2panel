@@ -152,4 +152,4 @@ location / {
 adminx/123456789  
 
 # 后台展示  
-![图片的描述文字](图片的链接地址)
+![后台界面](https://github.com/pingProMax/gov2panel/blob/master/admin.png?raw=true)
