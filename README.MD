@@ -136,8 +136,8 @@ nohup ./gov2panel &
 检查日志启动无误
 ```
 
-4、配置nginx  s
-反向代理，仅供参考
+4、配置nginx  
+反向代理，仅供参考  
 
 ``` nginx 
 location / {
