@@ -119,22 +119,24 @@ windows 客户端
 
 # 安装教程  
 
-当前为尝鲜版，有未知bug，以及订阅尚未开发完全，当前仅支持v2rayN和v2rayNG
-xrayr后端对接以开发，但尚未编译并且还在测试用：https://github.com/pingProMax/XrayR , PanelType填写"Gov2panel"
+当前为尝鲜版，有未知bug，以及订阅尚未开发完全，当前仅支持v2rayN和v2rayNG  
+xrayr后端对接以开发，但尚未编译并且还在测试用：https://github.com/pingProMax/XrayR , PanelType填写"Gov2panel"  
 
-1、创建数据库导入数据
+1、创建数据库导入数据  
 
-2、修改config.yaml文件
-修改数据库连接信息
-修改jwtkey 随机填写
-修改admini_path 后台管理地址
+2、修改config.yaml文件  
+修改数据库连接信息  
+修改jwtkey 随机填写  
+修改admini_path 后台管理地址  
 
-3、启动项目
+3、启动项目  
+``` code
 cd 项目目录
 nohup ./gov2panel &
 检查日志启动无误
+```
 
-4、配置nginx
+4、配置nginx  s
 反向代理，仅供参考
 
 ``` nginx 
@@ -146,5 +148,5 @@ location / {
 }
 ```
 
-5、登录后台修改 账号/密码
+5、登录后台修改 账号/密码  
 adminx/123456789
