@@ -61,11 +61,7 @@ func New() *sUser {
 
 // 账号查询用户
 func (s *sUser) GetUserByUserName(userName string) (user *entity.V2User, err error) {
-	record, err := s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).One()
-	if err != nil {
-		return nil, err
-	}
-	err = record.Struct(&user)
+	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Scan(&user)
 	return
 }
 
@@ -367,22 +363,25 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 	//查询用户名
 	user, err = s.GetUserByUserName(userName)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("账号或密码错误")
+		}
 		return nil, err
 	}
+
 	if user == nil {
 		return nil, errors.New("账号或密码错误")
 	}
 
 	passwd = utils.MD5V(passwd, user.PasswordSalt)
 
-	record, err := s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Where(dao.V2User.Columns().Password, passwd).One()
+	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Where(dao.V2User.Columns().Password, passwd).Scan(&user)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("账号或密码错误")
 		}
 		return nil, err
 	}
-	err = record.Struct(&user)
 
 	return
 }
