@@ -112,7 +112,27 @@
                 {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayng
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayn')">
+              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayng')">
+                复制
+              </td>
+            </tr>
+
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <a href="#" class="avatar rounded-circle mr-3">
+                    <img alt="Image placeholder" src="data:image/png;base64,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">
+                  </a>
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">shadowrocket</span>
+                  </div>
+                </div>
+              </th>
+              <td class="budget">
+                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=shadowrocket
+              </td>
+              
+              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=shadowrocket')">
                 复制
               </td>
             </tr>
@@ -132,7 +152,7 @@
                 {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=shadowsocks
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayn')">
+              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=shadowsocks')">
                 复制
               </td>
             </tr>
