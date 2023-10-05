@@ -85,13 +85,14 @@ ws+tls:
 shadowsocks2022
 协议:shadowsocks/ss2022
 {
-  "cypher_method": "12345",
-  "obfs": "",
-  "server_key":"",
-  "obfs_settings": {
-	"path":"",
-	"host":""
-  }
+	"port": "9996",
+	"cypher_method": "aes-128-gcm",
+	"obfs": "none",
+	"server_key":"",
+	"obfs_settings": {
+		"path": "",
+		"host": ""
+	}
 }
 
 协议:trojan/trojan
@@ -99,7 +100,12 @@ trojan
 {
 	"host":"",
 	"port":"",
-	"server_name":"sni.com",
+  "sni":"",
+  "security":"",
+  "alpn":"",
+  "fp":"",
+  "type":"tcp",
+  "headerType":""
 }
 
 ``` 

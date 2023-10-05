@@ -35,17 +35,18 @@
                       </span>`
               }else{
                 let htmlStr = `${onlineUserCountAndLastPushAt[row.id][1]} | `
-
-                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) > 300) {
+                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
                   htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="bg-success">正常</i>
+                        <i class="bg-success"></i>
+                        <span class="status">正常</span>
                       </span>`
                 }else{
                   htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="border-darker">异常</i>
+                        <i class="bg-dark"></i>
+                        <span class="status">异常</span>
                       </span>`
                 }
-                return 
+                return htmlStr
                 
 
               }

@@ -116,6 +116,26 @@
                 复制
               </td>
             </tr>
+
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <a href="#" class="avatar rounded-circle mr-3">
+                    <img alt="Image placeholder" src="https://raw.githubusercontent.com/shadowsocks/shadowsocks-windows/main/Shadowsocks.WPF/Resources/ssw128.png">
+                  </a>
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">shadowsocks</span>
+                  </div>
+                </div>
+              </th>
+              <td class="budget">
+                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=shadowsocks
+              </td>
+              
+              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=v2rayn')">
+                复制
+              </td>
+            </tr>
             
             
           </tbody>
