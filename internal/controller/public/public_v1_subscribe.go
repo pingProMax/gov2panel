@@ -65,6 +65,38 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 				}
 
 				result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds))
+			case "vless":
+				// vless://uuid@127.0.0.1:8888?encryption=none&security=reality&sni=sni.com&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
+				// vless://uuid@127.0.0.1:8888?encryption=none&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
+				// vless://78f10ea1-81a4-4bf5-876f-90e3001f37dc@127.0.0.1:8888?encryption=none&flow=xtls-rprx-vision&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
+
+				result = result + fmt.Sprintf(
+					"%s://%s@%s:%s?encryption=%s&flow=%s&security=%s&sni=%s&alpn=%s&fp=%s&pbk=%s&sid=%s&spx=%s&type=%s&serviceName=%s&mode=%s&headerType=%s&quicSecurity=%s&key=%s&host=%s&path=%s&seed=%s#%s\n",
+					"vless",
+					user.Uuid,
+					service.Host,
+					service.Port,
+					gconv.String(serviceJson["encryption"]),
+					gconv.String(serviceJson["security"]),
+					gconv.String(serviceJson["flow"]),
+					gconv.String(serviceJson["sni"]),
+					gconv.String(serviceJson["alpn"]),
+					gconv.String(serviceJson["fp"]),
+					gconv.String(serviceJson["pbk"]),
+					gconv.String(serviceJson["sid"]),
+					gconv.String(serviceJson["spx"]),
+					gconv.String(serviceJson["type"]),
+					gconv.String(serviceJson["serviceName"]),
+					gconv.String(serviceJson["mode"]),
+					gconv.String(serviceJson["headerType"]),
+					gconv.String(serviceJson["quicSecurity"]),
+					gconv.String(serviceJson["key"]),
+					gconv.String(serviceJson["host"]),
+					gconv.String(serviceJson["path"]),
+					gconv.String(serviceJson["seed"]),
+					service.Name,
+				)
+
 			case "ss2022":
 				// ss://base64(加密方式:密码)@地址:端口#别名
 				// ss://OjY4ZDJjNTFmLTUzMTEtNDc2MS1hYTNhLTllNDg1MmYzMGYyNQ==@127.0.0.1:9996#ss2022

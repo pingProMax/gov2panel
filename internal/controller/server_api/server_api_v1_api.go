@@ -98,3 +98,12 @@ func (c *ControllerV1) Push(ctx context.Context, req *v1.PushReq) (res *v1.PushR
 
 	return
 }
+
+func (c *ControllerV1) ChangeIP(ctx context.Context, req *v1.ChangeIPReq) (res *v1.ChangeIPRes, err error) {
+	res = &v1.ChangeIPRes{}
+	err = service.ProxyService().UpProxyServiceIpById(req.NodeId, req.Ip)
+	if err != nil {
+		return
+	}
+	return
+}

@@ -19,6 +19,8 @@ type (
 		GetProxyServiceAllList() (m []*entity.V2ProxyService, err error)
 		// AE设置
 		AEProxyService(data *entity.V2ProxyService) (err error)
+		// 更改服务器地址
+		UpProxyServiceIpById(id int, ip string) (err error)
 		// 删除
 		DelProxyService(ids []int) error
 		// 查询服务器中的路由数量 根据路由id

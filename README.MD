@@ -82,6 +82,30 @@ ws+tls:
   "alpn": ""
 }
 
+
+协议:v2ray/vless
+{
+  "port": "12345",
+  "encryption": "",
+  "security": "",
+  "flow": "",
+  "sni": "",
+  "alpn": "",
+  "fp": "",
+  "pbk": "",
+  "sid": "",
+  "spx": "",
+  "type": "",
+  "serviceName": "", //grpc serviceName
+  "mode": "", //grpc 模式
+  "headerType": "",
+  "quicSecurity": "", //quid 加密方式
+  "key": "", //quid 加密密钥
+  "host": "",
+  "path": "",
+  "seed": "" //kcp seed
+}
+
 shadowsocks2022
 协议:shadowsocks/ss2022
 {

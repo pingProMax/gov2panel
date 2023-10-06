@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -141,6 +142,12 @@ func (s *sProxyService) AEProxyService(data *entity.V2ProxyService) (err error) 
 	}
 
 	err = s.Cornerstone.Save(data)
+	return
+}
+
+// 更改服务器地址
+func (s *sProxyService) UpProxyServiceIpById(id int, ip string) (err error) {
+	_, err = s.Cornerstone.GetDB().Data(g.Map{dao.V2ProxyService.Columns().Host: ip}).Where(dao.V2ProxyService.Columns().Id, id).Update()
 	return
 }
 

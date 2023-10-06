@@ -25,9 +25,18 @@ type UserRes struct {
 }
 
 type PushReq struct {
-	g.Meta `path:"/push" tags:"Push" method:"get,post" summary:"报告用户流量"`
+	g.Meta `path:"/push" tags:"Api" method:"get,post" summary:"报告用户流量"`
 	Data   []model.UserTraffic
 }
 
 type PushRes struct {
+}
+
+type ChangeIPReq struct {
+	g.Meta `path:"/change_id" tags:"Api" method:"get,post" summary:"更改服务器iip"`
+	NodeId int    `json:"node_id"`
+	Ip     string `json:"ip"`
+}
+
+type ChangeIPRes struct {
 }
