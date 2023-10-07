@@ -4,6 +4,8 @@
 - https://goframe.org/pages/viewpage.action?pageId=1114399  
 
 
+节点地址   
+$uuid$ 订阅时会替换成用户的uuid
 
 数据示例：
 ``` json  

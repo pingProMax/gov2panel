@@ -38,6 +38,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		// base64编码   单个：协议://base64编码
 
 		for _, service := range serviceArr {
+			service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 			serviceJson := make(map[string]interface{})
 			json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
 			switch strings.Split(service.Agreement, "/")[1] {
