@@ -149,9 +149,9 @@ trojan
 
 
 # 当前阶段任务  
-测试和BUG
-订阅开发
-xrayr后端对接
+测试和BUG  
+订阅开发  
+xrayr后端对接  
 
 # 计划任务  
 windows 客户端  
