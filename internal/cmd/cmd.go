@@ -29,16 +29,15 @@ var (
 				panic(err.Error())
 			}
 
-			d, err := service.Setting().GetSettingAllMap()
-			if err != nil {
-				panic(err.Error())
-			}
-			d["admin_path"] = adminiPath
-
 			s.Group("/", func(group *ghttp.RouterGroup) {
 
 				group.Middleware(func(r *ghttp.Request) { //设置参数
 
+					d, err := service.Setting().GetSettingAllMap()
+					if err != nil {
+						panic(err.Error())
+					}
+					d["admin_path"] = adminiPath
 					r.Assigns(gview.Params{
 						"setting":     d,
 						"admini_path": adminiPath,
@@ -73,7 +72,7 @@ var (
 
 				})
 
-				group.Group("/"+d["admin_path"].String(), func(group *ghttp.RouterGroup) {
+				group.Group("/"+adminiPath.String(), func(group *ghttp.RouterGroup) {
 					group.Middleware(user.Middleware().AuthAdmin) //权限处理
 					group.Bind(
 						admin.NewV1(),
