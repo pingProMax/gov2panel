@@ -167,6 +167,7 @@ xrayr后端对接以开发，但尚未编译并且还在测试用：https://gith
 1、创建数据库导入数据  
 
 2、修改config.yaml文件  
+manifest/config/config.yaml  
 修改数据库连接信息  
 修改jwtkey 随机填写  
 修改admini_path 后台管理地址  
