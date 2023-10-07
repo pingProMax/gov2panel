@@ -11,7 +11,8 @@
   let onlineUserCountAndLastPushAt;
   const $table = $('#table')
   $(function () {
-    initTable()
+    GetOnlineUserCountAndLastPushAt()
+    
   })
 
   //初始化表格
@@ -100,7 +101,6 @@
 
       //搜索
       queryParams: function (x) {
-        GetOnlineUserCountAndLastPushAt()
         $("select[data-function='search']").each(function (i, domEle) {
           x[$(domEle).attr("name")] = domEle.value
         })
@@ -136,6 +136,7 @@
         success: function (data) {
           if (data.code == 0) {
             onlineUserCountAndLastPushAt = data.data.data
+            initTable()
           } else {
             notify('danger', data.message)
           }
