@@ -35,6 +35,39 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 			result = result + fmt.Sprintf("STATUS=↑:%.2fGB,↓:%.2fGB,TOT:%.2fGBExpires:%s\n", utils.BytesToGB(user.U), utils.BytesToGB(user.D), utils.BytesToGB(user.TransferEnable), user.ExpiredAt)
 		}
 
+		if req.Flag == "v2rayn" || req.Flag == "v2rayng" {
+			s1 := map[string]string{
+				"v":    "2",
+				"add":  "127.0.0.1",                                  //链接地址
+				"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
+				"port": "80",                                         //端口
+				"id":   user.Uuid,                                    //uuid
+				"aid":  "0",
+			}
+			ds1, err := json.Marshal(s1)
+			if err != nil {
+				return res, err
+			}
+
+			result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
+
+			s1 = map[string]string{
+				"v":    "2",
+				"add":  "127.0.0.1",                                                                          //链接地址
+				"ps":   "剩余流量：" + fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)), //名字
+				"port": "80",                                                                                 //端口
+				"id":   user.Uuid,                                                                            //uuid
+				"aid":  "0",
+			}
+			ds1, err = json.Marshal(s1)
+			if err != nil {
+				return res, err
+			}
+
+			result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
+
+		}
+
 		// base64编码   单个：协议://base64编码
 
 		for _, service := range serviceArr {
@@ -62,7 +95,6 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 				ds, err := json.Marshal(s)
 				if err != nil {
 					return res, err
-
 				}
 
 				result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds))
