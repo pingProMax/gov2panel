@@ -56,8 +56,18 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 				"add":  "127.0.0.1",                                                                          //链接地址
 				"ps":   "剩余流量：" + fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)), //名字
 				"port": "80",                                                                                 //端口
-				"id":   user.Uuid,                                                                            //uuid
+				"id":   user.Uuid,
 				"aid":  "0",
+				"net":  "tcp",
+				"type": "none",
+				"tls":  "",
+				"sni":  "",
+				"alpn": "",
+				"host": "",
+				"path": "",
+				"scy":  "",
+				"fp":   "", //uuid
+
 			}
 			ds1, err = json.Marshal(s1)
 			if err != nil {
@@ -91,6 +101,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 					"host": gconv.String(serviceJson["host"]),
 					"path": gconv.String(serviceJson["path"]),
 					"scy":  gconv.String(serviceJson["scy"]),
+					"fp":   gconv.String(serviceJson["fp"]),
 				}
 				ds, err := json.Marshal(s)
 				if err != nil {

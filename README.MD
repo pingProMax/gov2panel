@@ -160,9 +160,7 @@ windows 客户端
 
 
 # 安装教程  
-
-当前为尝鲜版，有未知bug，以及订阅尚未开发完全，当前仅支持v2rayN和v2rayNG  
-xrayr后端对接以开发，但尚未编译并且还在测试用：https://github.com/pingProMax/XrayR , PanelType填写"Gov2panel"  
+xrayr后端对接以开发，但尚未编译并且还在测试用：https://github.com/pingProMax/XrayR , PanelType填写"GoV2Panel"  
 
 1、创建数据库导入数据  
 
