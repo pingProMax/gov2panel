@@ -90,16 +90,17 @@ ws+tls:
 协议:v2ray/vless
 {
   "port": "12345",
-  "encryption": "",
-  "security": "",
-  "flow": "",
+  "encryption": "", //加密方式
+  "security": "", //传输层安全
+  "flow": "", //流控
   "sni": "",
   "alpn": "",
   "fp": "",
   "pbk": "",
   "sid": "",
   "spx": "",
-  "type": "",
+  "type": "", //传输协议 (订阅用)
+  "net": "", //传输协议 (后端用)
   "serviceName": "", //grpc serviceName
   "mode": "", //grpc 模式
   "headerType": "",
@@ -108,6 +109,24 @@ ws+tls:
   "host": "",
   "path": "",
   "seed": "" //kcp seed
+}
+
+vless+tcp+reality:
+协议:v2ray/vless
+{
+	"port": "45555",
+	"encryption": "none",
+	"security": "reality",
+	"flow": "xtls-rprx-vision",
+	"sni": "www.smzdm.com",
+	"alpn": "",
+	"fp": "chrome",
+	"pbk": "3embN-YWuuKUd4Lg-7YsbNJwLisZZx2ZF2omf5YvjTs",
+	"sid": "0123456789abcdef",
+	"type": "tcp",
+	"net": "tcp",
+	"headerType": "none",
+	"host": ""
 }
 
 shadowsocks2022

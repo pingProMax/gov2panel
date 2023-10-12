@@ -36,3 +36,7 @@ SET CGO_ENABLED=0
 SET GOOS=linux
 SET GOARCH=amd64
 go build main.go
+
+bug修复记录
+vless 订阅flow和security位置相反
+订阅fp 字段
