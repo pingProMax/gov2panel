@@ -5,9 +5,10 @@ import (
 )
 
 type SubscribeReq struct {
-	g.Meta `path:"/api/subscribe" tags:"Pay" method:"get" summary:"订阅"`
-	Token  string `json:"token"`
-	Flag   string `json:"flag"`
+	g.Meta       `path:"/api/subscribe" tags:"Pay" method:"get" summary:"订阅"`
+	Token        string `json:"token"`
+	Flag         string `json:"flag"`
+	FlagInfoHide bool   `json:"flag_info_hide"`
 }
 
 type SubscribeRes struct {

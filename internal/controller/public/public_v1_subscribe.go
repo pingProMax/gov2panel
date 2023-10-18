@@ -35,7 +35,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 			result = result + fmt.Sprintf("STATUS=↑:%.2fGB,↓:%.2fGB,TOT:%.2fGBExpires:%s\n", utils.BytesToGB(user.U), utils.BytesToGB(user.D), utils.BytesToGB(user.TransferEnable), user.ExpiredAt)
 		}
 
-		if req.Flag == "v2rayn" || req.Flag == "v2rayng" {
+		if (req.Flag == "v2rayn" || req.Flag == "v2rayng") && !req.FlagInfoHide {
 			s1 := map[string]string{
 				"v":    "2",
 				"add":  "127.0.0.1",                                  //链接地址

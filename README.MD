@@ -179,9 +179,16 @@ windows 客户端
 
 
 # 安装教程  
-xrayr后端对接以开发，但尚未编译并且还在测试用：https://github.com/pingProMax/XrayR , PanelType填写"GoV2Panel"  
+xrayr后端：
+https://github.com/XrayR-project/XrayR , PanelType填写"GoV2Panel"  
+
+建议自行拉取编译，打包好的可能比较落后...  
+还需要以下两个静态资源文件夹  
+resource  
+manifest  
 
 1、创建数据库导入数据  
+sql下载： https://github.com/pingProMax/gov2panel/releases/download/gov2panel/gov2panel.sql  
 
 2、修改config.yaml文件  
 manifest/config/config.yaml  
@@ -210,6 +217,9 @@ location / {
 
 5、登录后台修改 账号/密码  
 adminx/123456789  
+
+# 客户端 
+https://github.com/pingProMax/GoV2App
 
 # 后台展示  
 ![后台界面](https://github.com/pingProMax/gov2panel/blob/master/admin.png?raw=true)
