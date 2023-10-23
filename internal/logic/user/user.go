@@ -520,7 +520,12 @@ func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserU
 		return res, errors.New("密码错误，修改失败")
 	}
 
-	_, err = s.Cornerstone.GetDB().Data(g.Map{dao.V2User.Columns().Password: utils.MD5V(req.NewPasswd, strings.Split(uuid.New().String(), "-")[0])}).Where(dao.V2User.Columns().Id, req.TUserID).Update()
+	passwordSalt := strings.Split(uuid.New().String(), "-")[0]
+	_, err = s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2User.Columns().Password:     utils.MD5V(req.NewPasswd, passwordSalt),
+			dao.V2User.Columns().PasswordSalt: passwordSalt,
+		}).Where(dao.V2User.Columns().Id, req.TUserID).Update()
 
 	return
 }
