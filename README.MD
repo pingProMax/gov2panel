@@ -219,7 +219,9 @@ location / {
 adminx/123456789  
 
 # 客户端 
-https://github.com/pingProMax/GoV2App
+https://github.com/pingProMax/GoV2App  
+https://github.com/pingProMax/gov2app_flutter  
+
 
 # 后台展示  
 ![后台界面](https://github.com/pingProMax/gov2panel/blob/master/admin.png?raw=true)

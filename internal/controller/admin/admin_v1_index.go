@@ -64,6 +64,8 @@ func (c *ControllerV1) Index(ctx context.Context, req *v1.IndexReq) (res *v1.Ind
 		if err != nil {
 			return
 		}
+
+		fmt.Println(dayIncomeSumList)
 		var dayIncomeSumBytes []byte
 		dayIncomeSumBytes, err = json.Marshal(dayIncomeSumList)
 		if err != nil {

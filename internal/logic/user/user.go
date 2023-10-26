@@ -589,7 +589,7 @@ func (s *sUser) GetNowMonthDayCount() (count []int, err error) {
 		return
 	}
 
-	for i := timeNow.Day(); i > 0; i-- {
+	for i := 1; i <= timeNow.Day(); i++ {
 
 		var iDayCount int
 		for _, v := range result {
