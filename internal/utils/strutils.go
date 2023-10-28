@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // md5 盐加密
@@ -79,4 +80,16 @@ func GetDateNowMinusDayStr(day int) string {
 	timeNow = timeNow.Add(-time.Duration(day) * 24 * time.Hour)
 
 	return fmt.Sprintf("%s%s%s", strconv.Itoa(timeNow.Year()), strconv.Itoa(int(timeNow.Month())), strconv.Itoa(timeNow.Day())) // = 2023922
+}
+
+// 生成加密密码
+func BcryptGeneratePassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+// 密码效验
+func BcryptCheckPassword(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

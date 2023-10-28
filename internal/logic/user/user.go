@@ -116,13 +116,17 @@ func (s *sUser) UpUser(data *entity.V2User) (err error) {
 	db := s.Cornerstone.GetDB().Data(data)
 	if data.Password == "" {
 		db.FieldsEx(dao.V2User.Columns().Password)
+		db.FieldsEx(dao.V2User.Columns().PasswordAlgo)
+		db.FieldsEx(dao.V2User.Columns().PasswordSalt)
 	}
+
+	passwordSalt := strings.Split(uuid.New().String(), "-")[0]
+	data.PasswordAlgo = "MD5"
+	data.Password = utils.MD5V(data.Password, passwordSalt)
+	data.PasswordSalt = passwordSalt
 
 	_, err =
 		db.FieldsEx(
-			dao.V2User.Columns().CreatedAt,
-			dao.V2User.Columns().PasswordAlgo,
-			dao.V2User.Columns().PasswordSalt,
 			dao.V2User.Columns().InviteUserId,   //邀请id
 			dao.V2User.Columns().TelegramId,     //电报id
 			dao.V2User.Columns().Uuid,           //uuid
@@ -219,14 +223,6 @@ func (s *sUser) AEUser(data *entity.V2User) (err error) {
 	data.D = utils.GBToBytes(float64(data.D))
 	data.TransferEnable = utils.GBToBytes(float64(data.TransferEnable))
 	if data.Id != 0 {
-		if data.Password != "" {
-			user, err := s.GetUserByIdAndCheck(data.Id)
-			if err != nil {
-				return err
-			}
-			data.Password = utils.MD5V(data.Password, user.PasswordSalt)
-		}
-
 		err = s.UpUser(data)
 		return err
 	}
@@ -373,17 +369,29 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 		return nil, errors.New("账号或密码错误")
 	}
 
-	passwd = utils.MD5V(passwd, user.PasswordSalt)
+	switch user.PasswordAlgo {
+	case "MD5":
+		passwd = utils.MD5V(passwd, user.PasswordSalt)
 
-	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Where(dao.V2User.Columns().Password, passwd).Scan(&user)
-	if err != nil {
-		if err == sql.ErrNoRows {
+		err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, userName).Where(dao.V2User.Columns().Password, passwd).Scan(&user)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, errors.New("账号或密码错误")
+			}
+			return nil, err
+		}
+		return
+
+	case "BCRYPT":
+		if !utils.BcryptCheckPassword(passwd, user.Password) {
 			return nil, errors.New("账号或密码错误")
 		}
-		return nil, err
+		return
+	default:
+		return nil, errors.New("账号异常请联系管理员！！！")
+
 	}
 
-	return
 }
 
 // 获取用户数据
@@ -523,6 +531,7 @@ func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserU
 	passwordSalt := strings.Split(uuid.New().String(), "-")[0]
 	_, err = s.Cornerstone.GetDB().Data(
 		g.Map{
+			dao.V2User.Columns().PasswordAlgo: "MD5",
 			dao.V2User.Columns().Password:     utils.MD5V(req.NewPasswd, passwordSalt),
 			dao.V2User.Columns().PasswordSalt: passwordSalt,
 		}).Where(dao.V2User.Columns().Id, req.TUserID).Update()

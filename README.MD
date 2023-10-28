@@ -225,3 +225,11 @@ https://github.com/pingProMax/gov2app_flutter
 
 # 后台展示  
 ![后台界面](https://github.com/pingProMax/gov2panel/blob/master/admin.png?raw=true)
+
+# 适配 v2board 用户BCRYPT密码的加密方式  
+如要导入本项目,password_algo字段固定值`BCRYPT`,其他的请看表注释, 以下是导入示例  
+把v2board v2_user用户表复制到gov2panel数据库中，命名为：v2board_user;   
+执行插入语句,把v2board_user数据插入到v2_user表中：
+编写中...  
+更新用户的订阅组(这里用BCRYPT字段做下区分,表示是v2board_user刚导入的,后面用户修改密码会自动重置为MD5):  
+编写中...  
