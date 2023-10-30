@@ -283,7 +283,7 @@ func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []model.UserTra
 	}
 
 	//服务器最后提交数据时间
-	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(nodeId)), timeNow.Unix(), 3600*time.Second)
+	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(nodeId)), timeNow.Unix(), 0)
 	if err != nil {
 		return
 	}
