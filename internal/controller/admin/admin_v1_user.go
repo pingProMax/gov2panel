@@ -66,3 +66,9 @@ func (c *ControllerV1) Refresh(ctx context.Context, req *v1.RefreshReq) (res *v1
 	res.Token, res.Expire = service.User().Refresh(ctx)
 	return
 }
+
+func (c *ControllerV1) ResetTokenAndUuidById(ctx context.Context, req *v1.ResetTokenAndUuidReq) (res *v1.ResetTokenAndUuidRes, err error) {
+	res = &v1.ResetTokenAndUuidRes{}
+	err = service.User().ResetTokenAndUuidById(req.UserId)
+	return
+}

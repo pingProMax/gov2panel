@@ -621,6 +621,12 @@
               'click #edit': function (e, value, row, index) {
                 AE(row)
               },
+              'click #copy_sub': function (e, value, row, index) {
+                copy_text("{{.setting.subscribe_domain}}api/subscribe?token=" + row.user.token)
+              },
+              'click #reset_uuid_token': function (e, value, row, index) {
+                reset_uuid_token(row.user.id)
+              },
             },
             formatter: function (value, row, index) {
               return `
@@ -632,8 +638,8 @@
                   </button>
 
                   <div class="dropdown-menu" style="">
-                    <a class="dropdown-item" href="#"><i class="far fa-copy"></i>复制订阅</a>
-                    <a class="dropdown-item" href="#"><i class="fas fa-redo-alt"></i>重置UUID和订阅地址</a>
+                    <a class="dropdown-item" href="#" id="copy_sub"><i class="far fa-copy"></i>复制订阅</a>
+                    <a class="dropdown-item" href="#" id="reset_uuid_token"><i class="fas fa-redo-alt"></i>重置UUID和订阅地址</a>
                   </div>
                 </div>
 
@@ -683,5 +689,38 @@
       },
 
     })
+  }
+
+  function copy_text(text) {
+      let input_dom = document.createElement('input');
+      input_dom.value = text;
+      document.body.appendChild(input_dom);//向页面底部追加输入框
+      input_dom.select();//选择input元素
+      document.execCommand("Copy");//执行复制命令
+      notify('success', "复制成功")
+      input_dom.remove();//删除动态创建的节点
+  }
+
+  function reset_uuid_token(id) {
+    $.ajax({
+        type: "POST",
+        url: "/{{.setting.admin_path}}/user/reset_token_uuid",
+        data: {"user_id":id},
+        dataType: "json",
+        success: function(data) {
+            if (data.code == 0) {
+              notify('success', "重置成功")
+            } else {
+              notify('danger', data.message)
+            }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log(errorThrown)
+            notify('danger', errorThrown)
+        },
+        complete: function () {//不管成功还是失败 都会进这个函数
+          $("#table").bootstrapTable('refresh');
+        }
+    });
   }
 </script>

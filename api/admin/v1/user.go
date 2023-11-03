@@ -73,3 +73,10 @@ type RefreshRes struct {
 	Token  string    `json:"token"`
 	Expire time.Time `json:"expire"`
 }
+
+type ResetTokenAndUuidReq struct {
+	g.Meta `path:"/user/reset_token_uuid" tags:"User" method:"post" summary:"重置用户uuid和token"`
+	UserId int `json:"user_id"`
+}
+type ResetTokenAndUuidRes struct {
+}

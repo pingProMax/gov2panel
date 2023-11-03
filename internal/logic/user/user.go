@@ -522,10 +522,21 @@ func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserU
 	if err != nil {
 		return res, err
 	}
+
 	//检查旧密码
-	req.OldPasswd = utils.MD5V(req.OldPasswd, u.PasswordSalt)
-	if req.OldPasswd != u.Password {
-		return res, errors.New("密码错误，修改失败")
+	switch u.PasswordAlgo {
+	case "MD5":
+		req.OldPasswd = utils.MD5V(req.OldPasswd, u.PasswordSalt)
+		if req.OldPasswd != u.Password {
+			return res, errors.New("密码错误，修改失败")
+		}
+	case "BCRYPT":
+		if utils.BcryptCheckPassword(req.OldPasswd, u.PasswordSalt) {
+			return res, errors.New("密码错误，修改失败")
+		}
+	default:
+		err = errors.New("账号密码异常，请联系管理员")
+		return
 	}
 
 	passwordSalt := strings.Split(uuid.New().String(), "-")[0]

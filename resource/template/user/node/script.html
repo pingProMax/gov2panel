@@ -64,19 +64,15 @@
             title: '操作',
             width:120,
             events: {
-              'click #edit': function (e, value, row, index) {
-                TicketMsg(row)
-              },
-              'click #close': function (e, value, row, index) {
-                Close(row.ticket.id)
+              'click #copy_url': function (e, value, row, index) {
+                copy_url(row)
               },
             },
             formatter: function (value, row, index) {
                 return `
               <div class="btn-group" role="group" aria-label="Basic example">
-                <button id="edit" type="button" class="btn btn-twitter btn-icon-only" data-toggle="tooltip" data-placement="left" title="复制URL"><span class="btn-inner--icon"><i class="fas fa-copy"></i></span></button>
+                <button id="copy_url" type="button" class="btn btn-twitter btn-icon-only" data-toggle="tooltip" data-placement="left" title="复制URL"><span class="btn-inner--icon"><i class="fas fa-copy"></i></span></button>
               </div>`;
-
               
             }
           }
@@ -151,5 +147,62 @@
       });
     }
     
+  }
+
+
+  function copy_url(params) {
+    var serviceJson = JSON.parse(params.service_json);
+    var url = "";
+    switch (params.agreement) {
+      case "v2ray/vmess":
+        var d = {
+          "v":    "2",
+					"add":  params.host, //链接地址
+					"ps":   params.name, //名字
+					"port": params.port, //端口
+					"id":   "{{.user.Uuid}}",    //uuid
+					"aid":  "0",
+					"net":  serviceJson["net"],
+					"type": serviceJson["type"],
+					"tls":  serviceJson["tls"],
+					"sni":  serviceJson["sni"],
+					"alpn": serviceJson["alpn"],
+					"host": serviceJson["host"],
+					"path": serviceJson["path"],
+					"scy":  serviceJson["scy"],
+					"fp":   serviceJson["fp"],
+        };
+        url = window.btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+        url = "vmess://"+ url;
+        break;
+
+      case "v2ray/vless":
+        url = `vless://{{.user.Uuid}}@${params.host}:${params.port}?encryption=${serviceJson.encryption}&flow=${serviceJson.flow}&security=${serviceJson.security}&sni=${serviceJson.sni}&alpn=${serviceJson.alpn}&fp=${serviceJson.fp}&pbk=${serviceJson.pbk}&sid=${serviceJson.sid}&spx=${serviceJson.spx}&type=${serviceJson.type}&serviceName=${serviceJson.serviceName}&mode=${serviceJson.mode}&headerType=${serviceJson.headerType}&quicSecurity=${serviceJson.quicSecurity}&key=${serviceJson.key}&host=${serviceJson.host}&path=${serviceJson.path}&seed=${serviceJson.seed}#${params.name}`
+        break;
+      
+      case "shadowsocks/ss2022":
+        url = `ss://${window.btoa(unescape(encodeURIComponent(serviceJson.encryption+":"+"{{.user.Uuid}}")))}@${params.host}:${params.port}#${params.name}`
+        break;
+
+      case "trojan/trojan":
+        url = `trojan://{{.user.Uuid}}@${params.host}:${params.port}?security=${serviceJson.security}&sni=${serviceJson.sni}&alpn=${serviceJson.alpn}&fp=${serviceJson.fp}&type=${serviceJson.type}&headerType=${serviceJson.headerType}&host=${serviceJson.host}#${params.name}`
+        break;
+    
+      default:
+        break;
+    }
+    console.log(params)
+    console.log(serviceJson)
+    copy_text(url);
+  }
+
+  function copy_text(text) {
+      let input_dom = document.createElement('input');
+      input_dom.value = text;
+      document.body.appendChild(input_dom);//向页面底部追加输入框
+      input_dom.select();//选择input元素
+      document.execCommand("Copy");//执行复制命令
+      notify('success', "复制成功")
+      input_dom.remove();//删除动态创建的节点
   }
 </script>
