@@ -227,9 +227,21 @@ https://github.com/pingProMax/gov2app_flutter
 ![后台界面](https://github.com/pingProMax/gov2panel/blob/master/admin.png?raw=true)
 
 # 适配 v2board 用户BCRYPT密码的加密方式  
-如要导入本项目,password_algo字段固定值`BCRYPT`,其他的请看表注释, 以下是导入示例  
-把v2board v2_user用户表复制到gov2panel数据库中，命名为：v2board_user;   
-执行插入语句,把v2board_user数据插入到v2_user表中：
-编写中...  
-更新用户的订阅组(这里用BCRYPT字段做下区分,表示是v2board_user刚导入的,后面用户修改密码会自动重置为MD5):  
-编写中...  
+如要导入本项目,password_algo字段固定值`BCRYPT`,其他的请看表注释,后面用户修改密码会自动重置为MD5,以下是导入示例  
+1、把v2board v2_user用户表复制或导入到gov2panel数据库中，命名为：v2board_user;   
+
+2、执行插入语句,把v2board_user数据插入到v2_user表中： 
+``` sql
+INSERT INTO `v2_user`(
+  invite_user_id,user_name,password,password_algo,password_salt,balance,discount,commission_type,commission_rate,commission_balance,commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,remarks,expired_at,created_at,updated_at) 
+SELECT 
+  invite_user_id,email,password,"BCRYPT" as password_algo,password_salt,balance,discount,commission_type,commission_rate,commission_balance,
+  REPLACE(UUID(), '-', '') AS commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,"v2board_user" as remarks,expired_at,created_at,updated_at  FROM `v2board_user`;    
+```
+
+3、手动创建订阅权限，注意订阅权限类型要为覆盖；  
+4、更新用户的订阅组(这里用remarks字段做下区分,表示是v2board_user刚导入的):    
+``` sql
+update `v2_user` set group_id = 填手动创建订阅权限ID where group_id = v2board项目中的id and remarks = "v2board_user"
+```
+
