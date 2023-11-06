@@ -242,6 +242,10 @@ SELECT
 3、手动创建订阅权限，注意订阅权限类型要为覆盖；  
 4、更新用户的订阅组(这里用remarks字段做下区分,表示是v2board_user刚导入的):    
 ``` sql
-update `v2_user` set group_id = 填手动创建订阅权限ID where group_id = v2board项目中的id and remarks = "v2board_user"
+update `v2_user` set group_id = 填手动创建订阅权限ID, remarks = '' where group_id = v2board项目中的id and remarks = "v2board_user"
+
+如果v2board_user原套餐时间为长期有效，需要手动设置下时间，否则无法使用: 
+update `v2_user` set expired_at = "2034-12-12" where (expired_at is null or expired_at < '1970-01-01') and group_id = 填手动创建订阅权限ID;
+
 ```
 
