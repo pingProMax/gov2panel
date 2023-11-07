@@ -235,7 +235,7 @@ https://github.com/pingProMax/gov2app_flutter
 INSERT INTO `v2_user`(
   invite_user_id,user_name,password,password_algo,password_salt,balance,discount,commission_type,commission_rate,commission_balance,commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,remarks,expired_at,created_at,updated_at) 
 SELECT 
-  invite_user_id,email,password,"BCRYPT" as password_algo,password_salt,balance,discount,commission_type,commission_rate,commission_balance,
+  invite_user_id,email,password,"BCRYPT" as password_algo,password_salt,balance / 100,discount,commission_type,commission_rate,commission_balance / 100,
   REPLACE(UUID(), '-', '') AS commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,"v2board_user" as remarks,expired_at,created_at,updated_at  FROM `v2board_user`;    
 ```
 
