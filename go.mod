@@ -17,6 +17,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/tidwall/gjson v1.17.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.16.0 // indirect
 	golang.org/x/crypto v0.12.0
 	golang.org/x/image v0.11.0 // indirect
