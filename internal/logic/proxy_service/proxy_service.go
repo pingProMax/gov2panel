@@ -71,7 +71,7 @@ func (s *sProxyService) GetProxyServiceList(req *v1.ProxyServiceReq, orderBy, or
 
 	if total > 0 {
 
-		planList, err := service.Plan().GetPlanShowAndResetTrafficMethod1List()
+		planList, err := service.Plan().GetPlanResetTrafficMethod1List()
 		if err != nil {
 			return m, 0, err
 		}

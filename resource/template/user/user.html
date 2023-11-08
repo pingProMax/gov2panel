@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <!-- Icons -->
   <link rel="stylesheet" href="/resource/nucleo/css/nucleo.css" type="text/css">
-  <link rel="stylesheet" href="/resource/fontawesome-free-5.15.4-web/css/all.min.css" type="text/css">
+  
   <!-- Page plugins -->
   <!-- Argon CSS -->
   <link rel="stylesheet" href="/resource/css/argon.css?v=1.1.0" type="text/css">
@@ -119,14 +119,14 @@
           <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link {{if eq .path (concat "/user/plan" "")}}active{{end}}" href="/user/plan" role="button" aria-controls="navbar-dashboards">
-                <i class="fas fa-store text-primary"></i>
+                <i class="ni ni-bag-17 text-primary"></i>
                 <span class="nav-link-text">购买订阅</span>
               </a>
             </li>
             
             <li class="nav-item">
               <a class="nav-link {{if eq .path (concat "/user/node" "")}}active{{end}}" href="/user/node" role="button" aria-controls="navbar-dashboards">
-                <i class="ni ni-atom text-primary"></i>
+                <i class="ni ni-world text-primary"></i>
                 <span class="nav-link-text">节点列表</span>
               </a>
             </li>
@@ -140,7 +140,7 @@
           <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link {{if eq .path (concat "/user/wallet" "")}}active{{end}}" href="/user/wallet" role="button" aria-controls="navbar-dashboards">
-                <i class="fas fa-wallet text-primary"></i>
+                <i class="ni ni-credit-card text-primary"></i>
                 <span class="nav-link-text">钱包</span>
               </a>
             </li>
@@ -167,7 +167,7 @@
             </li>
             <li class="nav-item">
               <a class="nav-link {{if eq .path (concat "/user/flow" "")}}active{{end}}" href="/user/flow" role="button" aria-controls="navbar-dashboards">
-                <i class="fas fa-asterisk text-primary"></i>
+                <i class="ni ni-ruler-pencil text-primary"></i>
                 <span class="nav-link-text">流量明细</span>
               </a>
             </li>
@@ -252,6 +252,7 @@
 
   <script src="/resource/js/bootstrap-notify.min.js"></script>
   
+  <!-- <script src="https://use.fontawesome.com/releases/v5.11.2/js/all.js"></script> -->
   
 
   {{include .scriptTpl .}}

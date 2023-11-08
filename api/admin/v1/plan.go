@@ -39,10 +39,10 @@ type PlanGetShowRes struct {
 	Data   []*entity.V2Plan `json:"data"`
 }
 
-type PlanGetShowAndResetTrafficMethod1Req struct {
-	g.Meta `path:"/plan/get_show_rtm1" tags:"Plan" method:"post" summary:"获取显示的 可覆盖的订阅列表"`
+type PlanGetResetTrafficMethod1Req struct {
+	g.Meta `path:"/plan/get_rtm1" tags:"Plan" method:"post" summary:"获取 可覆盖的订阅列表"`
 }
-type PlanGetShowAndResetTrafficMethod1Res struct {
+type PlanGetResetTrafficMethod1Res struct {
 	g.Meta `mime:"text/html" example:"string"`
 	Data   []*entity.V2Plan `json:"data"`
 }

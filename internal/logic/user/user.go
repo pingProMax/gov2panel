@@ -132,9 +132,10 @@ func (s *sUser) UpUser(data *entity.V2User) (err error) {
 			dao.V2User.Columns().Uuid,           //uuid
 			dao.V2User.Columns().Token,          //token
 			dao.V2User.Columns().CommissionCode, //优惠码
+			dao.V2User.Columns().CreatedAt,
 		).
 			Where(dao.V2User.Columns().Id, data.Id).
-			Update()
+			Update(data)
 	return err
 }
 

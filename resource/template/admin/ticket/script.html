@@ -27,7 +27,7 @@
       </div>
       <div class="row px-3">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data">
+          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data" onkeydown="if(event.keyCode==13) Subjectajax()">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-row="" onclick="Subjectajax()">发送</button>
           </div>
@@ -193,15 +193,18 @@
       columns: [
         [
           {
-
           }, {
             title: '<input type="text"  placeholder="ID" class="form-control" name="id" data-function="search" data-type="eq"  />',
+            width: 80,
           }, {
             title: '<input type="number"  placeholder="用户id" class="form-control" name="user_id" data-function="search" data-type="eq" />',
+            width: 80,
           },{
             title: '<input type="text"  placeholder="用户名" class="form-control" name="user_name" data-function="search" data-type="like" />',
           },{
             title: '<input type="text"  placeholder="标题" class="form-control" name="subject" data-function="search" data-type="like" />',
+            width:250,
+
           }, {
             title:  `
                   <div class="input-group">
@@ -213,6 +216,7 @@
                     </select>
                   </div>
           `,
+            width: 80,
           }, {
             title:  `
                   <div class="input-group">
@@ -254,11 +258,10 @@
             field: 'ticket.id',
             sortName:'id',
             title: 'ID',
-            width: 80,
           }, {
             field: 'ticket.user_id',
             sortName:'user_id',
-            title: '用户',
+            title: '用户id',
             formatter: function (value, row, index) {
               return row.ticket.user_id
             },

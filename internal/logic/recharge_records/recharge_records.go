@@ -204,11 +204,13 @@ func (s *sRechargeRecords) GetNowMonthSumAmount() (amount float64, err error) {
 	var amountSum *gvar.Var
 	timeNow := time.Now()
 
-	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s",
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s and %s = %s",
 		dao.V2RechargeRecords.Columns().CreatedAt,
 		strconv.Itoa(timeNow.Year()),
 		dao.V2RechargeRecords.Columns().CreatedAt,
 		strconv.Itoa(int(timeNow.Month())),
+		dao.V2RechargeRecords.Columns().OperateType,
+		strconv.Itoa(1),
 	)
 	amountSum, err = s.Cornerstone.GetDB().Fields(fmt.Sprintf("SUM(%s)", dao.V2RechargeRecords.Columns().Amount)).Where(sqlStr).Value()
 	if err != nil {

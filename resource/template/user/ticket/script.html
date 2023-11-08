@@ -65,7 +65,7 @@
       </div>
       <div class="row px-3">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data">
+          <input type="text" class="form-control" placeholder="输入信息回复" aria-label="输入信息回复" aria-describedby="button-addon2" id="msg_data" onkeydown="if(event.keyCode==13) Subjectajax()">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" id="button-addon2" data-row="" onclick="Subjectajax()">发送</button>
           </div>
@@ -317,14 +317,14 @@
               if (row.ticket.status == 0) {
                 return `
               <div class="btn-group" role="group" aria-label="Basic example">
-                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-comments"></i></span></button>
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="ni ni-chat-round"></i></span></button>
                 <button id="close" type="button" class="btn btn-outline-warning btn-icon-only"><span class="btn-inner--icon">关闭</span></button>
               </div>`;
               }
 
               return `
               <div class="btn-group" role="group" aria-label="Basic example">
-                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-comments"></i></span></button>
+                <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="ni ni-chat-round"></i></span></button>
               </div>`;
               
             }

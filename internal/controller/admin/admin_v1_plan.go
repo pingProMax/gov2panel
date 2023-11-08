@@ -47,9 +47,9 @@ func (c *ControllerV1) PlanGetShow(ctx context.Context, req *v1.PlanGetShowReq) 
 	return
 }
 
-func (c *ControllerV1) PlanGetShowAndResetTrafficMethod1(ctx context.Context, req *v1.PlanGetShowAndResetTrafficMethod1Req) (res *v1.PlanGetShowAndResetTrafficMethod1Res, err error) {
-	res = &v1.PlanGetShowAndResetTrafficMethod1Res{}
-	res.Data, err = service.Plan().GetPlanShowAndResetTrafficMethod1List()
+func (c *ControllerV1) PlanGetResetTrafficMethod1(ctx context.Context, req *v1.PlanGetResetTrafficMethod1Req) (res *v1.PlanGetResetTrafficMethod1Res, err error) {
+	res = &v1.PlanGetResetTrafficMethod1Res{}
+	res.Data, err = service.Plan().GetPlanResetTrafficMethod1List()
 
 	return
 }

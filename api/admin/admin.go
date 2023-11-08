@@ -28,7 +28,7 @@ type IAdminV1 interface {
 	PlanAE(ctx context.Context, req *v1.PlanAEReq) (res *v1.PlanAERes, err error)
 	PlanDel(ctx context.Context, req *v1.PlanDelReq) (res *v1.PlanDelRes, err error)
 	PlanGetShow(ctx context.Context, req *v1.PlanGetShowReq) (res *v1.PlanGetShowRes, err error)
-	PlanGetShowAndResetTrafficMethod1(ctx context.Context, req *v1.PlanGetShowAndResetTrafficMethod1Req) (res *v1.PlanGetShowAndResetTrafficMethod1Res, err error)
+	PlanGetResetTrafficMethod1(ctx context.Context, req *v1.PlanGetResetTrafficMethod1Req) (res *v1.PlanGetResetTrafficMethod1Res, err error)
 	ProxyService(ctx context.Context, req *v1.ProxyServiceReq) (res *v1.ProxyServiceRes, err error)
 	ProxyServiceAE(ctx context.Context, req *v1.ProxyServiceAEReq) (res *v1.ProxyServiceAERes, err error)
 	ProxyServiceDel(ctx context.Context, req *v1.ProxyServiceDelReq) (res *v1.ProxyServiceDelRes, err error)

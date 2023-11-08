@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	v1 "gov2panel/api/user/v1"
 	"gov2panel/internal/service"
@@ -39,6 +41,10 @@ func (c *ControllerV1) TicketCreate(ctx context.Context, req *v1.TicketCreateReq
 	req.V2Ticket.UserId = req.TUserID
 	req.V2Ticket.Status = 0
 	req.V2Ticket.ReplyStatus = 0
+	if strings.TrimSpace(req.V2Ticket.Subject) == "" {
+		err = errors.New("主题不能为空！")
+		return
+	}
 	err = service.Ticket().AETicket(&req.V2Ticket)
 	return
 }
