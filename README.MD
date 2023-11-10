@@ -236,7 +236,15 @@ INSERT INTO `v2_user`(
   invite_user_id,user_name,password,password_algo,password_salt,balance,discount,commission_type,commission_rate,commission_balance,commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,remarks,expired_at,created_at,updated_at) 
 SELECT 
   invite_user_id,email,password,"BCRYPT" as password_algo,password_salt,balance / 100,discount,commission_type,commission_rate,commission_balance / 100,
-  REPLACE(UUID(), '-', '') AS commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,"v2board_user" as remarks,expired_at,created_at,updated_at  FROM `v2board_user`;    
+  CONCAT(
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1),
+    SUBSTRING('AaBbCcDdEdFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', FLOOR(RAND() * 36) + 1, 1)
+  ) AS commission_code,u,d,transfer_enable,banned,is_admin,is_staff,uuid,group_id,token,"v2board_user" as remarks,expired_at,created_at,updated_at  FROM `v2board_user`;    
 ```
 
 3、手动创建订阅权限，注意订阅权限类型要为覆盖；  

@@ -126,8 +126,8 @@ func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err erro
 			payment.NotifyDomain+"/pay/e_pay_notify", //服务器异步通知地址
 			out_trade_no, //订单号
 			priceStr+"|"+strconv.Itoa(payment.Id)+"|"+strconv.Itoa(res.TUserID)+"|"+transactionId, //自定义 用户实际得到的金额|支付方式的id|用户id|订单号
-			epayConfig.Pid.String(),             //pid
-			payment.NotifyDomain+"/user/wallet", //页面跳转通知地址
+			epayConfig.Pid.String(),     //pid
+			res.Redirect+"/user/wallet", //页面跳转通知地址
 
 		)
 

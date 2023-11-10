@@ -63,6 +63,7 @@ type PayRedirectionReq struct {
 	TUserID   int
 	PaymentId int     `json:"payment_id"`
 	Amount    float64 `json:"amount"`
+	Redirect  string  `json:"redirect"`
 }
 
 type PayRedirectionRes struct {

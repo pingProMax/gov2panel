@@ -227,11 +227,13 @@ func (s *sRechargeRecords) GetNowMonthDaySum() (data []int, err error) {
 	data = make([]int, 0)
 	timeNow := time.Now()
 	createAt := dao.V2RechargeRecords.Columns().CreatedAt
-	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s and (",
+	sqlStr := fmt.Sprintf("YEAR(%s) = %s and MONTH(%s) = %s and %s = %s and (",
 		createAt,
 		strconv.Itoa(timeNow.Year()),
 		createAt,
 		strconv.Itoa(int(timeNow.Month())),
+		dao.V2RechargeRecords.Columns().OperateType,
+		strconv.Itoa(1),
 	)
 
 	for i := timeNow.Day(); i > 0; i-- {

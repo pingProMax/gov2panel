@@ -17,7 +17,7 @@
     $.ajax({
         type: "post",
         url: "/user/pay_redirection",
-        data: {'payment_id':checkedData.id,'amount':$("#recharge_id").val()},
+        data: {'payment_id':checkedData.id,'amount':$("#recharge_id").val(),"redirect":document.location.protocol + "//" + document.location.host},
         dataType: "json",
         success: function(data) {
             if (data.code == 0) {
