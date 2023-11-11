@@ -169,6 +169,8 @@ func (s *sPlan) UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error) {
 		return res, errors.New("余额不足")
 	}
 
+	time.Sleep(5 * time.Second)
+
 	//扣款 和 设置用户套餐
 	g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
 

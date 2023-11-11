@@ -7,6 +7,7 @@
     let userExclusiveDiscount = {{.user.Discount}};
 
     let price = {{.data.Price}};
+    let uuid = "{{.uuid}}";
 
     $(function(){
         if (userExclusiveDiscount > 0 ) {
@@ -31,7 +32,7 @@
         $.ajax({
             type: "post",
             url: "/user/coupon",
-            data: {'code':$("#code_input_id").val(),plan_id:$("#plan_id_id").val()},
+            data: {'code':$("#code_input_id").val(),'plan_id':$("#plan_id_id").val()},
             dataType: "json",
             success: function(data) {
                 if (data.code == 0) {
@@ -85,7 +86,7 @@
         $.ajax({
             type: "post",
             url: "/user/buy",
-            data: {'code':$("#code_input_id").val(),plan_id:$("#plan_id_id").val()},
+            data: {'code':$("#code_input_id").val(),'plan_id':$("#plan_id_id").val(),'uuid':uuid},
             dataType: "json",
             success: function(data) {
                 if (data.code == 0) {
