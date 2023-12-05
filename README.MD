@@ -6,6 +6,9 @@
 # 更新日志  
 https://github.com/pingProMax/gov2panel/blob/master/UpdateLog.MD  
 
+* * *  
+
+# 节点
 节点地址   
 ``` json 
 $uuid$ 订阅时会替换成用户的uuid   
