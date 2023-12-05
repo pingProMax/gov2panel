@@ -4,8 +4,7 @@
 - https://goframe.org/pages/viewpage.action?pageId=1114399  
 
 # 更新日志  
-
-
+https://github.com/pingProMax/gov2panel/blob/master/UpdateLog.MD  
 
 节点地址   
 ``` json 
