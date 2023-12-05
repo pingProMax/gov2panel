@@ -82,7 +82,7 @@ func (s *sTicket) UpTicketStatusAndReplyStatusById(ticketId, status, reply_statu
 
 // 获取 打开工单的数量
 func (s *sTicket) GetOpenTicketCount() (totle int, err error) {
-	totle, err = s.Cornerstone.GetDB().Where(dao.V2Ticket.Columns().Status, 0).Count()
+	totle, err = s.Cornerstone.GetDB().Where(dao.V2Ticket.Columns().Status, -1).Count()
 	return
 }
 
@@ -97,13 +97,13 @@ func (s *sTicket) GetTicketList(req *entity.V2Ticket, userName string, orderBy, 
 	if req.UserId != 0 {
 		db.Where(dao.V2Ticket.Columns().UserId, req.UserId)
 	}
-	if req.Level != -1 {
+	if req.Level != 0 {
 		db.Where(dao.V2Ticket.Columns().Level, req.Level)
 	}
-	if req.Status != -1 {
+	if req.Status != 0 {
 		db.Where(dao.V2Ticket.Columns().Status, req.Status)
 	}
-	if req.ReplyStatus != -1 {
+	if req.ReplyStatus != 0 {
 		db.Where(dao.V2Ticket.Columns().ReplyStatus, req.ReplyStatus)
 	}
 

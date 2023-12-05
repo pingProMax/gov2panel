@@ -14,8 +14,8 @@ type V2Ticket struct {
 	UserId      int         `json:"user_id"      ` //
 	Subject     string      `json:"subject"      ` //
 	Level       int         `json:"level"        ` //
-	Status      int         `json:"status"       ` // 0:已开启 1:已关闭
-	ReplyStatus int         `json:"reply_status" ` // 0:待回复 1:已回复
+	Status      int         `json:"status"       ` // -1:已开启 1:已关闭
+	ReplyStatus int         `json:"reply_status" ` // -1:待回复 1:已回复
 	CreatedAt   *gtime.Time `json:"created_at"   ` //
 	UpdatedAt   *gtime.Time `json:"updated_at"   ` //
 }

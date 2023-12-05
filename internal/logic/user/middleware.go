@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"gov2panel/internal/service"
+	"net/http"
 	"time"
 
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -61,6 +62,14 @@ func (s *middlewareService) AuthUser(r *ghttp.Request) {
 	user, err := service.User().GetUserById(r.Get("TUserID").Int())
 	if err != nil {
 		r.Response.WriteExit(err.Error())
+	}
+
+	if user.Banned == 1 {
+		service.User().Logout(r.GetCtx())
+		ghttp.RequestFromCtx(r.GetCtx()).Cookie.Remove("jwt")
+		ghttp.RequestFromCtx(r.GetCtx()).Response.RedirectTo("/", http.StatusFound)
+		ghttp.RequestFromCtx(r.GetCtx()).ExitAll()
+		return
 	}
 
 	mapClaims, _, err := Auth().GetClaimsFromJWT(r.GetCtx())

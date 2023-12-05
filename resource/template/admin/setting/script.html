@@ -54,6 +54,7 @@
 
 <script>
   const $table = $('#table')
+  let hasInit = false;
   $(function () {
     initTable()
   })
@@ -256,7 +257,27 @@
 
         return x
       },
+      onColumnSwitch:function(field,checked) { //列选择事件
+        window.localStorage.setItem('setting_hidden_columns', JSON.stringify($("#table").bootstrapTable('getHiddenColumns').map(function (it) {return it.field})))
+        
+      },
+      onPostBody:function(data){//渲染并在 DOM 中可用后触发
+        
+        if (hasInit == false &&window.localStorage.getItem('setting_hidden_columns') != null) {
+          JSON.parse(window.localStorage.getItem('setting_hidden_columns')).forEach(v => {
+            $("#table").bootstrapTable('hideColumn', v);
+          });
+        }
+        if (!hasInit) hasInit = true
+      },
 
     })
   }
+  
+  document.addEventListener('keyup', function(event) {
+    if (event.keyCode === 13) {
+        // 回车键按下后的操作
+        search()
+    }
+  });
 </script>

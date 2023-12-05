@@ -56,10 +56,17 @@
             </div>
             <div class="position-relative form-group">
               <label>是否启用</label>
-              <p><label class="custom-toggle">
-                <input type="checkbox" checked="" name="enable" value="1">
-                <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
-              </label></p>
+              <div>
+                <div class="custom-control custom-radio ">
+                  <input name="enable" class="custom-control-input" id="radio1" type="radio" checked="" value="1">
+                  <label class="custom-control-label" for="radio1">启用</label>
+                </div>
+                <div class="custom-control custom-radio ">
+                  <input name="enable" class="custom-control-input" id="radio2" type="radio" value="-1">
+                  <label class="custom-control-label" for="radio2">禁用</label>
+                </div>
+              </div>
+             
             </div>
             
             <div class="position-relative form-group">
@@ -129,6 +136,15 @@
                     }
                 }
             }
+        })
+
+        //单选默认值
+        $("#AEForm input[type='radio']").each(function (i, v) {
+          for (let key in data) {
+            if (key == $(v).attr("name")) {
+              $("#AEForm input:radio[name='"+key+"'][value='" + data[key] + "']").prop("checked", true)
+            }
+          }
         })
         
         

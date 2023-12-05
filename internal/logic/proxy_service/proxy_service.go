@@ -48,11 +48,11 @@ func (s *sProxyService) GetProxyServiceList(req *v1.ProxyServiceReq, orderBy, or
 	if req.Id != 0 {
 		db.Where(dao.V2ProxyService.Columns().Id, req.Id)
 	}
-	if req.Show != -1 {
+	if req.Show != 0 {
 		db.Where(dao.V2ProxyService.Columns().Show, req.Show)
 	}
 
-	if req.PlanId != "-1" {
+	if gconv.Int(req.PlanId) != 0 {
 		db.WhereLike(dao.V2ProxyService.Columns().PlanId, "%\""+req.PlanId+"\"%")
 	}
 

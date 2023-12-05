@@ -72,7 +72,7 @@ func (s *sCoupon) CheckCouponCanUseByCode(req *userv1.CouponReq) (res *userv1.Co
 	}
 	nowTimeUnix := time.Now().Unix()
 
-	if coupon.StartedAt.Timestamp() <= nowTimeUnix && coupon.EndedAt.Timestamp() >= nowTimeUnix {
+	if coupon.StartedAt.Timestamp() <= nowTimeUnix && coupon.EndedAt.Timestamp() >= nowTimeUnix && coupon.Enable == 1 {
 
 		//判断是否指定订阅
 		if coupon.LimitPlanId != 0 {

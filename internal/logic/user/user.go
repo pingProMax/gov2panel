@@ -182,9 +182,13 @@ func (s *sUser) RegisterUser(UserName, Passwd, CommissionCode string) error {
 	}
 
 	err = s.AddUser(&entity.V2User{
-		UserName:     UserName,
-		Password:     Passwd,
-		InviteUserId: uu.Id,
+		UserName:       UserName,
+		Password:       Passwd,
+		InviteUserId:   uu.Id,
+		Banned:         -1,
+		IsAdmin:        -1,
+		IsStaff:        -1,
+		CommissionType: 3,
 	})
 	if err != nil {
 		return err
@@ -280,7 +284,7 @@ func (s *sUser) GetUserListByGroupIds(groupIds []int) (u []*entity.V2User, err e
 		Where(dao.V2User.Columns().GroupId, groupIds).
 		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
 		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).
-		Where(dao.V2User.Columns().Banned, 0).
+		Where(dao.V2User.Columns().Banned, -1).
 		Wheref("`%s` != ''", dao.V2User.Columns().Uuid).
 		Scan(&u)
 	return
@@ -292,7 +296,7 @@ func (s *sUser) GetUserCountByGroupIds(groupIds []int) (totle int, err error) {
 		Where(dao.V2User.Columns().GroupId, groupIds).
 		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
 		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).
-		Where(dao.V2User.Columns().Banned, 0).
+		Where(dao.V2User.Columns().Banned, -1).
 		Wheref("`%s` != ''", dao.V2User.Columns().Uuid).
 		Count()
 	return
@@ -381,11 +385,20 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 			}
 			return nil, err
 		}
+
+		if user.Banned == 1 {
+			return nil, errors.New("账号被冻结请联系管理员")
+		}
+
 		return
 
 	case "BCRYPT":
 		if !utils.BcryptCheckPassword(passwd, user.Password) {
 			return nil, errors.New("账号或密码错误")
+		}
+
+		if user.Banned == 1 {
+			return nil, errors.New("账号被冻结请联系管理员")
 		}
 		return
 	default:
@@ -404,11 +417,14 @@ func (s *sUser) GetUserList(req *v1.UserReq, orderBy, orderDirection string, off
 		gdbU.Where("id like ?", "%"+strconv.Itoa(req.V2User.Id)+"%")
 	}
 	gdbU.Where("user_name like ?", "%"+req.V2User.UserName+"%")
-	if req.V2User.Banned != -1 {
+	if req.V2User.Banned != 0 {
 		gdbU.Where("banned", req.V2User.Banned)
 	}
-	if req.V2User.GroupId != -1 {
+	if req.V2User.GroupId != 0 {
 		gdbU.Where("group_id", req.V2User.GroupId)
+	}
+	if req.V2User.IsAdmin != 0 {
+		gdbU.Where("is_admin", req.V2User.IsAdmin)
 	}
 
 	if req.US != "" {
@@ -482,7 +498,7 @@ func (s *sUser) GetUserList(req *v1.UserReq, orderBy, orderDirection string, off
 			gdbU.Where("discount <= ?", g.Slice{req.V2User.Discount})
 		}
 	}
-	if req.V2User.CommissionType != -1 {
+	if req.V2User.CommissionType != 0 {
 		gdbU.Where("commission_type = ?", g.Slice{req.V2User.CommissionType})
 
 	}

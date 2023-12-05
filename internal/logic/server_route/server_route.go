@@ -34,7 +34,7 @@ func (s *sServerRoute) GetServerRouteList(req *v1.ServerRouteReq, orderBy, order
 		db.Where(dao.V2ServerRoute.Columns().Id, req.Id)
 	}
 
-	if req.Enable != -1 {
+	if req.Enable != 0 {
 		db.Where(dao.V2ServerRoute.Columns().Enable, req.Enable)
 	}
 	if req.Action != "" {

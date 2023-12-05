@@ -102,7 +102,7 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 							CommissionRate:    cRate,
 							RechargeRecordsId: int(rechargeRecordsId),
 							OperateType:       1,
-							State:             0,
+							State:             -1,
 						}
 						_, err = tx.Ctx(ctx).Model(d.V2InvitationRecords.Table()).Data(invitationRecords).Insert()
 						if err != nil {

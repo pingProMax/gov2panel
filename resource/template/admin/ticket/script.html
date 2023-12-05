@@ -40,6 +40,7 @@
 
 <script>
   const $table = $('#table')
+  let hasInit = false;
   $(function () {
     initTable()
   })
@@ -209,7 +210,7 @@
             title:  `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="level">
-                      <option selected value="-1">全部</option>
+                      <option selected value="0">全部</option>
                       <option value="1">低</option>
                       <option value="2">中</option>
                       <option value="3">高</option>
@@ -221,8 +222,8 @@
             title:  `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="status">
-                      <option selected value="-1">全部</option>
-                      <option value="0">已开启</option>
+                      <option selected value="0">全部</option>
+                      <option value="-1">已开启</option>
                       <option value="1">已关闭</option>
                     </select>
                   </div>
@@ -231,8 +232,8 @@
             title:  `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="reply_status">
-                      <option selected value="-1">全部</option>
-                      <option value="0">待回复</option>
+                      <option selected value="0">全部</option>
+                      <option value="-1">待回复</option>
                       <option value="1">已回复</option>
                     </select>
                   </div>
@@ -301,7 +302,7 @@
             sortName:'status',
             title: '工单状态',
             formatter: function (value, row, index) {
-              if (row.ticket.status == 0) {
+              if (row.ticket.status == -1) {
                 return `<span class="badge badge-dot mr-4">
                         <i class="bg-warning"></i>
                         <span class="status">开启</span>
@@ -317,7 +318,7 @@
             sortName:'reply_status',
             title: '回复状态',
             formatter: function (value, row, index) {
-              if (row.ticket.reply_status == 0) {
+              if (row.ticket.reply_status == -1) {
                 return `待回复`
               }
               return `已回复`;
@@ -381,7 +382,27 @@
 
         return x
       },
+      onColumnSwitch:function(field,checked) { //列选择事件
+        window.localStorage.setItem('ticket_hidden_columns', JSON.stringify($("#table").bootstrapTable('getHiddenColumns').map(function (it) {return it.field})))
+        
+      },
+      onPostBody:function(data){//渲染并在 DOM 中可用后触发
+        
+        if (hasInit == false &&window.localStorage.getItem('ticket_hidden_columns') != null) {
+          JSON.parse(window.localStorage.getItem('ticket_hidden_columns')).forEach(v => {
+            $("#table").bootstrapTable('hideColumn', v);
+          });
+        }
+        if (!hasInit) hasInit = true
+      },
 
     })
   }
+
+  document.addEventListener('keyup', function(event) {
+    if (event.keyCode === 13) {
+        // 回车键按下后的操作
+        search()
+    }
+  });
 </script>

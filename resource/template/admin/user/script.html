@@ -30,13 +30,19 @@
         <div class="card-body">
           <form id="AEForm">
             <input type="hidden" name="id" id="aeid"  class="form-control">
-            <div class="position-relative form-group">
-              <label>账号</label>
-              <input name="user_name" placeholder="账号" type="text" class="form-control">
-            </div>
-            <div class="position-relative form-group">
-              <label>密码</label>
-              <input name="password" placeholder="密码为空不修改" type="text" class="form-control">
+            <div class="row">
+              <div class="col">
+                <div class="position-relative form-group">
+                  <label>账号</label>
+                  <input name="user_name" placeholder="账号" type="text" class="form-control">
+                </div>
+              </div>
+              <div class="col">
+                <div class="position-relative form-group">
+                  <label>密码</label>
+                  <input name="password" placeholder="密码为空不修改" type="text" class="form-control">
+                </div>
+              </div>
             </div>
             <div class="position-relative form-group">
               <label>权限组</label>
@@ -70,7 +76,7 @@
                 <div class="position-relative form-group">
                   <label>返利模式</label>
                   <select name="commission_type" class="form-control">
-                    <option value="0">跟随系统</option>
+                    <option value="3">跟随系统</option>
                     <option value="1">循环</option>
                     <option value="2">一次性</option>
                   </select>
@@ -113,7 +119,7 @@
                 <div class="position-relative form-group">
                   <label>是否冻结</label>
                   <select name="banned" class="form-control">
-                    <option value="0">否</option>
+                    <option value="-1">否</option>
                     <option value="1">是</option>
                   </select>
                 </div>
@@ -122,7 +128,7 @@
                 <div class="position-relative form-group">
                   <label>是否管理员</label>
                   <select name="is_admin" class="form-control">
-                    <option value="0">否</option>
+                    <option value="-1">否</option>
                     <option value="1">是</option>
                   </select>
                 </div>
@@ -131,7 +137,7 @@
                 <div class="position-relative form-group">
                   <label>是否员工</label>
                   <select name="is_staff" class="form-control">
-                    <option value="0">否</option>
+                    <option value="-1">否</option>
                     <option value="1">是</option>
                   </select>
                 </div>
@@ -158,6 +164,7 @@
   let planList =  [];
 
   const $table = $('#table')
+  let hasInit = false;
   $(function () {
     initTable()
     getShowPlan()
@@ -373,8 +380,8 @@
             title: `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="banned">
-                      <option selected value="-1">状态</option>
-                      <option value="0">正常</option>
+                      <option selected value="0">全部</option>
+                      <option value="-1">正常</option>
                       <option value="1">禁用</option>
                     </select>
                   </div>
@@ -382,16 +389,26 @@
           }, {
             title: `
                   <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="is_admin">
+                      <option selected value="0">全部</option>
+                      <option value="1">是</option>
+                      <option value="-1">否</option>
+                    </select>
+                  </div>
+          `,
+          },{
+            title: `
+                  <div class="input-group">
                     <select class="custom-select" data-function="search" name="group_id" id="select_group_id" >
-                      <option selected value="-1" >全部</option>
-                      <option value="0">未订阅</option>
+                      <option selected value="0" >全部</option>
+                      <option value="-1">未订阅</option>
                     </select>
                   </div>
           `,
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="uS" id="select_u">
+                    <select class="custom-select" name="uS" id="select_u" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -402,7 +419,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="dS" id="select_d">
+                    <select class="custom-select" name="dS" id="select_d" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -413,7 +430,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="transfer_enableS" id="select_transfer_enable">
+                    <select class="custom-select" name="transfer_enableS" id="select_transfer_enable" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -426,7 +443,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select col-4 " name="expired_atS" id="select_expired_at">
+                    <select class="custom-select col-4 " name="expired_atS" id="select_expired_at" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -438,7 +455,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="balanceS" id="select_balance">
+                    <select class="custom-select" name="balanceS" id="select_balance" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -451,7 +468,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="commission_balanceS" id="select_commission_balance">
+                    <select class="custom-select" name="commission_balanceS" id="select_commission_balance" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -464,7 +481,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="discountS" id="select_discount">
+                    <select class="custom-select" name="discountS" id="select_discount" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -478,8 +495,8 @@
             title: `
                   <div class="input-group">
                     <select class="custom-select" name="commission_type" data-function="search">
-                      <option value="-1">全部</option>
-                      <option value="0">系统</option>
+                      <option value="0">全部</option>
+                      <option value="3">系统</option>
                       <option value="1">循环</option>
                       <option value="2">一次性</option>
                     </select>
@@ -488,7 +505,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select" name="commission_rateS" id="select_commission_rate">
+                    <select class="custom-select" name="commission_rateS" id="select_commission_rate" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -501,7 +518,7 @@
           }, {
             title: `
                   <div class="input-group">
-                    <select class="custom-select col-4 " name="created_atS" id="select_created_at">
+                    <select class="custom-select col-4 " name="created_atS" id="select_created_at" data-function="search">
                       <option selected value="">选择</option>
                       <option value=">=">>=</option>
                       <option value="<="><=</option>
@@ -536,17 +553,28 @@
             title: '账号',
             sortable: true, //是否允许排序
             sortName:'user_name',
-            width: 900,
           }, {
             field: 'banned',
             title: '账号状态',
             sortable: true, //是否允许排序
             sortName:'banned',
             formatter: function (value, row, index) {
-              if (row.user.banned== 0) {
-                return `正常`;
-              }else{
+              if (row.user.banned == 1) {
                 return `封禁`;
+              }else{
+                return `正常`;
+              }
+            }
+          }, {
+            field: 'is_admin',
+            title: '是否管理员',
+            sortable: true, //是否允许排序
+            sortName:'is_admin',
+            formatter: function (value, row, index) {
+              if (row.user.is_admin == 1) {
+                return `是`;
+              }else{
+                return `否`;
               }
             }
           },{
@@ -603,6 +631,24 @@
             title: 'aff模式',
             sortable: true, //是否允许排序
             sortName:'commission_type',
+            formatter: function (value, row, index) {
+              let t = "系统错误";
+              switch (value) {
+                case 1:
+                  t = "循环";
+                  break;
+                case 2:
+                  t = "一次性";
+                  break;
+                case 3:
+                  t = "系统";
+                  break;
+              
+                default:
+                  break;
+              }
+              return t;
+            }
           }, {
             field: 'user.commission_rate',
             title: '返利比例',
@@ -687,6 +733,19 @@
 
         return x
       },
+      onColumnSwitch:function(field,checked) { //列选择事件
+        window.localStorage.setItem('user_hidden_columns', JSON.stringify($("#table").bootstrapTable('getHiddenColumns').map(function (it) {return it.field})))
+        
+      },
+      onPostBody:function(data){//渲染并在 DOM 中可用后触发
+        
+        if (hasInit == false &&window.localStorage.getItem('user_hidden_columns') != null) {
+          JSON.parse(window.localStorage.getItem('user_hidden_columns')).forEach(v => {
+            $("#table").bootstrapTable('hideColumn', v);
+          });
+        }
+        if (!hasInit) hasInit = true
+      },
 
     })
   }
@@ -723,4 +782,11 @@
         }
     });
   }
+
+  document.addEventListener('keyup', function(event) {
+    if (event.keyCode === 13) {
+        // 回车键按下后的操作
+        search()
+    }
+  });
 </script>

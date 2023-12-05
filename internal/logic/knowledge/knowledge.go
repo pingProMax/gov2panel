@@ -47,7 +47,7 @@ func (s *sKnowledge) GetKnowledgeAllList(req entity.V2Knowledge) (m []*entity.V2
 	if req.Id != 0 {
 		db.Where(dao.V2Knowledge.Columns().Id, req.Id)
 	}
-	if req.Show != -1 {
+	if req.Show != 0 {
 		db.Where(dao.V2Knowledge.Columns().Show, req.Show)
 	}
 	err = db.OrderDesc("order_id").Scan(&m)
@@ -67,7 +67,7 @@ func (s *sKnowledge) GetKnowledgeShowList(req entity.V2Knowledge) (data []*model
 	if req.Id != 0 {
 		db.Where(dao.V2Knowledge.Columns().Id, req.Id)
 	}
-	if req.Show != -1 {
+	if req.Show != 0 {
 		db.Where(dao.V2Knowledge.Columns().Show, req.Show)
 	}
 	err = db.OrderDesc("order_id").Scan(&m)

@@ -24,8 +24,8 @@ type V2TicketColumns struct {
 	UserId      string //
 	Subject     string //
 	Level       string //
-	Status      string // 0:已开启 1:已关闭
-	ReplyStatus string // 0:待回复 1:已回复
+	Status      string // -1:已开启 1:已关闭
+	ReplyStatus string // -1:待回复 1:已回复
 	CreatedAt   string //
 	UpdatedAt   string //
 }

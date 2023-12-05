@@ -18,9 +18,9 @@ func (c *ControllerV1) Ticket(ctx context.Context, req *v1.TicketReq) (res *v1.T
 	case "POST":
 		res = &v1.TicketRes{}
 		req.UserId = req.TUserID
-		req.ReplyStatus = -1
-		req.Status = -1
-		req.Level = -1
+		req.ReplyStatus = 0
+		req.Status = 0
+		req.Level = 0
 		res.Data, res.Totle, err = service.Ticket().GetTicketList(&req.V2Ticket, "", "id", "desc", req.Offset, req.Limit)
 
 		return
@@ -39,8 +39,8 @@ func (c *ControllerV1) TicketClose(ctx context.Context, req *v1.TicketCloseReq) 
 
 func (c *ControllerV1) TicketCreate(ctx context.Context, req *v1.TicketCreateReq) (res *v1.TicketCreateRes, err error) {
 	req.V2Ticket.UserId = req.TUserID
-	req.V2Ticket.Status = 0
-	req.V2Ticket.ReplyStatus = 0
+	req.V2Ticket.Status = -1
+	req.V2Ticket.ReplyStatus = -1
 	if strings.TrimSpace(req.V2Ticket.Subject) == "" {
 		err = errors.New("主题不能为空！")
 		return

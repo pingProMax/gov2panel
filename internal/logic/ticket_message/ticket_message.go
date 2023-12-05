@@ -57,7 +57,7 @@ func (s *sTicketMessage) SaveTicketMessageAdmin(data *entity.V2TicketMessage) (e
 		return
 	}
 
-	err = service.Ticket().UpTicketStatusAndReplyStatusById(data.TicketId, 0, 1)
+	err = service.Ticket().UpTicketStatusAndReplyStatusById(data.TicketId, -1, 1)
 
 	return
 }
@@ -77,7 +77,7 @@ func (s *sTicketMessage) SaveTicketMessageUser(data *entity.V2TicketMessage) (er
 		return
 	}
 
-	err = service.Ticket().UpTicketStatusAndReplyStatusById(data.TicketId, 0, 0)
+	err = service.Ticket().UpTicketStatusAndReplyStatusById(data.TicketId, -1, -1)
 
 	return
 }

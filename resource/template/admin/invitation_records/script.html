@@ -15,6 +15,7 @@
 <script>
   let planData;
   const $table = $('#table')
+  let hasInit = false;
   $(function () {
     initTable()
 
@@ -96,8 +97,8 @@
           }, {
             title:`<div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="state">
-                      <option selected value="-1">全部</option>
-                      <option value="0">待审核</option>
+                      <option selected value="0">全部</option>
+                      <option value="-1">待审核</option>
                       <option value="1">已审核</option>
                       <option value="2">已拒绝</option>
                     </select>
@@ -222,7 +223,7 @@
             },
             formatter: function (value, row, index) {
               switch (row.invitation_records.state) {
-                case 0:
+                case -1:
                   return `<div class="btn-group" role="group" aria-label="Basic example">
                 <button id="ok" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-check-circle"></i></span></button>
                 <button id="no" type="button" class="btn btn-danger btn-icon-only"><span class="btn-inner--icon"><i class="fas fa-times"></i></span></button>
@@ -286,7 +287,27 @@
 
         return x
       },
+      onColumnSwitch:function(field,checked) { //列选择事件
+        window.localStorage.setItem('invitation_records_hidden_columns', JSON.stringify($("#table").bootstrapTable('getHiddenColumns').map(function (it) {return it.field})))
+        
+      },
+      onPostBody:function(data){//渲染并在 DOM 中可用后触发
+        
+        if (hasInit == false &&window.localStorage.getItem('invitation_records_hidden_columns') != null) {
+          JSON.parse(window.localStorage.getItem('invitation_records_hidden_columns')).forEach(v => {
+            $("#table").bootstrapTable('hideColumn', v);
+          });
+        }
+        if (!hasInit) hasInit = true
+      },
 
     })
   }
+
+  document.addEventListener('keyup', function(event) {
+    if (event.keyCode === 13) {
+        // 回车键按下后的操作
+        search()
+    }
+  });
 </script>

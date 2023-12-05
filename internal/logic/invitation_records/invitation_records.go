@@ -48,7 +48,7 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 	if req.OperateType != 0 {
 		db.Where(dao.V2InvitationRecords.Columns().OperateType, req.V2InvitationRecords.OperateType)
 	}
-	if req.State != -1 {
+	if req.State != 0 {
 		db.Where(dao.V2InvitationRecords.Columns().State, req.V2InvitationRecords.State)
 	}
 	if req.RechargeRecordsId != 0 {

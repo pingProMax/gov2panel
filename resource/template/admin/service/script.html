@@ -42,11 +42,18 @@
             </div>
             <div class="col">
               <div class="position-relative form-group">
-                <label>是否显示</label>
-                <p><label class="custom-toggle">
-                    <input type="checkbox" checked="" name="show" value="1">
-                    <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="Yes"></span>
-                  </label></p>
+                <label>显示状态</label>
+                <div>
+                  <div class="custom-control custom-radio ">
+                    <input name="show" class="custom-control-input" id="customRadioShow" type="radio" checked="" value="1">
+                    <label class="custom-control-label" for="customRadioShow">显示</label>
+                  </div>
+                  <div class="custom-control custom-radio ">
+                    <input name="show" class="custom-control-input" id="customRadioNoShow" type="radio" value="-1">
+                    <label class="custom-control-label" for="customRadioNoShow">隐藏</label>
+                  </div>
+                </div>
+               
               </div>
             </div>
           </div>
@@ -129,6 +136,7 @@
 <script>
   let planData;
   let onlineUserCountAndLastPushAt;
+  let hasInit = false;
   const $table = $('#table')
   $.fn.selectpicker.Constructor.BootstrapVersion = '4';
   $(function () {
@@ -233,6 +241,16 @@
           }
         }
       })
+      
+      //单选默认值
+      $("#AEForm input[type='radio']").each(function (i, v) {
+        for (let key in data.service) {
+          if (key == $(v).attr("name")) {
+            $("#AEForm input:radio[name='"+key+"'][value='" + data.service[key] + "']").prop("checked", true)
+          }
+        }
+      })
+
 
       $("#limit_plan_id").selectpicker('val',data.plan.map(plan => plan.id + ""));
       $("#limit_route_id").selectpicker('val',data.route.map(route => route.id + ""));
@@ -323,9 +341,11 @@
 
   }
 
+  
 
   //初始化表格
   function initTable() {
+
     $table.bootstrapTable({
       columns: [
         [
@@ -349,7 +369,7 @@
             title:  `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="plan_id" id="so_plan_id_select_id">
-                      <option selected value="-1">全部</option>
+                      <option selected value="0">全部</option>
                     </select>
                   </div>
           `,
@@ -357,9 +377,9 @@
             title:  `
                   <div class="input-group">
                     <select class="custom-select" data-function="search" data-type="eq" name="show">
-                      <option selected value="-1">全部</option>
+                      <option selected value="0">全部</option>
                       <option value="1">显示</option>
-                      <option value="0">隐藏</option>
+                      <option value="-1">隐藏</option>
                     </select>
                   </div>
           `,
@@ -441,7 +461,6 @@
           },{
             title: '在线和状态',
             formatter: function (value, row, index) {
-              console.log(onlineUserCountAndLastPushAt[row.service.id])
               if (onlineUserCountAndLastPushAt[row.service.id] == undefined) {
                 return `<span class="badge badge-dot">
                         <i class="bg-warning"></i>
@@ -531,6 +550,19 @@
 
         return x
       },
+      onColumnSwitch:function(field,checked) { //列选择事件
+        window.localStorage.setItem('service_hidden_columns', JSON.stringify($("#table").bootstrapTable('getHiddenColumns').map(function (it) {return it.field})))
+        
+      },
+      onPostBody:function(data){//渲染并在 DOM 中可用后触发
+        
+        if (hasInit == false &&window.localStorage.getItem('service_hidden_columns') != null) {
+          JSON.parse(window.localStorage.getItem('service_hidden_columns')).forEach(v => {
+            $("#table").bootstrapTable('hideColumn', v);
+          });
+        }
+        if (!hasInit) hasInit = true
+      },
 
     })
   }
@@ -562,4 +594,14 @@
     }
     
   }
+
+  
+  document.addEventListener('keyup', function(event) {
+    if (event.keyCode === 13) {
+        // 回车键按下后的操作
+        search()
+    }
+  });
+
+  
 </script>

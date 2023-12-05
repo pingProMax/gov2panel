@@ -278,7 +278,7 @@
             field: 'ticket.status',
             title: '工单状态',
             formatter: function (value, row, index) {
-              if (row.ticket.status == 0) {
+              if (row.ticket.status == -1) {
                 return `<span class="badge badge-dot mr-4">
                         <i class="bg-warning"></i>
                         <span class="status">开启</span>
@@ -293,7 +293,7 @@
             field: 'ticket.reply_status',
             title: '回复状态',
             formatter: function (value, row, index) {
-              if (row.ticket.reply_status == 0) {
+              if (row.ticket.reply_status == -1) {
                 return `待回复`
               }
               return `已回复`;
@@ -314,7 +314,7 @@
               },
             },
             formatter: function (value, row, index) {
-              if (row.ticket.status == 0) {
+              if (row.ticket.status == -1) {
                 return `
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button id="edit" type="button" class="btn btn-twitter btn-icon-only"><span class="btn-inner--icon"><i class="ni ni-chat-round"></i></span></button>
