@@ -205,7 +205,7 @@
 
   //搜索
   function search() {
-    $("#table").bootstrapTable('refresh');
+    $("#table").bootstrapTable('refresh',{pageNumber:1});
   }
   //清除搜索
   function cleanSearch() {
@@ -225,8 +225,6 @@
     console.log(data)
     $('#AEForm')[0].reset();
     if (data != null) {
-
-        
         
         $("#AEModalLongTitle").text("编辑")
         $("#AEForm input[type='hidden'],#AEForm input[type='number'],#AEForm input[type='text'],#AEForm input[type='datetime-local'],#AEForm select,#AEForm textarea").each(function (i, v) {

@@ -3,6 +3,7 @@ package recharge_records
 import (
 	"context"
 	"errors"
+	"fmt"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/dao"
 	d "gov2panel/internal/dao"
@@ -36,6 +37,26 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 	m = make([]*model.InvitationRecordsInfo, 0)
 	db := s.Cornerstone.GetDB()
 
+	orderBy = dao.V2InvitationRecords.Table() + "." + orderBy
+	db.LeftJoin(
+		dao.V2User.Table(),
+		"user",
+		fmt.Sprintf("%s.%s=user.%s",
+			dao.V2InvitationRecords.Table(),
+			dao.V2InvitationRecords.Columns().UserId,
+			dao.V2User.Columns().Id,
+		))
+	db.LeftJoin(
+		dao.V2User.Table(),
+		"from_user",
+		fmt.Sprintf("%s.%s=from_user.%s",
+			dao.V2InvitationRecords.Table(),
+			dao.V2InvitationRecords.Columns().FromUserId,
+			dao.V2User.Columns().Id,
+		))
+
+	db.WhereLike("user."+dao.V2User.Columns().UserName, "%"+req.UserName+"%")
+	db.WhereLike("from_user."+dao.V2User.Columns().UserName, "%"+req.FromUserName+"%")
 	if req.Id != 0 {
 		db.Where(dao.V2InvitationRecords.Columns().Id, req.Id)
 	}
@@ -58,11 +79,13 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 	dbC := *db
 	dbCCount := &dbC
 
+	db.Fields(fmt.Sprintf("%s.*", dao.V2InvitationRecords.Table()))
 	err = db.Order(orderBy, orderDirection).Limit(offset, limit).ScanList(&m, "InvitationRecords")
 	if err != nil {
 		return m, 0, err
 	}
 
+	db.Fields("*")
 	total, err = dbCCount.Count()
 	if err != nil {
 		return m, 0, err
@@ -71,28 +94,12 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 	if total > 0 {
 		err = s.Cornerstone.GetDBT(d.V2User.Table()).
 			Where("id", gdb.ListItemValuesUnique(m, "InvitationRecords", "UserId")).
-			WhereLike(dao.V2User.Columns().UserName, "%"+req.UserName+"%").
 			ScanList(&m, "User", "InvitationRecords", "id:UserId")
 
 		err = s.Cornerstone.GetDBT(d.V2User.Table()).
 			Where("id", gdb.ListItemValuesUnique(m, "InvitationRecords", "FromUserId")).
-			WhereLike(dao.V2User.Columns().UserName, "%"+req.FromUserName+"%").
 			ScanList(&m, "FromUser", "InvitationRecords", "id:FromUserId")
 	}
-
-	totaljs := 0
-	// for i := 0; i < len(m); i++ {
-	// 	if m[i].User == nil {
-	// 		m = append(m[:i], m[i+1:]...)
-	// 		i--
-	// 		totaljs++
-	// 	} else if m[i].FromUser == nil {
-	// 		m = append(m[:i], m[i+1:]...)
-	// 		i--
-	// 		totaljs++
-	// 	}
-	// }
-	total = total - totaljs
 
 	return m, total, err
 }

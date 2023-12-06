@@ -124,10 +124,21 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 func (s *sRechargeRecords) GetRechargeRecordsList(req *v1.RechargeRecordsReq, orderBy, orderDirection string, offset, limit int) (m []*model.RechargeRecordsInfo, total int, err error) {
 	m = make([]*model.RechargeRecordsInfo, 0)
 	db := s.Cornerstone.GetDB()
+	orderBy = dao.V2RechargeRecords.Table() + "." + orderBy
+	db.LeftJoin(
+		dao.V2User.Table(),
+		fmt.Sprintf("%s.%s=%s.%s",
+			dao.V2RechargeRecords.Table(),
+			dao.V2RechargeRecords.Columns().UserId,
+			dao.V2User.Table(),
+			dao.V2User.Columns().Id,
+		))
 
 	db.WhereLike(dao.V2RechargeRecords.Columns().RechargeName, "%"+req.V2RechargeRecords.RechargeName+"%")
 	db.WhereLike(dao.V2RechargeRecords.Columns().ConsumptionName, "%"+req.V2RechargeRecords.ConsumptionName+"%")
 	db.WhereLike(dao.V2RechargeRecords.Columns().TransactionId, "%"+req.TransactionId+"%")
+	db.WhereLike(dao.V2User.Columns().UserName, "%"+req.UserName+"%")
+
 	if req.Id != 0 {
 		db.Where(dao.V2RechargeRecords.Columns().Id, req.Id)
 	}
@@ -141,11 +152,13 @@ func (s *sRechargeRecords) GetRechargeRecordsList(req *v1.RechargeRecordsReq, or
 	dbC := *db
 	dbCCount := &dbC
 
+	db.Fields(fmt.Sprintf("%s.*,%s.*", dao.V2RechargeRecords.Table(), dao.V2User.Table()))
 	err = db.Order(orderBy, orderDirection).Limit(offset, limit).ScanList(&m, "V2RechargeRecords")
 	if err != nil {
 		return m, 0, err
 	}
 
+	db.Fields("*")
 	total, err = dbCCount.Count()
 	if err != nil {
 		return m, 0, err
@@ -154,19 +167,8 @@ func (s *sRechargeRecords) GetRechargeRecordsList(req *v1.RechargeRecordsReq, or
 	if total > 0 {
 		err = s.Cornerstone.GetDBT(dao.V2User.Table()).
 			Where("id", gdb.ListItemValuesUnique(m, "V2RechargeRecords", "UserId")).
-			WhereLike(dao.V2User.Columns().UserName, "%"+req.UserName+"%").
 			ScanList(&m, "V2User", "V2RechargeRecords", "id:UserId")
 	}
-
-	totaljs := 0
-	for i := 0; i < len(m); i++ {
-		if m[i].V2User == nil {
-			m = append(m[:i], m[i+1:]...)
-			i--
-			totaljs++
-		}
-	}
-	total = total - totaljs
 
 	return m, total, err
 }

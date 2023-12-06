@@ -1,6 +1,7 @@
 package ticket
 
 import (
+	"fmt"
 	"gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
 	"gov2panel/internal/model/entity"
@@ -90,7 +91,18 @@ func (s *sTicket) GetOpenTicketCount() (totle int, err error) {
 func (s *sTicket) GetTicketList(req *entity.V2Ticket, userName string, orderBy, orderDirection string, offset, limit int) (m []*model.TicketInfo, total int, err error) {
 	m = make([]*model.TicketInfo, 0)
 	db := s.Cornerstone.GetDB()
+	orderBy = dao.V2Ticket.Table() + "." + orderBy
+	db.LeftJoin(
+		dao.V2User.Table(),
+		fmt.Sprintf("%s.%s=%s.%s",
+			dao.V2Ticket.Table(),
+			dao.V2Ticket.Columns().UserId,
+			dao.V2User.Table(),
+			dao.V2User.Columns().Id,
+		))
+
 	db.WhereLike(dao.V2Ticket.Columns().Subject, "%"+req.Subject+"%")
+	db.WhereLike(dao.V2User.Columns().UserName, "%"+userName+"%")
 	if req.Id != 0 {
 		db.Where(dao.V2Ticket.Columns().Id, req.Id)
 	}
@@ -110,11 +122,13 @@ func (s *sTicket) GetTicketList(req *entity.V2Ticket, userName string, orderBy, 
 	dbC := *db
 	dbCCount := &dbC
 
+	db.Fields(fmt.Sprintf("%s.*", dao.V2Ticket.Table()))
 	err = db.Order(orderBy, orderDirection).Limit(offset, limit).ScanList(&m, "V2Ticket")
 	if err != nil {
 		return m, 0, err
 	}
 
+	db.Fields("*")
 	total, err = dbCCount.Count()
 	if err != nil {
 		return m, 0, err
@@ -123,20 +137,8 @@ func (s *sTicket) GetTicketList(req *entity.V2Ticket, userName string, orderBy, 
 	if total > 0 {
 		err = dao.V2User.Ctx(dao.V2User.DB().GetCtx()).
 			Where("id", gdb.ListItemValuesUnique(m, "V2Ticket", "UserId")).
-			WhereLike(dao.V2User.Columns().UserName, "%"+userName+"%").
 			ScanList(&m, "V2User", "V2Ticket", "id:UserId")
 	}
 
-	totaljs := 0
-	for i := 0; i < len(m); i++ {
-		if m[i].V2User == nil {
-			m = append(m[:i], m[i+1:]...)
-			i--
-			totaljs++
-		}
-	}
-	total = total - totaljs
-
 	return m, total, err
-
 }
