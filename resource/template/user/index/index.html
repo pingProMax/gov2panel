@@ -42,7 +42,8 @@
           {{if eq .data.Id 0}}
             <a href="/user/plan">请购买订阅</a>
           {{else}}
-            <h2>{{.data.Name}} {{if eq .data.Renew 1}}<button type="button" class="btn btn-outline-success" onclick="xf()">续费</button>{{end}}</h2>
+            <!-- <h2>{{.data.Name}} {{if eq .data.Renew 1}}<button type="button" class="btn btn-outline-success" onclick="xf()">续费</button>{{end}}</h2> -->
+            <h2>{{.data.Name}} {{if eq .data.Renew 1}}{{end}}</h2>
             <p class="card-text" id="expired_at_id">到期时间:{{.user.ExpiredAt}}</p>
             <div class="progress">
               <div id="jdt" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
