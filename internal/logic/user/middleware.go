@@ -40,7 +40,7 @@ func (s *middlewareService) AuthAdmin(r *ghttp.Request) {
 		return
 	}
 
-	if int64(mapClaims["exp"].(float64))-time.Now().UnixMilli() < 43200000 { //自动刷新token
+	if int64(mapClaims["exp"].(float64))-time.Now().UnixMilli() < 302400000 { //自动刷新token
 		token, expire, err := Auth().RefreshToken(r.GetCtx())
 		if err != nil {
 			r.Response.WriteExit(err.Error())
@@ -77,7 +77,7 @@ func (s *middlewareService) AuthUser(r *ghttp.Request) {
 		return
 	}
 
-	if int64(mapClaims["exp"].(float64))-time.Now().UnixMilli() < 43200000 { //自动刷新token
+	if int64(mapClaims["exp"].(float64))-time.Now().UnixMilli() < 302400000 { //自动刷新token
 		token, expire, err := Auth().RefreshToken(r.GetCtx())
 		if err != nil {
 			r.Response.WriteExit(err.Error())

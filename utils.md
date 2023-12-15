@@ -40,3 +40,8 @@ go build main.go
 bug修复记录
 vless 订阅flow和security位置相反
 订阅fp 字段
+
+USER_%s_%s_FLOW_UPLOAD,UID,2023922
+
+gf gen ctrl
+gf gen service

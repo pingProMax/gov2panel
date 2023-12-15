@@ -42,13 +42,19 @@
           {{if eq .data.Id 0}}
             <a href="/user/plan">请购买订阅</a>
           {{else}}
-            <!-- <h2>{{.data.Name}} {{if eq .data.Renew 1}}<button type="button" class="btn btn-outline-success" onclick="xf()">续费</button>{{end}}</h2> -->
-            <h2>{{.data.Name}} {{if eq .data.Renew 1}}{{end}}</h2>
+            <h2>{{.data.Name}} </h2>
             <p class="card-text" id="expired_at_id">到期时间:{{.user.ExpiredAt}}</p>
             <div class="progress">
               <div id="jdt" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
             </div>
             <p class="card-text">已用：{{.total_used_traffic}}GB / 总计：{{.transfer_enable}}GB</p>
+            <hr>
+            <h3>我的套餐信息：</h3>
+            <p class="card-text" id="expired_at_id">价格：{{.data.Price}}</p>
+            <p class="card-text" id="expired_at_id">时长：{{.data.Expired}} 天</p>
+            <p class="card-text" id="expired_at_id">速度：{{if gt .data.SpeedLimit 0}}{{.data.SpeedLimit}} Mbps{{else}}不限制{{end}}</p>
+            <p class="card-text" id="expired_at_id">流量：{{.data.TransferEnable}} GB</p>
+            <p>{{if eq .data.Renew 1}}<button type="button" onclick="xf({{.data.Id}})" class="btn btn-outline-success">续费</button>{{else}}<button type="button" class="btn btn-outline-default">不允许续费</button>{{end}}</p>
           {{end}}
           
         </div>

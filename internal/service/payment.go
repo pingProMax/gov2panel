@@ -23,7 +23,7 @@ type (
 		// 获取显示的支付
 		GetPaymentShowList() (m []*entity.V2Payment, err error)
 		// 支付业务，获取支付url
-		GetPayUrl(res *v1.PayRedirectionReq) (url string, err error)
+		GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err error)
 	}
 )
 

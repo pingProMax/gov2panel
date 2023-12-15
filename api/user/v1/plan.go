@@ -24,6 +24,15 @@ type Plan2Res struct {
 	Data   *entity.V2Plan `json:"data"`
 }
 
+type PlanRenewReq struct {
+	g.Meta `path:"/plan_renew" tags:"Plan" method:"get" summary:"订阅续费页面"`
+	Id     int `json:"id"`
+}
+type PlanRenewRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+	Data   *entity.V2Plan `json:"data"`
+}
+
 type BuyReq struct {
 	g.Meta  `path:"/buy" tags:"Buy" method:"post" summary:"购买"`
 	PlanId  int    `json:"plan_id"` //订阅id
@@ -32,5 +41,15 @@ type BuyReq struct {
 	TUserID int    //用户id
 }
 type BuyRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+}
+
+type RenewReq struct {
+	g.Meta  `path:"/renew" tags:"Buy" method:"post" summary:"续费"`
+	Code    string `json:"code"` //优惠码
+	Uuid    string `json:"uuid"` //
+	TUserID int    //用户id
+}
+type RenewRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }

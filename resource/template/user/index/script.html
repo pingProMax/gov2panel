@@ -43,10 +43,10 @@
         input_dom.remove();//删除动态创建的节点
     }
 
-   function xf() {
+   function xf(id) {
         Swal.fire({
             title: "确定?",
-            text: "是否确定续费，将在你账号余额上扣款！",
+            text: "续费将覆盖当前订阅时长和流量！",
             icon: "question",
             confirmButtonText: "确定",
             showCancelButton: true,
@@ -54,7 +54,7 @@
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Swal.fire("Saved!", "", "success");
+                location.href = "/user/plan_renew?id=" + id
             } 
         });
 

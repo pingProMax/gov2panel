@@ -54,6 +54,9 @@ type IAdminV1 interface {
 	UserAE(ctx context.Context, req *v1.UserAEReq) (res *v1.UserAERes, err error)
 	UserDel(ctx context.Context, req *v1.UserDelReq) (res *v1.UserDelRes, err error)
 	UserUpBanned1(ctx context.Context, req *v1.UserUpBanned1Req) (res *v1.UserUpBanned1Res, err error)
+	Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error)
+	Refresh(ctx context.Context, req *v1.RefreshReq) (res *v1.RefreshRes, err error)
+	ResetTokenAndUuid(ctx context.Context, req *v1.ResetTokenAndUuidReq) (res *v1.ResetTokenAndUuidRes, err error)
 }
 
 

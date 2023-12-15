@@ -3,10 +3,14 @@ package user
 import (
 	"context"
 	"errors"
+	"net/http"
 	"time"
 
 	v1 "gov2panel/api/user/v1"
+	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
+
+	"github.com/gogf/gf/v2/net/ghttp"
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -34,6 +38,31 @@ func (c *ControllerV1) Plan2(ctx context.Context, req *v1.Plan2Req) (res *v1.Pla
 	return
 }
 
+func (c *ControllerV1) PlanRenew(ctx context.Context, req *v1.PlanRenewReq) (res *v1.PlanRenewRes, err error) {
+	res = &v1.PlanRenewRes{}
+	res.Data, err = service.Plan().GetPlanById(req.Id)
+	if res.Data == nil {
+		return res, gerror.NewCode(gcode.CodeNotFound)
+	}
+
+	var user entity.V2User
+	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
+	if err != nil {
+		g.RequestFromCtx(ctx).Response.Write(err.Error())
+		return
+	}
+
+	if res.Data.Id != user.GroupId {
+		ghttp.RequestFromCtx(ctx).Response.RedirectTo("/user", http.StatusFound)
+		ghttp.RequestFromCtx(ctx).ExitAll()
+		return
+	}
+	uuid := uuid.New().String()
+	gcache.Set(ctx, uuid, 1, time.Hour)
+	setTplUser(ctx, "plan_renew", g.Map{"data": res.Data, "uuid": uuid})
+	return
+}
+
 // 购买api
 func (c *ControllerV1) Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes, err error) {
 	res = &v1.BuyRes{}
@@ -47,5 +76,69 @@ func (c *ControllerV1) Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes,
 	} else {
 		gcache.Remove(ctx, req.Uuid)
 	}
-	return service.Plan().UserBuy(req)
+
+	var user entity.V2User
+	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
+	if err != nil {
+		g.RequestFromCtx(ctx).Response.Write(err.Error())
+		return
+	}
+
+	//检查要购买的套餐
+	plan, err := service.Plan().GetPlanById(req.PlanId)
+	if err != nil {
+		return
+	}
+	if plan == nil {
+		return res, errors.New("套餐不存在")
+	}
+	if plan.Show != 1 {
+		return res, errors.New("套餐未开启")
+	}
+	if plan.Price < 0 || plan.Expired < 0 {
+		return res, errors.New("套餐设置不对请联系管理员")
+	}
+
+	err = service.Plan().UserBuyAndRenew(req.Code, plan, &user)
+	return
+}
+
+// 续费api
+func (c *ControllerV1) Renew(ctx context.Context, req *v1.RenewReq) (res *v1.RenewRes, err error) {
+	res = &v1.RenewRes{}
+	uuid, err := gcache.Get(ctx, req.Uuid)
+	if err != nil {
+		return
+	}
+	if uuid.Int() != 1 {
+		err = errors.New("数据验证错误，请刷新页面")
+		return
+	} else {
+		gcache.Remove(ctx, req.Uuid)
+	}
+
+	var user entity.V2User
+	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
+	if err != nil {
+		g.RequestFromCtx(ctx).Response.Write(err.Error())
+		return
+	}
+
+	//检查套餐
+	plan, err := service.Plan().GetPlanById(user.GroupId)
+	if err != nil {
+		return
+	}
+	if plan == nil {
+		return res, errors.New("套餐不存在")
+	}
+	if plan.Price < 0 || plan.Expired < 0 {
+		return res, errors.New("套餐设置不对请联系管理员")
+	}
+	if plan.Renew != 1 {
+		return res, errors.New("当前套餐不允许续费！")
+	}
+
+	err = service.Plan().UserBuyAndRenew(req.Code, plan, &user)
+	return
 }

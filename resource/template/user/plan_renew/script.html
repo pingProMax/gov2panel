@@ -80,16 +80,17 @@
         });
     }
 
-    function buy() {
+    function renew() {
         $(".loader-container").css("visibility","visible");
         $.ajax({
             type: "post",
-            url: "/user/buy",
+            url: "/user/renew",
             data: {'code':$("#code_input_id").val(),'plan_id':$("#plan_id_id").val(),'uuid':uuid},
             dataType: "json",
             success: function(data) {
                 if (data.code == 0) {
                     location.href='/user'
+                    
                 } else {
                     notify('danger', data.message)
                 }

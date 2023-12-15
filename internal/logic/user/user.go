@@ -39,8 +39,8 @@ func init() {
 	auth := jwt.New(&jwt.GfJWTMiddleware{
 		Realm:           "gov2panel",
 		Key:             jwtkey.Bytes(),
-		Timeout:         time.Hour * 24,
-		MaxRefresh:      time.Hour * 24,
+		Timeout:         time.Hour * 168,
+		MaxRefresh:      time.Hour * 168,
 		IdentityKey:     "TUserID",
 		TokenLookup:     "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName:   "Bearer",
@@ -265,7 +265,7 @@ func (s *sUser) GetUserByCommissionCode(commissionCode string) (u *entity.V2User
 	return u, err
 }
 
-// 获取用户并且检测用户装
+// 获取用户并且检测用户状态
 func (s *sUser) GetUserByIdAndCheck(id int) (u *entity.V2User, err error) {
 	u, err = s.GetUserById(id)
 	if err != nil {
@@ -304,6 +304,7 @@ func (s *sUser) GetUserCountByGroupIds(groupIds []int) (totle int, err error) {
 
 // 更新用户 流量使用情况
 func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
+
 	colId := dao.V2User.Columns().Id
 	colU := dao.V2User.Columns().U
 	colD := dao.V2User.Columns().D
@@ -638,6 +639,13 @@ func (s *sUser) GetNowMonthDayCount() (count []int, err error) {
 	}
 
 	return
+}
+
+// 获取订阅组用户数量
+func (s *sUser) GetUserCountByPlanID(id int) (count int, err error) {
+	gdbU := s.Cornerstone.GetDB()
+	gdbU.Where(dao.V2User.Columns().GroupId, id)
+	return gdbU.Count()
 }
 
 func (s *sUser) Logout(ctx context.Context) {

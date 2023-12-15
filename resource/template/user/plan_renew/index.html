@@ -18,7 +18,7 @@
     <div class="col-8">
       <div class="card">
         <div class="card-header">
-          <h3 class="mb-0">{{.data.Name}}</h3>
+          <h3 class="mb-0">{{.data.Name}} - 续费</h3>
           <input type="hidden" id="plan_id_id" value="{{.data.Id}}">
         </div>
         <div class="card-body">
@@ -111,7 +111,7 @@
               <h3 class="heading-title text-warning mb-0" id="totle_id">{{.data.Price}}</h3>
             </div>
           </div>
-          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="buy()">购买</button>
+          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="renew()">续费</button>
         
         </div>
       </div>
@@ -122,5 +122,5 @@
 </div>
 
 <div class="loader-container">
-  <div class="loader"></div>  <span>购买中...</span>
+  <div class="loader"></div>  <span>续费中...</span>
 </div>

@@ -184,7 +184,7 @@
             sortable: true, //是否允许排序
             formatter: function (value, row, index) {
               switch (row.invitation_records.state) {
-                case 0:
+                case -1:
                   return `未审核`;
                   break;
                 case 1:

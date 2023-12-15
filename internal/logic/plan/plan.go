@@ -112,45 +112,36 @@ func (s *sPlan) GetPlanById(id int) (d *entity.V2Plan, err error) {
 	return
 }
 
-// 用户购买套餐处理
-func (s *sPlan) UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error) {
-	res = &userv1.BuyRes{}
-
-	//检查套餐
-	plan, err := s.GetPlanById(req.PlanId)
-	if err != nil {
-		return
-	}
-	if plan == nil {
-		return res, errors.New("套餐不存在")
-	}
-	if plan.Show != 1 {
-		return res, errors.New("套餐未开启")
-	}
-	if plan.Price < 0 || plan.Expired < 0 {
-		return res, errors.New("套餐设置不对请联系管理员")
-	}
+// 用户购买/续费套餐处理
+func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V2User) (err error) {
 
 	//套餐最终价格
 	var price float64
 	price = plan.Price
 	var couponRes *userv1.CouponRes
 
-	u, err := service.User().GetUserByIdAndCheck(req.TUserID)
-	if err != nil {
-		return res, err
-	}
-
 	//检查用户是否有专享折扣
-	if u.Discount > 0 {
-		price = price - (price * u.Discount / 100)
+	if user.Discount > 0 {
+		price = price - (price * user.Discount / 100)
 	}
 
-	if req.Code != "" {
-		//检查优惠码
-		couponRes, err = service.Coupon().CheckCouponCanUseByCode(&userv1.CouponReq{Code: req.Code, PlanId: req.PlanId, TUserID: req.TUserID})
+	//检查套餐当前用户数量
+	if plan.CapacityLimit > 0 && user.GroupId != plan.Id {
+		planUserCoun, err := service.User().GetUserCountByPlanID(plan.Id)
 		if err != nil {
-			return res, err
+			return err
+		}
+
+		if planUserCoun >= plan.CapacityLimit {
+			return errors.New("当前订阅人数达到上限！")
+		}
+	}
+
+	if code != "" {
+		//检查优惠码
+		couponRes, err = service.Coupon().CheckCouponCanUseByCode(&userv1.CouponReq{Code: code, PlanId: plan.Id, TUserID: user.Id})
+		if err != nil {
+			return err
 		}
 
 		switch couponRes.Data.Type {
@@ -165,8 +156,8 @@ func (s *sPlan) UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error) {
 		price = 0
 	}
 
-	if u.Balance < price {
-		return res, errors.New("余额不足")
+	if user.Balance < price {
+		return errors.New("余额不足")
 	}
 
 	time.Sleep(5 * time.Second)
@@ -178,24 +169,24 @@ func (s *sPlan) UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error) {
 		err = service.RechargeRecords().SaveRechargeRecords(
 			&entity.V2RechargeRecords{
 				Amount:          plan.Price,
-				UserId:          u.Id,
+				UserId:          user.Id,
 				OperateType:     2,
 				ConsumptionName: plan.Name,
 			},
 			"",
 			price,
 			plan.Id,
-			req.Code,
+			code,
 		)
 		if err != nil {
 			return err
 		}
 
 		//添加优惠码使用记录
-		if req.Code != "" {
+		if code != "" {
 			_, err := tx.Ctx(ctx).Insert(d.V2CouponUse.Table(), g.Map{
 				d.V2CouponUse.Columns().CouponId: couponRes.Data.Id,
-				d.V2CouponUse.Columns().UserId:   u.Id,
+				d.V2CouponUse.Columns().UserId:   user.Id,
 				d.V2CouponUse.Columns().PlanId:   plan.Id,
 			})
 			if err != nil {
@@ -220,7 +211,7 @@ func (s *sPlan) UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error) {
 				d.V2User.Columns().ExpiredAt:      gdb.Raw(fmt.Sprintf("DATE_ADD(%s, INTERVAL %s DAY)", d.V2User.Columns().ExpiredAt, strconv.Itoa(plan.Expired))),
 			}
 		}
-		_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Data(userUpData).Where(d.V2User.Columns().Id, u.Id).Update()
+		_, err = tx.Ctx(ctx).Model(d.V2User.Table()).Data(userUpData).Where(d.V2User.Columns().Id, user.Id).Update()
 		if err != nil {
 			return err
 		}

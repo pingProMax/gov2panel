@@ -73,7 +73,7 @@ func (c *ControllerV1) CommissionTransferBalance(ctx context.Context, req *v1.Co
 }
 
 // 佣金转余额
-func (c *ControllerV1) WithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error) {
+func (c *ControllerV1) CWithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error) {
 	res = &v1.CWithdrawalBalanceRes{}
 	err = service.InvitationRecords().WithdrawalBalance(req.TUserID)
 	return

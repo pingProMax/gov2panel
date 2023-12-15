@@ -152,7 +152,7 @@ func (s *sRechargeRecords) GetRechargeRecordsList(req *v1.RechargeRecordsReq, or
 	dbC := *db
 	dbCCount := &dbC
 
-	db.Fields(fmt.Sprintf("%s.*,%s.*", dao.V2RechargeRecords.Table(), dao.V2User.Table()))
+	db.Fields(fmt.Sprintf("%s.*", dao.V2RechargeRecords.Table()))
 	err = db.Order(orderBy, orderDirection).Limit(offset, limit).ScanList(&m, "V2RechargeRecords")
 	if err != nil {
 		return m, 0, err

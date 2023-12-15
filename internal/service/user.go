@@ -66,6 +66,8 @@ type (
 		ResetTokenAndUuidById(id int) (err error)
 		// 获取当月每一天注册量
 		GetNowMonthDayCount() (count []int, err error)
+		// 获取订阅组用户数量
+		GetUserCountByPlanID(id int) (count int, err error) 
 		Logout(ctx context.Context)
 		Refresh(ctx context.Context) (tokenString string, expire time.Time)
 	}

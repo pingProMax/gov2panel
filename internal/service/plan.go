@@ -6,7 +6,6 @@
 package service
 
 import (
-	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
 )
 
@@ -24,10 +23,10 @@ type (
 		GetPlanShowAndResetTrafficMethod1List() (m []*entity.V2Plan, err error)
 		// 获取可覆盖的订阅
 		GetPlanResetTrafficMethod1List() (m []*entity.V2Plan, err error)
-		// 删除
+		// 根据id获取
 		GetPlanById(id int) (d *entity.V2Plan, err error)
-		// 用户购买套餐处理
-		UserBuy(req *userv1.BuyReq) (res *userv1.BuyRes, err error)
+		// 用户续费套餐处理
+		UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V2User) (err error)
 	}
 )
 
