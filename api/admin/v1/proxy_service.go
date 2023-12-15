@@ -49,3 +49,19 @@ type OnlineUserCountAndLastPushAtReq struct {
 type OnlineUserCountAndLastPushAtRes struct {
 	Data map[int]map[int]int64 `json:"data"`
 }
+
+type BatchPlanReq struct {
+	g.Meta `path:"/service/batch_plan" tags:"ProxyService" method:"post" summary:"批量设置订阅"`
+	Ids    []int  `json:"ids"`
+	PlanId string `json:"plan_id"      ` // 所属订阅组
+}
+type BatchPlanRes struct {
+}
+
+type BatchRouteReq struct {
+	g.Meta  `path:"/service/batch_route" tags:"ProxyService" method:"post" summary:"批量设置路由"`
+	Ids     []int  `json:"ids"`
+	RouteId string `json:"route_id"     ` // 所属路由组
+}
+type BatchRouteRes struct {
+}

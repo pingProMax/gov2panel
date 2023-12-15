@@ -354,3 +354,25 @@ func (s *sProxyService) GetOnlineUserCountAndLastPushAt() (data map[int]map[int]
 
 	return data, nil
 }
+
+// 批量更新节点订阅
+func (s *sProxyService) UpBatchPlan(ids []int, planIds string) (err error) {
+	db := s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2ProxyService.Columns().PlanId: planIds,
+		},
+	)
+	_, err = db.WhereIn(dao.V2ProxyService.Columns().Id, ids).Update()
+	return
+}
+
+// 批量更新节点路由
+func (s *sProxyService) UpBatchRoute(ids []int, routeIds string) (err error) {
+	db := s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2ProxyService.Columns().RouteId: routeIds,
+		},
+	)
+	_, err = db.WhereIn(dao.V2ProxyService.Columns().Id, ids).Update()
+	return
+}

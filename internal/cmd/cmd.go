@@ -97,7 +97,6 @@ var (
 			if err != nil {
 				panic(err)
 			}
-
 			s.Run()
 			return nil
 		},

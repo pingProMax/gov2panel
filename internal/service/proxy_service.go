@@ -42,6 +42,10 @@ type (
 		// 获取所有服务器当前在线用户数量和服务器最后提交时间
 		// map[服务器id][type 1在线数量、2服务器最后提交时间]int
 		GetOnlineUserCountAndLastPushAt() (data map[int]map[int]int64, err error)
+		// 批量更新节点订阅
+		UpBatchPlan(ids []int, planIds string) (err error)
+		// 批量更新节点路由
+		UpBatchRoute(ids []int, routeIds string) (err error)
 	}
 )
 

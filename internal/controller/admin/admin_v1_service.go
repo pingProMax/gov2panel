@@ -119,3 +119,15 @@ func (c *ControllerV1) OnlineUserCountAndLastPushAt(ctx context.Context, req *v1
 
 	return res, err
 }
+
+func (c *ControllerV1) BatchPlan(ctx context.Context, req *v1.BatchPlanReq) (res *v1.BatchPlanRes, err error) {
+	res = &v1.BatchPlanRes{}
+	err = service.ProxyService().UpBatchPlan(req.Ids, req.PlanId)
+	return
+}
+
+func (c *ControllerV1) BatchRoute(ctx context.Context, req *v1.BatchRouteReq) (res *v1.BatchRouteRes, err error) {
+	res = &v1.BatchRouteRes{}
+	err = service.ProxyService().UpBatchRoute(req.Ids, req.RouteId)
+	return
+}

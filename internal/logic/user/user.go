@@ -152,7 +152,9 @@ func (s *sUser) ClearExpiredUserGroupIdAndUDTransferEnable() (err error) {
 	)
 
 	_, err =
-		db.WhereLT(dao.V2User.Columns().ExpiredAt, time.Now()).
+		db.WhereGT(dao.V2User.Columns().GroupId, 0).Where(
+			db.Builder().WhereLT(dao.V2User.Columns().ExpiredAt, time.Now()).WhereOr(fmt.Sprintf("%s + %s >= %s", dao.V2User.Columns().U, dao.V2User.Columns().D, dao.V2User.Columns().TransferEnable)),
+		).
 			Update()
 	return err
 }
