@@ -13,6 +13,10 @@
     $(function () {
         initRechargeRecordsTable()
         initInvitationRecords()
+
+        const protocol = window.location.protocol;
+        const host = window.location.host;
+        $('#commission_code').text(`${protocol}//${host}/register?code=${$('#commission_code').text()}`)
     })
 
     

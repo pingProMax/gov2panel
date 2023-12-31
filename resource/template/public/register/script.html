@@ -66,7 +66,10 @@
                     notify('danger', data.message)
                     return
                 }
-                notify('success', "注册成功")
+                notify('success', "注册成功，3秒后进入登录页面")
+                setTimeout(function() {
+                    location.href = "/login"
+                }, 3000);
             },
             error: function () {//失败的函数
                 notify('danger', data.message)
