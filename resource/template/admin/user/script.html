@@ -59,7 +59,7 @@
               </div>
               <div class="col">
                 <div class="position-relative form-group">
-                  <label>推广佣金<a href="/{{.setting.admin_path}}/recharge_records">（去推广管理添加）</a></label>
+                  <label>推广佣金</label>
                   <input name="commission_balance" placeholder="推广佣金" type="number" class="form-control">
                 </div>
               </div>
@@ -179,7 +179,7 @@
     $.ajax({
         type: "POST",
         async: false,
-        url: "/{{.setting.admin_path}}/plan/get_show",
+        url: "/{{.setting.admin_path}}/plan/get_rtm1",
         dataType: "json",
 
         success: function(data) {

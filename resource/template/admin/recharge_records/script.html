@@ -136,7 +136,7 @@
   function getShowPlan() {
     $.ajax({
         type: "POST",
-        url: "/{{.setting.admin_path}}/plan/get_show",
+        url: "/{{.setting.admin_path}}/plan/get_rtm1",
         dataType: "json",
         success: function(data) {
           if (data.code == 0) {

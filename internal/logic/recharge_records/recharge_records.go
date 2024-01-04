@@ -49,6 +49,7 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 		return errors.New("用户id不存在")
 	}
 	err = g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
+
 		//为用户充值/消费 金额
 		switch data.OperateType {
 		case 1: //充值
@@ -59,6 +60,16 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 			}
 
 		case 2: //消费
+
+			// 查询用户余额
+			err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(dao.V2User.Columns().Id, user.Id).Scan(&user)
+			if user.Balance < val {
+				return errors.New("余额不足")
+			}
+			if err != nil {
+				return err
+			}
+
 			data.TransactionId = utils.UseOrderNo(id, data.Amount, couponCode)
 			data.Amount = val
 			data.RechargeName = ""

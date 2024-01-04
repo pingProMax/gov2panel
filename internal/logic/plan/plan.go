@@ -160,7 +160,7 @@ func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V
 		return errors.New("余额不足")
 	}
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(5 * time.Second) //等老板说要优化
 
 	//扣款 和 设置用户套餐
 	g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
