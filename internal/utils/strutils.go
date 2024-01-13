@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,14 +20,14 @@ func MD5V(password, salt string) string {
 	return fmt.Sprintf("%x", hasher.Sum(nil))
 }
 
-// 消费订单生成 时间戳-套餐id-原价-优惠码-随机数
-func UseOrderNo(planId int, price float64, code string) string {
-	return fmt.Sprintf("%v-%v-%v-%v-%v", time.Now().Unix(), planId, price, code, strings.Split(uuid.New().String(), "-")[0])
+// 消费订单生成 时间戳-套餐id-原价-优惠码-用户ID
+func UseOrderNo(planId int, price float64, code string, userID int) string {
+	return fmt.Sprintf("%v-%v-%v-%v-%d", time.Now().Unix(), planId, price, code, userID)
 }
 
-// 充值订单生成 时间戳-充值金额(实际支付的)-payID-随机数
-func RechargeOrderNo(price float64, payId int) string {
-	return fmt.Sprintf("%v-%v-%v-%v", time.Now().Unix(), price, payId, strings.Split(uuid.New().String(), "-")[0])
+// 充值订单生成 时间戳-充值金额(实际支付的)-payID-用户ID
+func RechargeOrderNo(price float64, payId, userID int) string {
+	return fmt.Sprintf("%v-%v-%v-%d", time.Now().Unix(), price, payId, userID)
 }
 
 // bytes 转 GB

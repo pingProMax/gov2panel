@@ -16,7 +16,6 @@ type IPublicV1 interface {
 	Index(ctx context.Context, req *v1.IndexReq) (res *v1.IndexRes, err error)
 	Login(ctx context.Context, req *v1.LoginReq) (res *v1.LoginRes, err error)
 	EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (res *v1.EPayNotifyRes, err error)
-	AlphaNotify(ctx context.Context, req *v1.AlphaNotifyReq) (res *v1.AlphaNotifyRes, err error)
 	Register(ctx context.Context, req *v1.RegisterReq) (res *v1.RegisterRes, err error)
 	Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error)
 }

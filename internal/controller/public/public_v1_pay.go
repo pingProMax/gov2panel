@@ -81,9 +81,3 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 	ghttp.RequestFromCtx(ctx).Response.WriteExit("success")
 	return
 }
-
-func (c *ControllerV1) AlphaNotify(ctx context.Context, req *v1.AlphaNotifyReq) (res *v1.AlphaNotifyRes, err error) {
-
-	ghttp.RequestFromCtx(ctx).Response.WriteExit("success")
-	return
-}

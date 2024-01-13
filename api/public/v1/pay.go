@@ -14,12 +14,3 @@ type EPayNotifyReq struct {
 type EPayNotifyRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
-
-type AlphaNotifyReq struct {
-	g.Meta `path:"/pay/alpha_notify" tags:"Pay" method:"get,post" summary:"Alpha 异步通知"`
-	model.Epay
-}
-
-type AlphaNotifyRes struct {
-	g.Meta `mime:"text/html" example:"string"`
-}

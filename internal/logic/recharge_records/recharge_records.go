@@ -70,7 +70,7 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 				return err
 			}
 
-			data.TransactionId = utils.UseOrderNo(id, data.Amount, couponCode)
+			data.TransactionId = utils.UseOrderNo(id, data.Amount, couponCode, data.UserId)
 			data.Amount = val
 			data.RechargeName = ""
 			_, err := tx.Ctx(ctx).Model(d.V2User.Table()).Where(d.V2User.Columns().Id, data.UserId).Decrement(d.V2User.Columns().Balance, val)

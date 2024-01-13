@@ -33,7 +33,7 @@ type PushRes struct {
 }
 
 type ChangeIPReq struct {
-	g.Meta `path:"/change_id" tags:"Api" method:"get,post" summary:"更改服务器iip"`
+	g.Meta `path:"/change_ip" tags:"Api" method:"get,post" summary:"更改服务器ip"`
 	NodeId int    `json:"node_id"`
 	Ip     string `json:"ip"`
 }

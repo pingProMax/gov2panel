@@ -105,8 +105,8 @@ func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err erro
 		HandlingFeeAmount = HandlingFeeAmount + payment.HandlingFeeFixed
 	}
 
-	priceStr := strconv.FormatFloat(res.Amount, 'f', 2, 64)                          //金额
-	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, payment.Id) //订单号 系统用
+	priceStr := strconv.FormatFloat(res.Amount, 'f', 2, 64)                                       //金额
+	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, payment.Id, res.TUserID) //订单号 系统用
 
 	out_trade_no := strconv.FormatInt(time.Now().UnixNano()/int64(time.Millisecond), 10)
 
