@@ -44,24 +44,7 @@ tcp+tls:
   "alpn": ""
 }
 
-tcp+http:
-协议:v2ray/vmess
-{
-  "port": "12345",
-  "scy": "auto",
-  "net": "tcp",
-  "type": "http",
-  "host": "iqiyi.com",
-  "path": "/test",
-  "tls": "",
-  "sni": "",
-  "alpn": "",
-  "header": {
-    "type": "http",
-    "request": {},
-    "response": {}
-  }
-}
+
 
 ws:
 协议:v2ray/vmess
