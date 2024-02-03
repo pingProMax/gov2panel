@@ -8,6 +8,7 @@ import (
 	v1 "gov2panel/api/user/v1"
 	"gov2panel/internal/service"
 
+	"github.com/gogf/gf/v2/encoding/ghtml"
 	"github.com/gogf/gf/v2/frame/g"
 )
 
@@ -45,6 +46,7 @@ func (c *ControllerV1) TicketCreate(ctx context.Context, req *v1.TicketCreateReq
 		err = errors.New("主题不能为空！")
 		return
 	}
+	req.V2Ticket.Subject = ghtml.Entities(req.V2Ticket.Subject)
 	err = service.Ticket().AETicket(&req.V2Ticket)
 	return
 }
@@ -58,6 +60,7 @@ func (c *ControllerV1) TicketMessage(ctx context.Context, req *v1.TicketMessageR
 func (c *ControllerV1) TicketMessageAdd(ctx context.Context, req *v1.TicketMessageAddReq) (res *v1.TicketMessageAddRes, err error) {
 	res = &v1.TicketMessageAddRes{}
 	req.V2TicketMessage.UserId = g.RequestFromCtx(ctx).Get("TUserID").Int()
+	req.V2TicketMessage.Message = ghtml.Entities(req.V2TicketMessage.Message)
 	err = service.TicketMessage().SaveTicketMessageUser(&req.V2TicketMessage)
 	return
 }

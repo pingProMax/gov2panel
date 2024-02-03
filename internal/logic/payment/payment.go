@@ -128,7 +128,6 @@ func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err erro
 			priceStr+"|"+strconv.Itoa(payment.Id)+"|"+strconv.Itoa(res.TUserID)+"|"+transactionId, //自定义 用户实际得到的金额|支付方式的id|用户id|订单号
 			epayConfig.Pid.String(),     //pid
 			res.Redirect+"/user/wallet", //页面跳转通知地址
-
 		)
 
 		urlStr = addr + urlStr + fmt.Sprintf("&sign=%s&sign_type=MD5", utils.MD5V(urlStr, epayConfig.Key.String()))

@@ -92,3 +92,20 @@ func BcryptCheckPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+// 检查是否有特殊字符
+func CheckStr(str string) bool {
+	if strings.Contains(str, "'") ||
+		strings.Contains(str, "\"") ||
+		strings.Contains(str, "$") ||
+		strings.Contains(str, "%") ||
+		strings.Contains(str, "<") ||
+		strings.Contains(str, ">") ||
+		strings.Contains(str, "/") ||
+		strings.Contains(str, "\\") ||
+		strings.Contains(str, "#") ||
+		strings.Contains(str, "&") {
+		return true
+	}
+	return false
+}

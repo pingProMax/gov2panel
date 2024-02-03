@@ -162,6 +162,10 @@ func (s *sUser) ClearExpiredUserGroupIdAndUDTransferEnable() (err error) {
 // 用户注册
 func (s *sUser) RegisterUser(UserName, Passwd, CommissionCode string) error {
 
+	if utils.CheckStr(UserName) {
+		return errors.New("用户名存在特殊字符！")
+	}
+
 	userNameCount, err := s.Cornerstone.GetDB().Where(dao.V2User.Columns().UserName, UserName).Count()
 	if err != nil {
 		return err
@@ -174,6 +178,9 @@ func (s *sUser) RegisterUser(UserName, Passwd, CommissionCode string) error {
 	//获取邀请码
 	if CommissionCode != "" {
 		uu, err = s.GetUserByCommissionCode(CommissionCode)
+		if err == sql.ErrNoRows {
+			return errors.New("邀请码错误")
+		}
 		if err != nil {
 			return err
 		}
