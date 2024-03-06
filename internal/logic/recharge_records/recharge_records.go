@@ -50,6 +50,15 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 	}
 	err = g.DB().Transaction(context.TODO(), func(ctx context.Context, tx gdb.TX) error {
 
+		//查询订单号是否已经存在
+		c, err := tx.Ctx(ctx).Model(d.V2RechargeRecords.Table()).Where(d.V2RechargeRecords.Columns().TransactionId, data.TransactionId).Count()
+		if err != nil {
+			return err
+		}
+		if c > 0 {
+			return errors.New("订单号已经存在")
+		}
+
 		//为用户充值/消费 金额
 		switch data.OperateType {
 		case 1: //充值
