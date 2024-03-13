@@ -121,7 +121,7 @@ shadowsocks2022
 协议:shadowsocks/ss2022
 {
 	"port": "9996",
-	"cypher_method": "aes-128-gcm",
+	"encryption": "aes-128-gcm",
 	"obfs": "none",
 	"server_key":"",
 	"obfs_settings": {
