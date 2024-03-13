@@ -257,6 +257,7 @@ func (s *sUser) GetUserByTokenAndUDAndGTExpiredAt(token string) (u *entity.V2Use
 	u = new(entity.V2User)
 	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().Token, token).
 		Where(fmt.Sprintf("%s > %s + %s", dao.V2User.Columns().TransferEnable, dao.V2User.Columns().U, dao.V2User.Columns().D)).
+		Where(dao.V2User.Columns().Banned, -1).
 		WhereGT(dao.V2User.Columns().ExpiredAt, time.Now()).Scan(u)
 	return u, err
 }
