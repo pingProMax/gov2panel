@@ -26,10 +26,10 @@ type V2InvitationRecordsColumns struct {
 	FromUserId        string // 被邀请者
 	CommissionRate    string // 佣金比例
 	RechargeRecordsId string // 订单id
-	CreatedAt         string // 创建时间
-	UpdatedAt         string // 更新时间
+	CreatedAt         string //
+	UpdatedAt         string //
 	OperateType       string // 1邀请 2提现
-	State             string // 状态 0未审核 1审核 2拒绝
+	State             string // 状态 -1未审核 1审核 2拒绝
 }
 
 // v2InvitationRecordsColumns holds the columns for table v2_invitation_records.

@@ -9,6 +9,7 @@ import (
 	d "gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
 	"gov2panel/internal/model/entity"
+	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
 	"strconv"
@@ -217,6 +218,19 @@ func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V
 		}
 
 		return nil
+	})
+
+	//查询用户更新到上报缓存
+	user, _ = service.User().GetUserById(user.Id)
+	service.User().MUpUserMap(model.UserTraffic{
+		UID:            user.Id,
+		Download:       user.D,
+		Upload:         user.U,
+		Email:          user.UserName,
+		TransferEnable: user.TransferEnable,
+		ExpiredAt:      user.ExpiredAt,
+		GroupId:        user.GroupId,
+		Banned:         user.Banned,
 	})
 
 	return

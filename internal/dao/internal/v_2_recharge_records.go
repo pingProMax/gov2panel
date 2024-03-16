@@ -28,8 +28,8 @@ type V2RechargeRecordsColumns struct {
 	ConsumptionName string // 消费类型 operate_type=2才有
 	Remarks         string // 备注
 	TransactionId   string // 订单号 规则看程序注释
-	CreatedAt       string // 创建时间
-	UpdatedAt       string // 更新时间
+	CreatedAt       string //
+	UpdatedAt       string //
 }
 
 // v2RechargeRecordsColumns holds the columns for table v2_recharge_records.

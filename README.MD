@@ -136,10 +136,10 @@ trojan
 	"host":"",
 	"port":"",
   "sni":"",
-  "security":"",
+  "security":"", //传输层安全
   "alpn":"",
-  "fp":"",
-  "type":"tcp",
+  "fp":"", //Fingerprint
+  "type":"tcp", //传输协议
   "headerType":""
 }
 

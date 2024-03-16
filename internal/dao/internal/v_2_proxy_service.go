@@ -30,8 +30,8 @@ type V2ProxyServiceColumns struct {
 	Port        string // 服务器端口
 	Rate        string // 倍率
 	OrderId     string // 顺序
-	CreatedAt   string // 创建时间
-	UpdatedAt   string // 更新时间
+	CreatedAt   string //
+	UpdatedAt   string //
 	RouteId     string // 所属路由组
 }
 

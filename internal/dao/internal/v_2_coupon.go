@@ -29,8 +29,8 @@ type V2CouponColumns struct {
 	LimitUse         string // 每个用户可使用次数
 	LimitUseWithUser string // 最大使用次数
 	LimitPlanId      string // 指定订阅
-	StartedAt        string // 有效期开始时间
-	EndedAt          string // 有效期结束时间
+	StartedAt        string //
+	EndedAt          string //
 	CreatedAt        string //
 	UpdatedAt        string //
 	Remarks          string // 备注

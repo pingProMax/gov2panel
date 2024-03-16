@@ -29,7 +29,7 @@ type V2UserColumns struct {
 	PasswordSalt      string // 加密盐
 	Balance           string // 账户余额
 	Discount          string // 专享折扣
-	CommissionType    string // 0: system 1: period 2: onetime
+	CommissionType    string // 3: system 1: period 2: onetime
 	CommissionRate    string // 返利比例
 	CommissionBalance string // aff余额
 	CommissionCode    string // 邀请码
@@ -41,14 +41,14 @@ type V2UserColumns struct {
 	IsAdmin           string // 是否管理员
 	IsStaff           string // 是否员工
 	LastLoginAt       string // 最后登入时间
-	LastLoginIp       string // 最后登入ip
+	LastLoginIp       string //
 	Uuid              string // uuid
 	GroupId           string // 权限组
 	Token             string // token 订阅用
 	Remarks           string // 备注
-	ExpiredAt         string // 到期时间
-	CreatedAt         string // 创建时间
-	UpdatedAt         string // 更新时间
+	ExpiredAt         string //
+	CreatedAt         string //
+	UpdatedAt         string //
 }
 
 // v2UserColumns holds the columns for table v2_user.

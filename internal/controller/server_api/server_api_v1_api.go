@@ -90,7 +90,7 @@ func (c *ControllerV1) Push(ctx context.Context, req *v1.PushReq) (res *v1.PushR
 	decoder := json.NewDecoder(ghttp.RequestFromCtx(ctx).Request.Body)
 	decoder.Decode(&req.Data)
 
-	err = service.User().UpUserUAndDBy(req.Data)
+	err = service.User().MUpUserUAndBy(req.Data)
 	if err != nil {
 		return
 	}

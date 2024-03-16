@@ -18,6 +18,6 @@ type V2RechargeRecords struct {
 	ConsumptionName string      `json:"consumption_name" ` // 消费类型 operate_type=2才有
 	Remarks         string      `json:"remarks"          ` // 备注
 	TransactionId   string      `json:"transaction_id"   ` // 订单号 规则看程序注释
-	CreatedAt       *gtime.Time `json:"created_at"       ` // 创建时间
-	UpdatedAt       *gtime.Time `json:"updated_at"       ` // 更新时间
+	CreatedAt       *gtime.Time `json:"created_at"       ` //
+	UpdatedAt       *gtime.Time `json:"updated_at"       ` //
 }

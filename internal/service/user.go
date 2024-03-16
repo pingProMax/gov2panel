@@ -46,14 +46,18 @@ type (
 		GetUserByTokenAndUDAndGTExpiredAt(token string) (u *entity.V2User, err error)
 		// 邀请码获取 邀请用户id
 		GetUserByCommissionCode(commissionCode string) (u *entity.V2User, err error)
-		// 获取用户并且检测用户装
+		// 获取用户并且检测用户状态
 		GetUserByIdAndCheck(id int) (u *entity.V2User, err error)
 		// 获取用户 订阅组下的用户数据
 		GetUserListByGroupIds(groupIds []int) (u []*entity.V2User, err error)
 		// 获取用户数量 订阅组下的用户数据
 		GetUserCountByGroupIds(groupIds []int) (totle int, err error)
-		// 更新用户 流量使用情况
+		// 更新用户 流量使用情况 直接更新数据库 u+值、d+值、t+值
 		UpUserUAndDBy(data []model.UserTraffic) (err error)
+		// 更新用户 u、d、t
+		UpUserDUTBy(data []model.UserTraffic) (err error)
+		// 更新用户 7天流量使用数据
+		UpUserDay7Flow(data []model.UserTraffic) (err error)
 		// 用户登录
 		Login(userName, passwd string) (user *entity.V2User, err error)
 		// 获取用户数据
@@ -67,9 +71,17 @@ type (
 		// 获取当月每一天注册量
 		GetNowMonthDayCount() (count []int, err error)
 		// 获取订阅组用户数量
-		GetUserCountByPlanID(id int) (count int, err error) 
+		GetUserCountByPlanID(id int) (count int, err error)
 		Logout(ctx context.Context)
 		Refresh(ctx context.Context) (tokenString string, expire time.Time)
+		// 启动 把有效用户 存入到内存
+		MSaveToRam() (err error)
+		// 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）
+		MUpUserUAndBy(data []model.UserTraffic) (err error)
+		// 所有数据持久化
+		MSaveAllRam() (err error)
+		// 更新缓存
+		MUpUserMap(data model.UserTraffic) (err error)
 	}
 )
 

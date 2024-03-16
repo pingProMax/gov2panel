@@ -16,8 +16,8 @@ type V2InvitationRecords struct {
 	FromUserId        int         `json:"from_user_id"        ` // 被邀请者
 	CommissionRate    int         `json:"commission_rate"     ` // 佣金比例
 	RechargeRecordsId int         `json:"recharge_records_id" ` // 订单id
-	CreatedAt         *gtime.Time `json:"created_at"          ` // 创建时间
-	UpdatedAt         *gtime.Time `json:"updated_at"          ` // 更新时间
+	CreatedAt         *gtime.Time `json:"created_at"          ` //
+	UpdatedAt         *gtime.Time `json:"updated_at"          ` //
 	OperateType       int         `json:"operate_type"        ` // 1邀请 2提现
-	State             int         `json:"state"               ` // 状态 0未审核 1审核 2拒绝
+	State             int         `json:"state"               ` // 状态 -1未审核 1审核 2拒绝
 }

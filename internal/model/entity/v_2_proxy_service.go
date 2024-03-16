@@ -20,7 +20,7 @@ type V2ProxyService struct {
 	Port        string      `json:"port"         ` // 服务器端口
 	Rate        int         `json:"rate"         ` // 倍率
 	OrderId     int         `json:"order_id"     ` // 顺序
-	CreatedAt   *gtime.Time `json:"created_at"   ` // 创建时间
-	UpdatedAt   *gtime.Time `json:"updated_at"   ` // 更新时间
+	CreatedAt   *gtime.Time `json:"created_at"   ` //
+	UpdatedAt   *gtime.Time `json:"updated_at"   ` //
 	RouteId     string      `json:"route_id"     ` // 所属路由组
 }

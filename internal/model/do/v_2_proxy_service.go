@@ -22,7 +22,7 @@ type V2ProxyService struct {
 	Port        interface{} // 服务器端口
 	Rate        interface{} // 倍率
 	OrderId     interface{} // 顺序
-	CreatedAt   *gtime.Time // 创建时间
-	UpdatedAt   *gtime.Time // 更新时间
+	CreatedAt   *gtime.Time //
+	UpdatedAt   *gtime.Time //
 	RouteId     interface{} // 所属路由组
 }

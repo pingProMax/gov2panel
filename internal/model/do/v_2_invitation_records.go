@@ -18,8 +18,8 @@ type V2InvitationRecords struct {
 	FromUserId        interface{} // 被邀请者
 	CommissionRate    interface{} // 佣金比例
 	RechargeRecordsId interface{} // 订单id
-	CreatedAt         *gtime.Time // 创建时间
-	UpdatedAt         *gtime.Time // 更新时间
+	CreatedAt         *gtime.Time //
+	UpdatedAt         *gtime.Time //
 	OperateType       interface{} // 1邀请 2提现
-	State             interface{} // 状态 0未审核 1审核 2拒绝
+	State             interface{} // 状态 -1未审核 1审核 2拒绝
 }

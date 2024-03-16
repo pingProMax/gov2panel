@@ -21,7 +21,7 @@ type V2User struct {
 	PasswordSalt      interface{} // 加密盐
 	Balance           interface{} // 账户余额
 	Discount          interface{} // 专享折扣
-	CommissionType    interface{} // 0: system 1: period 2: onetime
+	CommissionType    interface{} // 3: system 1: period 2: onetime
 	CommissionRate    interface{} // 返利比例
 	CommissionBalance interface{} // aff余额
 	CommissionCode    interface{} // 邀请码
@@ -33,12 +33,12 @@ type V2User struct {
 	IsAdmin           interface{} // 是否管理员
 	IsStaff           interface{} // 是否员工
 	LastLoginAt       interface{} // 最后登入时间
-	LastLoginIp       interface{} // 最后登入ip
+	LastLoginIp       interface{} //
 	Uuid              interface{} // uuid
 	GroupId           interface{} // 权限组
 	Token             interface{} // token 订阅用
 	Remarks           interface{} // 备注
-	ExpiredAt         *gtime.Time // 到期时间
-	CreatedAt         *gtime.Time // 创建时间
-	UpdatedAt         *gtime.Time // 更新时间
+	ExpiredAt         *gtime.Time //
+	CreatedAt         *gtime.Time //
+	UpdatedAt         *gtime.Time //
 }

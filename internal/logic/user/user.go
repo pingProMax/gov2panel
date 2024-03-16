@@ -238,6 +238,17 @@ func (s *sUser) AEUser(data *entity.V2User) (err error) {
 	data.TransferEnable = utils.GBToBytes(float64(data.TransferEnable))
 	if data.Id != 0 {
 		err = s.UpUser(data)
+		//查询用户更新到上报缓存
+		service.User().MUpUserMap(model.UserTraffic{
+			UID:            data.Id,
+			Download:       data.D,
+			Upload:         data.U,
+			Email:          data.UserName,
+			TransferEnable: data.TransferEnable,
+			ExpiredAt:      data.ExpiredAt,
+			GroupId:        data.GroupId,
+			Banned:         data.Banned,
+		})
 		return err
 	}
 
@@ -312,21 +323,22 @@ func (s *sUser) GetUserCountByGroupIds(groupIds []int) (totle int, err error) {
 	return
 }
 
-// 更新用户 流量使用情况
+// 更新用户 流量使用情况 直接更新数据库 u+值、d+值、t+值
 func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 
 	colId := dao.V2User.Columns().Id
 	colU := dao.V2User.Columns().U
 	colD := dao.V2User.Columns().D
+	colT := dao.V2User.Columns().T
 	sql := fmt.Sprintf("UPDATE `%s` SET ", s.Cornerstone.Table)
 	sqlSetU := fmt.Sprintf("`%s` = CASE `%s` ", colU, colId)
 	sqlSetD := fmt.Sprintf("`%s` = CASE `%s` ", colD, colId)
+	sqlSetPublic := fmt.Sprintf("`%s` = unix_timestamp(now()) ", colT)
 	sqlWhere := ""
 
 	for i, u := range data {
 		sqlSetU = sqlSetU + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colU, strconv.FormatInt(u.Upload, 10))
 		sqlSetD = sqlSetD + fmt.Sprintf("WHEN %s THEN `%s`+%s ", strconv.Itoa(u.UID), colD, strconv.FormatInt(u.Download, 10))
-
 		if i == 0 {
 			sqlWhere = strconv.Itoa(u.UID)
 		} else {
@@ -336,17 +348,63 @@ func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 	}
 
 	sqlSetU = sqlSetU + "END, "
-	sqlSetD = sqlSetD + "END "
+	sqlSetD = sqlSetD + "END, "
 
 	sqlWhere = fmt.Sprintf("WHERE `%s` IN (%s)", colId, sqlWhere)
 
-	sql = sql + sqlSetU + sqlSetD + sqlWhere
+	sql = sql + sqlSetU + sqlSetD + sqlSetPublic + sqlWhere
 	fmt.Println(sql)
 	_, err = g.DB().Exec(gctx.New(), sql)
 	if err != nil {
 		return
 	}
 
+	return
+
+}
+
+// 更新用户 u、d、t
+func (s *sUser) UpUserDUTBy(data []model.UserTraffic) (err error) {
+
+	colId := dao.V2User.Columns().Id
+	colU := dao.V2User.Columns().U
+	colD := dao.V2User.Columns().D
+	colT := dao.V2User.Columns().T
+	sql := fmt.Sprintf("UPDATE `%s` SET ", s.Cornerstone.Table)
+	sqlSetU := fmt.Sprintf("`%s` = CASE `%s` ", colU, colId)
+	sqlSetD := fmt.Sprintf("`%s` = CASE `%s` ", colD, colId)
+	sqlSetPublic := fmt.Sprintf("`%s` = unix_timestamp(now()) ", colT)
+	sqlWhere := ""
+
+	for i, u := range data {
+		sqlSetU = sqlSetU + fmt.Sprintf("WHEN %s THEN %s ", strconv.Itoa(u.UID), strconv.FormatInt(u.Upload, 10))
+		sqlSetD = sqlSetD + fmt.Sprintf("WHEN %s THEN %s ", strconv.Itoa(u.UID), strconv.FormatInt(u.Download, 10))
+		if i == 0 {
+			sqlWhere = strconv.Itoa(u.UID)
+		} else {
+			sqlWhere = sqlWhere + "," + strconv.Itoa(u.UID)
+		}
+
+	}
+
+	sqlSetU = sqlSetU + "END, "
+	sqlSetD = sqlSetD + "END, "
+
+	sqlWhere = fmt.Sprintf("WHERE `%s` IN (%s)", colId, sqlWhere)
+
+	sql = sql + sqlSetU + sqlSetD + sqlSetPublic + sqlWhere
+	fmt.Println(sql)
+	_, err = g.DB().Exec(gctx.New(), sql)
+	if err != nil {
+		return
+	}
+
+	return
+
+}
+
+// 更新用户 7天流量使用数据
+func (s *sUser) UpUserDay7Flow(data []model.UserTraffic) (err error) {
 	//用户流量使用缓存
 
 	ctx := gctx.New()
