@@ -43,6 +43,47 @@ func (c *ControllerV1) Config(ctx context.Context, req *v1.ConfigReq) (res *v1.C
 	return
 }
 
+// func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserRes, err error) {
+// 	res = &v1.UserRes{}
+// 	_, planIds, err := service.ProxyService().GetServicePlanIdsById(req.NodeId)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	userArr, err := service.User().GetUserListByGroupIds(planIds)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	planArr, err := service.Plan().GetPlanResetTrafficMethod1List()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	for _, user := range userArr {
+
+// 		var speedLimit int
+// 		for _, plan := range planArr {
+// 			if user.GroupId == plan.Id {
+// 				speedLimit = plan.SpeedLimit
+// 			}
+
+// 		}
+// 		u := map[string]interface{}{
+// 			"id":          user.Id,
+// 			"uuid":        user.Uuid,
+// 			"speed_limit": speedLimit,
+// 		}
+// 		if speedLimit <= 0 {
+// 			u["speed_limit"] = nil
+// 		}
+// 		res.Users = append(res.Users, u)
+// 	}
+// 	ghttp.RequestFromCtx(ctx).Response.WriteJsonExit(res)
+
+// 	return
+// }
+
 func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserRes, err error) {
 	res = &v1.UserRes{}
 	_, planIds, err := service.ProxyService().GetServicePlanIdsById(req.NodeId)
@@ -50,9 +91,9 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 		return
 	}
 
-	userArr, err := service.User().GetUserListByGroupIds(planIds)
-	if err != nil {
-		return
+	d := make([]*model.UserTraffic, 0)
+	for _, v := range planIds {
+		d = append(d, service.User().MGetUserByGroupId(v)...)
 	}
 
 	planArr, err := service.Plan().GetPlanResetTrafficMethod1List()
@@ -60,7 +101,7 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 		return
 	}
 
-	for _, user := range userArr {
+	for _, user := range d {
 
 		var speedLimit int
 		for _, plan := range planArr {
@@ -70,7 +111,7 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 
 		}
 		u := map[string]interface{}{
-			"id":          user.Id,
+			"id":          user.UID,
 			"uuid":        user.Uuid,
 			"speed_limit": speedLimit,
 		}

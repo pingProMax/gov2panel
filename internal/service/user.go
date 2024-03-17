@@ -53,11 +53,11 @@ type (
 		// 获取用户数量 订阅组下的用户数据
 		GetUserCountByGroupIds(groupIds []int) (totle int, err error)
 		// 更新用户 流量使用情况 直接更新数据库 u+值、d+值、t+值
-		UpUserUAndDBy(data []model.UserTraffic) (err error)
+		UpUserUAndDBy(data []*model.UserTraffic) (err error)
 		// 更新用户 u、d、t
-		UpUserDUTBy(data []model.UserTraffic) (err error)
+		UpUserDUTBy(data []*model.UserTraffic) (err error)
 		// 更新用户 7天流量使用数据
-		UpUserDay7Flow(data []model.UserTraffic) (err error)
+		UpUserDay7Flow(data []*model.UserTraffic) (err error)
 		// 用户登录
 		Login(userName, passwd string) (user *entity.V2User, err error)
 		// 获取用户数据
@@ -77,11 +77,17 @@ type (
 		// 启动 把有效用户 存入到内存
 		MSaveToRam() (err error)
 		// 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）
-		MUpUserUAndBy(data []model.UserTraffic) (err error)
+		MUpUserUAndBy(data []*model.UserTraffic) (err error)
 		// 所有数据持久化
 		MSaveAllRam() (err error)
-		// 更新缓存
-		MUpUserMap(data model.UserTraffic) (err error)
+		// 更新/添加 缓存
+		MUpUserMap(data *model.UserTraffic)
+		// 先把原有缓存更新到数据库,再查询查询数据库更新到缓存
+		MUpDbAndUserMap(uid int) (err error)
+		// 删除 缓存
+		MDelUserMap(id int)
+		// 权限组获取用户
+		MGetUserByGroupId(GroupId int) (d []*model.UserTraffic)
 	}
 )
 

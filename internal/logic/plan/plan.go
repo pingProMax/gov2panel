@@ -222,16 +222,7 @@ func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V
 
 	//查询用户更新到上报缓存
 	user, _ = service.User().GetUserById(user.Id)
-	service.User().MUpUserMap(model.UserTraffic{
-		UID:            user.Id,
-		Download:       user.D,
-		Upload:         user.U,
-		Email:          user.UserName,
-		TransferEnable: user.TransferEnable,
-		ExpiredAt:      user.ExpiredAt,
-		GroupId:        user.GroupId,
-		Banned:         user.Banned,
-	})
+	service.User().MUpUserMap(model.UserToUserTraffic(user))
 
 	return
 }

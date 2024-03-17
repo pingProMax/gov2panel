@@ -20,15 +20,14 @@ import (
 func init() {
 	ctx := gctx.New()
 
-	//每天7点执行  持久化所有 userMap 数据
-	gcron.Add(ctx, "0 0 7 * * *", func(ctx context.Context) {
+	//每一个小时执行一次  持久化所有 userMap 数据
+	gcron.Add(ctx, "0 0 */1 * * *", func(ctx context.Context) {
 		service.User().MSaveAllRam()
 	}, "SAVE_USER_MAP_CRON")
 
 }
 
-//内存map数据
-
+// 内存map数据
 var userMap = gmap.NewHashMap(true)
 
 // 启动 把有效用户 存入到内存
@@ -47,16 +46,7 @@ func (s *sUser) MSaveToRam() (err error) {
 	}
 
 	for _, user := range userArr {
-		userMap.Set(user.Id, model.UserTraffic{
-			UID:            user.Id,
-			Download:       user.D,
-			Upload:         user.U,
-			Email:          user.UserName,
-			TransferEnable: user.TransferEnable,
-			ExpiredAt:      user.ExpiredAt,
-			GroupId:        user.GroupId,
-			Banned:         user.Banned,
-		})
+		userMap.Set(user.Id, model.UserToUserTraffic(user))
 	}
 
 	fmt.Println(userArr)
@@ -65,24 +55,24 @@ func (s *sUser) MSaveToRam() (err error) {
 }
 
 // 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）
-func (s *sUser) MUpUserUAndBy(data []model.UserTraffic) (err error) {
+func (s *sUser) MUpUserUAndBy(data []*model.UserTraffic) (err error) {
 
 	for _, u := range data {
 		if !userMap.GetVar(u.UID).IsNil() {
 			//存在缓存
 
-			var user model.UserTraffic
-			err = userMap.GetVar(u.UID).Struct(&user)
+			var userTraffic model.UserTraffic
+			err = userMap.GetVar(u.UID).Struct(&userTraffic)
 			if err == nil {
-				user.Upload = user.Upload + u.Upload
-				user.Download = user.Download + u.Download
+				userTraffic.Upload = userTraffic.Upload + u.Upload
+				userTraffic.Download = userTraffic.Download + u.Download
 
 				//流量判断、到期时间判断、用户权限组、用户状态
-				if (user.Upload+user.Download) >= user.TransferEnable || user.ExpiredAt.Unix() <= time.Now().Unix() || user.GroupId <= 0 || user.Banned == 1 {
-					userMap.Remove(user.UID)                 //map中删除
-					s.UpUserDUTBy([]model.UserTraffic{user}) //保存数据库
+				if (userTraffic.Upload+userTraffic.Download) >= userTraffic.TransferEnable || userTraffic.ExpiredAt.Unix() <= time.Now().Unix() || userTraffic.GroupId <= 0 || userTraffic.Banned == 1 {
+					userMap.Remove(userTraffic.UID)                   //map中删除
+					s.UpUserDUTBy([]*model.UserTraffic{&userTraffic}) //保存数据库
 				} else {
-					userMap.Set(user.UID, user)
+					userMap.Set(userTraffic.UID, userTraffic)
 				}
 
 			}
@@ -90,16 +80,7 @@ func (s *sUser) MUpUserUAndBy(data []model.UserTraffic) (err error) {
 			newU, err := s.GetUserById(u.UID)
 			if err == nil {
 				if newU.Id != 0 {
-					userMap.Set(newU.Id, model.UserTraffic{
-						UID:            newU.Id,
-						Download:       newU.D,
-						Upload:         newU.U,
-						Email:          newU.UserName,
-						TransferEnable: newU.TransferEnable,
-						ExpiredAt:      newU.ExpiredAt,
-						GroupId:        newU.GroupId,
-						Banned:         newU.Banned,
-					})
+					userMap.Set(newU.Id, model.UserToUserTraffic(newU))
 				}
 			}
 		}
@@ -116,12 +97,12 @@ func (s *sUser) MUpUserUAndBy(data []model.UserTraffic) (err error) {
 
 // 所有数据持久化
 func (s *sUser) MSaveAllRam() (err error) {
-	data := make([]model.UserTraffic, 0)
+	data := make([]*model.UserTraffic, 0)
 	for _, v := range userMap.Keys() {
 		var user model.UserTraffic
 		err = userMap.GetVar(v).Struct(&user)
 		if err == nil {
-			data = append(data, user)
+			data = append(data, &user)
 		}
 	}
 
@@ -135,13 +116,50 @@ func (s *sUser) MSaveAllRam() (err error) {
 }
 
 // 更新/添加 缓存
-func (s *sUser) MUpUserMap(data model.UserTraffic) (err error) {
+func (s *sUser) MUpUserMap(data *model.UserTraffic) {
 	userMap.Set(data.UID, data)
+
+}
+
+// 先把原有缓存更新到数据库,再查询查询数据库更新到缓存
+func (s *sUser) MUpDbAndUserMap(uid int) (err error) {
+	var userTraffic model.UserTraffic
+	err = userMap.GetVar(uid).Struct(&userTraffic)
+	if err != nil {
+		return
+	}
+
+	err = s.UpUserDUTBy([]*model.UserTraffic{&userTraffic})
+	if err != nil {
+		return
+	}
+
+	user, err := s.GetUserById(uid)
+	if err != nil {
+		return err
+	}
+
+	s.MUpUserMap(model.UserToUserTraffic(user))
 	return
 }
 
 // 删除 缓存
-func (s *sUser) MDelUserMap(id int) (err error) {
+func (s *sUser) MDelUserMap(id int) {
 	userMap.Remove(id)
+}
+
+// 权限组获取用户
+func (s *sUser) MGetUserByGroupId(GroupId int) (d []*model.UserTraffic) {
+	d = make([]*model.UserTraffic, 0)
+	for _, v := range userMap.Keys() {
+		var user model.UserTraffic
+		err := userMap.GetVar(v).Struct(&user)
+		if err == nil {
+			if user.GroupId == GroupId {
+				d = append(d, &user)
+			}
+		}
+	}
+
 	return
 }

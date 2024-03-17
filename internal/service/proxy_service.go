@@ -38,7 +38,7 @@ type (
 		// 获取节点数量
 		GetServiceCount() (data int, err error)
 		// 缓存 服务器当前用户数量
-		CacheServiceFlow(nodeId int, userTraffic []model.UserTraffic) (err error)
+		CacheServiceFlow(nodeId int, userTraffic []*model.UserTraffic) (err error)
 		// 获取所有服务器当前在线用户数量和服务器最后提交时间
 		// map[服务器id][type 1在线数量、2服务器最后提交时间]int
 		GetOnlineUserCountAndLastPushAt() (data map[int]map[int]int64, err error)

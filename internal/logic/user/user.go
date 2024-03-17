@@ -238,18 +238,12 @@ func (s *sUser) AEUser(data *entity.V2User) (err error) {
 	data.TransferEnable = utils.GBToBytes(float64(data.TransferEnable))
 	if data.Id != 0 {
 		err = s.UpUser(data)
+		if err != nil {
+			return
+		}
 		//查询用户更新到上报缓存
-		service.User().MUpUserMap(model.UserTraffic{
-			UID:            data.Id,
-			Download:       data.D,
-			Upload:         data.U,
-			Email:          data.UserName,
-			TransferEnable: data.TransferEnable,
-			ExpiredAt:      data.ExpiredAt,
-			GroupId:        data.GroupId,
-			Banned:         data.Banned,
-		})
-		return err
+		err = service.User().MUpDbAndUserMap(data.Id)
+		return
 	}
 
 	err = s.AddUser(data)
@@ -324,7 +318,7 @@ func (s *sUser) GetUserCountByGroupIds(groupIds []int) (totle int, err error) {
 }
 
 // 更新用户 流量使用情况 直接更新数据库 u+值、d+值、t+值
-func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
+func (s *sUser) UpUserUAndDBy(data []*model.UserTraffic) (err error) {
 
 	colId := dao.V2User.Columns().Id
 	colU := dao.V2User.Columns().U
@@ -364,7 +358,7 @@ func (s *sUser) UpUserUAndDBy(data []model.UserTraffic) (err error) {
 }
 
 // 更新用户 u、d、t
-func (s *sUser) UpUserDUTBy(data []model.UserTraffic) (err error) {
+func (s *sUser) UpUserDUTBy(data []*model.UserTraffic) (err error) {
 
 	colId := dao.V2User.Columns().Id
 	colU := dao.V2User.Columns().U
@@ -404,7 +398,7 @@ func (s *sUser) UpUserDUTBy(data []model.UserTraffic) (err error) {
 }
 
 // 更新用户 7天流量使用数据
-func (s *sUser) UpUserDay7Flow(data []model.UserTraffic) (err error) {
+func (s *sUser) UpUserDay7Flow(data []*model.UserTraffic) (err error) {
 	//用户流量使用缓存
 
 	ctx := gctx.New()
@@ -654,12 +648,19 @@ func (s *sUser) GetNowMonthCount() (count int, err error) {
 // 重置用户的Token和uuid
 func (s *sUser) ResetTokenAndUuidById(id int) (err error) {
 
+	uuidStr := uuid.New().String()
 	_, err = s.Cornerstone.GetDB().Data(
 		g.Map{
 			dao.V2User.Columns().Token: strings.ReplaceAll(uuid.New().String(), "-", ""),
-			dao.V2User.Columns().Uuid:  uuid.New().String(),
+			dao.V2User.Columns().Uuid:  uuidStr,
 		},
 	).Where(dao.V2User.Columns().Id, id).Update()
+	if err != nil {
+		return
+	}
+
+	//更新到userMap缓存
+	err = s.MUpDbAndUserMap(id)
 
 	return
 }

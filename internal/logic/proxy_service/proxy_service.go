@@ -272,7 +272,7 @@ func (s *sProxyService) GetServiceCount() (data int, err error) {
 }
 
 // 缓存 服务器当前用户数量
-func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []model.UserTraffic) (err error) {
+func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []*model.UserTraffic) (err error) {
 	timeNow := time.Now()
 	ctx := gctx.New()
 

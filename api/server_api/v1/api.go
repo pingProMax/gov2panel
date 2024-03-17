@@ -26,7 +26,7 @@ type UserRes struct {
 
 type PushReq struct {
 	g.Meta `path:"/push" tags:"Api" method:"get,post" summary:"报告用户流量"`
-	Data   []model.UserTraffic
+	Data   []*model.UserTraffic
 }
 
 type PushRes struct {
