@@ -170,8 +170,9 @@ func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (resul
 		"v":    "2",
 		"add":  "127.0.0.1",                                  //链接地址
 		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"port": "80",                                         //端口
-		"id":   user.Uuid,                                    //uuid
+		"net":  "tcp",
+		"port": "80",      //端口
+		"id":   user.Uuid, //uuid
 		"aid":  "0",
 	}
 	ds1, err := json.Marshal(s1)
@@ -217,8 +218,9 @@ func V2rayNSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 		"v":    "2",
 		"add":  "127.0.0.1",                                  //链接地址
 		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"port": "80",                                         //端口
-		"id":   user.Uuid,                                    //uuid
+		"net":  "tcp",
+		"port": "80",      //端口
+		"id":   user.Uuid, //uuid
 		"aid":  "0",
 	}
 	ds1, err := json.Marshal(s1)
@@ -264,8 +266,9 @@ func NekoBoxSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (resul
 		"v":    "2",
 		"add":  "127.0.0.1",                                  //链接地址
 		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"port": "80",                                         //端口
-		"id":   user.Uuid,                                    //uuid
+		"net":  "tcp",
+		"port": "80",      //端口
+		"id":   user.Uuid, //uuid
 		"aid":  "0",
 	}
 	ds1, err := json.Marshal(s1)
