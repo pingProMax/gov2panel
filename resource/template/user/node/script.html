@@ -181,7 +181,20 @@
         break;
       
       case "shadowsocks/ss2022":
-        url = `ss://${window.btoa(unescape(encodeURIComponent(serviceJson.encryption+":"+"{{.user.Uuid}}")))}@${params.host}:${params.port}#${params.name}`
+        let pssswd = "{{.user.Uuid}}";
+        if (serviceJson.encryption == "2022-blake3-aes-128-gcm") {
+          pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 16))))
+        }
+        if (serviceJson.encryption == "2022-blake3-aes-256-gcm") {
+          pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 32))))
+        }
+
+        let str = window.btoa(unescape(encodeURIComponent(serviceJson.encryption+":"+pssswd)))
+        str=str.replace("+", "-")
+        str=str.replace("/", "_")
+        str=str.replace("=", "")
+
+        url = `ss://${str}@${params.host}:${params.port}#${params.name}`
         break;
 
       case "trojan/trojan":

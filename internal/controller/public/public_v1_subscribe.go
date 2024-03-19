@@ -121,23 +121,30 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 		case "ss2022":
 			ssPasswd := user.Uuid
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:16]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:32]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
+
+			str := base64.StdEncoding.EncodeToString(
+				gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + ssPasswd),
+			)
+			str = strings.ReplaceAll(str, "+", "-")
+			str = strings.ReplaceAll(str, "/", "_")
+			str = strings.ReplaceAll(str, "=", "")
 
 			// ss://base64(加密方式:密码)@地址:端口#别名
 			// ss://OjY4ZDJjNTFmLTUzMTEtNDc2MS1hYTNhLTllNDg1MmYzMGYyNQ==@127.0.0.1:9996#ss2022
 			result = result + fmt.Sprintf(
 				"%s://%s@%s:%s#%s\n",
 				"ss",
-				ssPasswd,
+				str,
 				service.Host,
 				service.Port,
 				service.Name,
@@ -355,23 +362,30 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		case "ss2022":
 			ssPasswd := user.Uuid
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:16]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:32]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
+
+			str := base64.StdEncoding.EncodeToString(
+				gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + ssPasswd),
+			)
+			str = strings.ReplaceAll(str, "+", "-")
+			str = strings.ReplaceAll(str, "/", "_")
+			str = strings.ReplaceAll(str, "=", "")
 
 			// ss://base64(加密方式:密码)@地址:端口#别名
 			// ss://OjY4ZDJjNTFmLTUzMTEtNDc2MS1hYTNhLTllNDg1MmYzMGYyNQ==@127.0.0.1:9996#ss2022
 			result = result + fmt.Sprintf(
 				"%s://%s@%s:%s#%s\n",
 				"ss",
-				ssPasswd,
+				str,
 				service.Host,
 				service.Port,
 				service.Name,
@@ -469,14 +483,14 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 		case "ss2022":
 			ssPasswd := user.Uuid
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:16]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
 			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
-				ssPasswd = base64.StdEncoding.EncodeToString(
-					gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + user.Uuid[0:32]),
+				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
+					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
 			d["type"] = "ss"

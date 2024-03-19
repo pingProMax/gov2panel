@@ -125,7 +125,7 @@ shadowsocks2022
 	"port": "9996",
 	"encryption": "aes-128-gcm",
 	"obfs": "none", //或者 http
-	"server_key":"", // 2022-blake3-aes-128-gcm 16个字符  2022-blake3-aes-256-gcm 32个字符
+	"server_key":"", // 2022-blake3-aes-128-gcm 16个字符->base64 || 2022-blake3-aes-256-gcm 32个字符->base64
 	"obfs_settings": {
 		"path": "",
 		"host": ""
