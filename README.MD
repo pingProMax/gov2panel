@@ -7,6 +7,8 @@
 - https://github.com/pingProMax/gov2panel/blob/master/UpdateLog.MD  
 
 * * *  
+高性能的面板，巨量用户和巨量节点用起来cpu和内存占用率极低
+* * *  
 
 # 节点
 节点地址   
@@ -122,8 +124,8 @@ shadowsocks2022
 {
 	"port": "9996",
 	"encryption": "aes-128-gcm",
-	"obfs": "none",
-	"server_key":"",
+	"obfs": "none", //或者 http
+	"server_key":"", // 2022-blake3-aes-128-gcm 16个字符  2022-blake3-aes-256-gcm 32个字符
 	"obfs_settings": {
 		"path": "",
 		"host": ""
@@ -154,6 +156,11 @@ trojan
 }
 ```
 
+
+# clash订阅自定义配置  
+``` json  
+项目文件夹/manifest/config/clash.yaml
+```
 
 # 当前阶段任务  
 测试和修复BUG  

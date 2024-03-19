@@ -148,6 +148,26 @@
               <th scope="row">
                 <div class="media align-items-center">
                   <a href="#" class="avatar rounded-circle mr-3">
+                    <img alt="Image placeholder" src="/resource/image/theme/clash.png">
+                  </a>
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">clash</span>
+                  </div>
+                </div>
+              </th>
+              <td class="budget">
+                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=clash
+              </td>
+              
+              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=clash')">
+                <a href="clash://install-config?url={{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=clash">导入</a>
+              </td>
+            </tr>
+
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <a href="#" class="avatar rounded-circle mr-3">
                     <img alt="Image placeholder" src="/resource/image/theme/shadowsocks.png">
                   </a>
                   <div class="media-body">
