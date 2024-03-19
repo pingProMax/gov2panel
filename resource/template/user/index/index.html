@@ -159,7 +159,7 @@
                 {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=clash
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=clash')">
+              <td class="text-right" style="cursor: pointer;" >
                 <a href="clash://install-config?url={{.setting.subscribe_domain | url}}{{"api/subscribe?token=" | url}}{{.user.Token}}{{"&flag=clash" | url}}">导入</a>
               </td>
             </tr>
