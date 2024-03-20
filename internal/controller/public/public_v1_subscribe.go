@@ -442,6 +442,16 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 				d["ws-headers"] = map[string]interface{}{
 					"Host": gconv.String(serviceJson["host"]),
 				}
+			case "h2":
+				d["h2-opts"] = map[string]interface{}{
+					"host": []string{gconv.String(serviceJson["host"])},
+					"path": gconv.String(serviceJson["path"]),
+				}
+			case "grpc":
+				d["grpc-opts"] = map[string]interface{}{
+					"grpc-service-name": gconv.String(serviceJson["path"]),
+				}
+
 			}
 
 			if gconv.String(serviceJson["type"]) == "http" { //伪装类型
@@ -470,6 +480,16 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 				d["ws-headers"] = map[string]interface{}{
 					"Host": gconv.String(serviceJson["host"]),
 				}
+			case "h2":
+				d["h2-opts"] = map[string]interface{}{
+					"host": []string{gconv.String(serviceJson["host"])},
+					"path": gconv.String(serviceJson["path"]),
+				}
+			case "grpc":
+				d["grpc-opts"] = map[string]interface{}{
+					"grpc-service-name": gconv.String(serviceJson["path"]),
+				}
+
 			}
 
 			if gconv.String(serviceJson["type"]) == "http" { //伪装类型
