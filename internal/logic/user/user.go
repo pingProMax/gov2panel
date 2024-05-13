@@ -74,7 +74,7 @@ func (s *sUser) GetInviteCountByUserId(user_id int) (inviteCount int, err error)
 // 获取 用户 的佣金比例\佣金类型
 func (s *sUser) GetUserCTypeAndCRate(user *entity.V2User) (commissionType int, commissionRate int) {
 	setting, _ := service.Setting().GetSettingAllMap()
-	if user.CommissionType != 0 {
+	if user.CommissionType != 3 {
 		commissionType = user.CommissionType
 	} else {
 		commissionType = setting["commission_type"].Int()

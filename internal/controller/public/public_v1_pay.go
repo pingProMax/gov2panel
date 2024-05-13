@@ -17,6 +17,24 @@ import (
 )
 
 func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (res *v1.EPayNotifyRes, err error) {
+	// err = service.RechargeRecords().SaveRechargeRecords(
+	// 	&entity.V2RechargeRecords{
+	// 		Amount:        100,
+	// 		UserId:        0,
+	// 		OperateType:   1,
+	// 		RechargeName:  "系统测试",
+	// 		Remarks:       "",
+	// 		TransactionId: "test",
+	// 	},
+	// 	"系统测试",
+	// 	110,
+	// 	0,
+	// 	"",
+	// )
+
+	// fmt.Println(err, "test")
+	// return
+
 	paramList := strings.Split(req.Epay.Param, "|") //用户实际得到的金额|支付方式的id|用户id|订单号
 	if len(paramList) != 4 {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢1？")
