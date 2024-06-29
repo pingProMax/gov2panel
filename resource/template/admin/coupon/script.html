@@ -88,7 +88,7 @@
 
             <div class="position-relative form-group">
               <label >指定订阅</label>
-              <select name="limit_plan_ids" id="limit_plan_ids" class="form-control" data-style="btn-primary" >
+              <select name="limit_plan_id" id="limit_plan_id" class="form-control" data-style="btn-primary" >
                 <option value="0">全部</option>
               </select>
             </div>
@@ -148,7 +148,7 @@
             console.log(data.data)
             for (let index = 0; index < data.data.data.length; index++) {
               const element = data.data.data[index];
-              $("#limit_plan_ids").append(`<option value="${element.id}">${element.name}</option>`)
+              $("#limit_plan_id").append(`<option value="${element.id}">${element.name}</option>`)
             }
           }
         },
