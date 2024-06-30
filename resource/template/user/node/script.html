@@ -35,7 +35,7 @@
                         <span class="status">离线</span>
                       </span>`
               }else{
-                let htmlStr = (onlineUserCountAndLastPushAt[row.service.id][1] || 0) + " | ";
+                let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
                 if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
                   htmlStr = htmlStr + `<span class="badge badge-dot">
                         <i class="bg-success"></i>
