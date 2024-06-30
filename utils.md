@@ -41,7 +41,12 @@ bug修复记录
 vless 订阅flow和security位置相反
 订阅fp 字段
 
+流量上报
 USER_%s_%s_FLOW_UPLOAD,UID,2023922
+
+服务器最后在线时间
+SERVER_%s_LAST_PUSH_AT,服务器id
+
 
 gf gen ctrl
 gf gen service

@@ -3,12 +3,16 @@ package server_api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strconv"
+	"time"
 
 	v1 "gov2panel/api/server_api/v1"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gcache"
 )
 
 func (c *ControllerV1) Config(ctx context.Context, req *v1.ConfigReq) (res *v1.ConfigRes, err error) {
@@ -119,6 +123,12 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 			u["speed_limit"] = nil
 		}
 		res.Users = append(res.Users, u)
+	}
+
+	//服务器最后提交数据时间
+	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix(), 0)
+	if err != nil {
+		return
 	}
 	ghttp.RequestFromCtx(ctx).Response.WriteJsonExit(res)
 
