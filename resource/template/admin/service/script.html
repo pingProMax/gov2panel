@@ -18,6 +18,7 @@
 <div id="toolbar">
   <div class="btn-group ml-3" role="group" aria-label="Basic example">
     <button type="button" class="btn btn-info " onclick="AE()">添加</button>
+    <button type="button" class="btn btn-primary " onclick="CopyNode()">复制</button>
     <button type="button" class="btn btn-success " onclick="DisplayModal('CoverPlan')">批量分配订阅</button>
     <button type="button" class="btn btn-warning " onclick="DisplayModal('CoverRoute')">批量分配路由</button>
     <button type="button" class="btn btn-danger " onclick="Del()">删除</button>
@@ -425,12 +426,49 @@
   function DisplayModal(htmlId) {
     let delData = $table.bootstrapTable('getSelections')
     if (delData.length == 0) {
-      notify('danger', '请选择！')
+      notify('danger', '请选择节点！')
       return
     }
     $('#'+htmlId).modal('show')
     $("#limit_plan_id2").selectpicker('val', '');
     $("#limit_route_id2").selectpicker('val', '');
+  }
+
+  //复制节点
+  function CopyNode(htmlId) {
+    let delData = $table.bootstrapTable('getSelections')
+    if (delData.length != 1) {
+      notify('danger', '请选择一个节点！')
+      return
+    }
+    console.log(delData)
+    let d = delData[0].service
+    console.log(d)
+    delete d.id
+    delete d.updated_at
+    delete d.created_at
+    
+    $.ajax({
+      type: "POST",
+      url: "/{{.setting.admin_path}}/service/ae",
+      data: d,
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          notify('success', "复制成功")
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        $("#table").bootstrapTable('refresh');
+      }
+    });
+
   }
 
   //批量分配订阅数据提交
@@ -710,6 +748,7 @@
           x[$(domEle).attr("name")] = domEle.value
         })
 
+        GetOnlineUserCountAndLastPushAt()
 
         return x
       },
@@ -732,30 +771,27 @@
 
   //获取所有服务器当前在线用户数量和服务器最后提交时间
   function GetOnlineUserCountAndLastPushAt() {
-    if (onlineUserCountAndLastPushAt == undefined) {
-      $.ajax({
-        async: false,
-        type: "POST",
-        url: "/{{.setting.admin_path}}/service/online_user_count_and_last_push_at",
-        dataType: "json",
-        success: function (data) {
-          if (data.code == 0) {
-            onlineUserCountAndLastPushAt = data.data.data
-            initTable()
-          } else {
-            notify('danger', data.message)
-          }
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-          console.log(errorThrown)
-          notify('danger', errorThrown)
-        },
-        complete: function () {//不管成功还是失败 都会进这个函数
-
+    $.ajax({
+      async: false,
+      type: "POST",
+      url: "/{{.setting.admin_path}}/service/online_user_count_and_last_push_at",
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          onlineUserCountAndLastPushAt = data.data.data
+          initTable()
+        } else {
+          notify('danger', data.message)
         }
-      });
-    }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(errorThrown)
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
 
+      }
+    });
   }
 
 
