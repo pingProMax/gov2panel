@@ -9,7 +9,7 @@ logger:
   stdout: true
 database:
   default:
-    link: "mysql:root:12345678@tcp(127.0.0.1:3306)/gov2panel?loc=Local&parseTime=true&charset=utf8" # mysql数据库配置信息
+    link: "mysql:root:12345678@tcp(127.0.0.1:3306)/gov2panel?loc=Local&parseTime=true&charset=utf8mb4" # mysql数据库配置信息
     debug: true
   
 viewer:
