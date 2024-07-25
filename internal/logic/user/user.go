@@ -148,6 +148,7 @@ func (s *sUser) ClearExpiredUserGroupIdAndUDTransferEnable() (err error) {
 			dao.V2User.Columns().U:              0,
 			dao.V2User.Columns().D:              0,
 			dao.V2User.Columns().TransferEnable: 0,
+			dao.V2User.Columns().ExpiredAt:      time.Now(),
 		},
 	)
 
@@ -242,7 +243,7 @@ func (s *sUser) AEUser(data *entity.V2User) (err error) {
 			return
 		}
 		//查询用户更新到上报缓存
-		err = service.User().MUpDbAndUserMap(data.Id)
+		err = service.User().MGetDb2UserMap(data.Id)
 		return
 	}
 
@@ -660,7 +661,7 @@ func (s *sUser) ResetTokenAndUuidById(id int) (err error) {
 	}
 
 	//更新到userMap缓存
-	err = s.MUpDbAndUserMap(id)
+	err = s.MGetDb2UserMap(id)
 
 	return
 }

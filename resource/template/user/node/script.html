@@ -182,14 +182,14 @@
       
       case "shadowsocks/ss2022":
         let pssswd = "{{.user.Uuid}}";
-        if (serviceJson.encryption == "2022-blake3-aes-128-gcm") {
+        if (serviceJson.cypher_method == "2022-blake3-aes-128-gcm") {
           pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 16))))
         }
-        if (serviceJson.encryption == "2022-blake3-aes-256-gcm") {
+        if (serviceJson.cypher_method == "2022-blake3-aes-256-gcm") {
           pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 32))))
         }
 
-        let str = window.btoa(unescape(encodeURIComponent(serviceJson.encryption+":"+pssswd)))
+        let str = window.btoa(unescape(encodeURIComponent(serviceJson.cypher_method+":"+pssswd)))
         str=str.replace("+", "-")
         str=str.replace("/", "_")
         str=str.replace("=", "")

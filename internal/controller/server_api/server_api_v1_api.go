@@ -43,7 +43,6 @@ func (c *ControllerV1) Config(ctx context.Context, req *v1.ConfigReq) (res *v1.C
 	ress["flow_rate"] = server.Rate //流量倍率
 
 	// ress["plan"] = planList
-	ghttp.RequestFromCtx(ctx).Response.WriteJsonExit(ress)
 	return
 }
 
@@ -130,16 +129,12 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 	if err != nil {
 		return
 	}
-	ghttp.RequestFromCtx(ctx).Response.WriteJsonExit(res)
 
 	return
 }
 
 func (c *ControllerV1) Push(ctx context.Context, req *v1.PushReq) (res *v1.PushRes, err error) {
 	res = &v1.PushRes{}
-
-	decoder := json.NewDecoder(ghttp.RequestFromCtx(ctx).Request.Body)
-	decoder.Decode(&req.Data)
 
 	err = service.User().MUpUserUAndBy(req.Data)
 	if err != nil {

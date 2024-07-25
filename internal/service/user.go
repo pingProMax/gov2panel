@@ -82,8 +82,8 @@ type (
 		MSaveAllRam() (err error)
 		// 更新/添加 缓存
 		MUpUserMap(data *model.UserTraffic)
-		// 先把原有缓存更新到数据库,再查询查询数据库更新到缓存
-		MUpDbAndUserMap(uid int) (err error)
+		// 查询查询数据库更新到缓存
+		MGetDb2UserMap(uid int) (err error)
 		// 删除 缓存
 		MDelUserMap(id int)
 		// 权限组获取用户

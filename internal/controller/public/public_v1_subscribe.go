@@ -106,7 +106,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				gconv.String(serviceJson["fp"]),
 				gconv.String(serviceJson["pbk"]),
 				gconv.String(serviceJson["sid"]),
-				gconv.String(serviceJson["spx"]),
+				gconv.String(strings.ReplaceAll(gconv.String(serviceJson["spx"]), "$uuid$", user.Uuid)),
 				gconv.String(serviceJson["type"]),
 				gconv.String(serviceJson["serviceName"]),
 				gconv.String(serviceJson["mode"]),
@@ -121,20 +121,20 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 
 		case "ss2022":
 			ssPasswd := user.Uuid
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-128-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-256-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
 
 			str := base64.StdEncoding.EncodeToString(
-				gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + ssPasswd),
+				gconv.Bytes(gconv.String(serviceJson["cypher_method"]) + ":" + ssPasswd),
 			)
 			str = strings.ReplaceAll(str, "+", "-")
 			str = strings.ReplaceAll(str, "/", "_")
@@ -362,20 +362,20 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		switch strings.Split(service.Agreement, "/")[1] {
 		case "ss2022":
 			ssPasswd := user.Uuid
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-128-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-256-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
 
 			str := base64.StdEncoding.EncodeToString(
-				gconv.Bytes(gconv.String(serviceJson["encryption"]) + ":" + ssPasswd),
+				gconv.Bytes(gconv.String(serviceJson["cypher_method"]) + ":" + ssPasswd),
 			)
 			str = strings.ReplaceAll(str, "+", "-")
 			str = strings.ReplaceAll(str, "/", "_")
@@ -503,20 +503,20 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 			}
 		case "ss2022":
 			ssPasswd := user.Uuid
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-128-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-128-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:16]),
 				)
 			}
 
-			if gconv.String(serviceJson["encryption"]) == "2022-blake3-aes-256-gcm" {
+			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-256-gcm" {
 				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
 					gconv.Bytes(user.Uuid[0:32]),
 				)
 			}
 			d["type"] = "ss"
-			d["cipher"] = gconv.String(serviceJson["encryption"]) //加密方式
-			d["password"] = ssPasswd                              //密码
+			d["cipher"] = gconv.String(serviceJson["cypher_method"]) //加密方式
+			d["password"] = ssPasswd                                 //密码
 
 		case "trojan":
 			d["type"] = "trojan"

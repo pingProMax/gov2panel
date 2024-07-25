@@ -18,79 +18,231 @@ $uuid$ 订阅时会替换成用户的uuid
 
 数据示例(使用时请删除注释)：
 ``` json  
+
+协议:v2ray/vmess
 tcp:
-协议:v2ray/vmess
 {
-  "port": "12345",
+  "port": "8888",
+  "transport_protocol": "tcp",
+
   "scy": "auto",
-  "net": "tcp",
-  "type": "none",
-  "host": "",
-  "path": "",
-  "tls": "",
-  "sni": "",
-  "alpn": ""
+  "net": "tcp"
 }
 
-tcp+tls:
 协议:v2ray/vmess
+tcp + tls:
 {
-  "port": "12345",
+  "port": "8888",
+  "transport_protocol": "tcp",
+  "enable_t_l_s":true,
+
   "scy": "auto",
   "net": "tcp",
   "type": "none",
-  "host": "",
-  "path": "",
   "tls": "tls",
-  "sni": "xxxx.com",
-  "alpn": ""
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
 }
 
 
-
-ws:
 协议:v2ray/vmess
+ws:
 {
-  "port": "12345",
+  "port": "8888",
+  "transport_protocol": "ws",
+
   "scy": "auto",
   "net": "ws",
   "type": "none",
   "host": "iqiyi.com",
-  "path": "/test",
-  "tls": "",
-  "sni": "",
-  "alpn": ""
+  "path": "/test"
 }
 
-ws+tls:
 协议:v2ray/vmess
+ws+tls:
 {
-  "port": "12345",
+  "port": "8888",
+  "transport_protocol": "ws",
+  "enable_t_l_s":true,
+
   "scy": "auto",
   "net": "ws",
   "type": "none",
-  "host": "xxxx.com",
+  "host": "local.id.seewo.com",
   "path": "/test",
   "tls": "tls",
-  "sni": "xxxx.com",
-  "alpn": ""
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
 }
 
 
-协议:v2ray/vless
+协议:v2ray/vmess
+httpupgrade:
 {
-  "port": "12345",
+  "port": "8888",
+  "transport_protocol": "httpupgrade",
+
+  "scy": "auto",
+  "net": "httpupgrade",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test"
+}
+
+协议:v2ray/vmess
+httpupgrade+tls:
+{
+  "port": "8888",
+  "transport_protocol": "httpupgrade",
+  "enable_t_l_s":true,
+
+  "scy": "auto",
+  "net": "httpupgrade",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+协议:v2ray/vmess
+splithttp
+{
+  "port": "8888",
+  "transport_protocol": "splithttp",
+
+  "scy": "auto",
+  "net": "splithttp",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test"
+}
+
+协议:v2ray/vmess
+splithttp + tls
+{
+  "port": "8888",
+  "transport_protocol": "splithttp",
+  "enable_t_l_s":true,
+
+  "scy": "auto",
+  "net": "splithttp",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+
+协议:v2ray/vmess
+h2 + tls
+{
+  "port": "8888",
+  "transport_protocol": "h2",
+  "enable_t_l_s":true,
+
+  "scy": "auto",
+  "net": "h2",
+  "type": "none",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+
+协议:v2ray/vmess
+quic + tls
+{
+  "port": "8888",
+  "transport_protocol": "quic",
+  "enable_t_l_s":true,
+  "header": {
+		"type": "srtp"
+  },
+
+  "scy": "auto",
+  "net": "quic",
+  "type": "srtp",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+
+协议:v2ray/vmess
+quic + srtp + tls
+{
+  "port": "8888",
+  "transport_protocol": "quic",
+  "enable_t_l_s":true,
+  "header": {
+		"type": "srtp"
+  },
+
+  "scy": "auto",
+  "net": "quic",
+  "type": "srtp",
+  "host": "iqiyi.com",
+  "path": "/test",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+协议:v2ray/vmess
+grpc + tls
+{
+  "port": "8888",
+  "transport_protocol": "grpc",
+  "enable_t_l_s":true,
+  "authority": "local.id.seewo.com",
+  "service_name": "local.id.seewo.com",
+
+  "scy": "auto",
+  "net": "grpc",
+  "type": "gun",
+  "host": "local.id.seewo.com",
+  "path": "local.id.seewo.com",
+  "tls": "tls",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
+}
+
+
+协议:v2ray/vless 注释描述  
+说明：xrayr 开启vless协议需要去config.yml 设置NodeType: Vless/EnableVless: true  
+{
+  "port": "8888",
+  "transport_protocol": "tcp", //传输协议 (后端用)
+  "security": "tls", //传输层安全 (后端用)  (订阅用)
+  "reject_unknown_sni": true, //拒绝未知Sni
+  "enable_t_l_s": true,//启用 tls
+
   "encryption": "", //加密方式
   "security": "", //传输层安全
-  "flow": "", //流控
-  "sni": "",
-  "alpn": "",
-  "fp": "",
-  "pbk": "",
-  "sid": "",
-  "spx": "",
-  "type": "", //传输协议 (订阅用)
-  "net": "", //传输协议 (后端用)
+  "flow": "xtls-rprx-vision", //流控
+  "sni": "",  //sni
+  "alpn": "", //alpn
+  "fp": "", //fp
+  "pbk": "",  //PublicKey
+  "sid": "",  //ShortId
+  "spx": "",  //SpiderX
+  "type": "tcp", //传输协议 (订阅用)
   "serviceName": "", //grpc serviceName
   "mode": "", //grpc 模式
   "headerType": "",
@@ -101,49 +253,121 @@ ws+tls:
   "seed": "" //kcp seed
 }
 
-vless+tcp+reality:
+
 协议:v2ray/vless
+tcp + tls
 {
-	"port": "45555",
-	"encryption": "none",
-	"security": "reality",
-	"flow": "xtls-rprx-vision",
-	"sni": "www.smzdm.com",
-	"alpn": "",
-	"fp": "chrome",
-	"pbk": "3embN-YWuuKUd4Lg-7YsbNJwLisZZx2ZF2omf5YvjTs",
-	"sid": "0123456789abcdef",
-	"type": "tcp",
-	"net": "tcp",
-	"headerType": "none",
-	"host": ""
+  "port": "8888",
+  "transport_protocol": "tcp", 
+  "reject_unknown_sni": true, 
+  "enable_t_l_s": true,     
+  "enable_vless": true, 
+  "security": "tls", 
+
+  "encryption": "none",
+  "flow": "xtls-rprx-vision", 
+  "headerType": "none",
+  "type": "tcp",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome"
 }
+
+协议:v2ray/vless
+tcp + reality
+{
+  "port": "8888",
+  "transport_protocol": "tcp", 
+  "reject_unknown_sni": true, 
+  "enable_r_e_a_l_i_t_y": true,    
+  "security": "reality", 
+ 
+
+  "encryption": "none",
+  "flow": "xtls-rprx-vision", 
+  "headerType": "none",
+  "type": "tcp",
+  "sni": "local.id.seewo.com",
+  "alpn": "http/1.1",
+  "fp": "chrome",
+  "pbk": "z7JzZnpZIUjr2FZXouK3ij11l-PiL0pnSVmYUxpv_Ss",
+	"sid": "0123456789abcdef",
+  "headerType": "none",
+  "spx": "/$uuid$/cccc"
+}
+
+......
+其他vless协议 参考上面vmess协议
+
 
 shadowsocks2022
 协议:shadowsocks/ss2022
 {
-	"port": "9996",
-	"encryption": "aes-128-gcm",
-	"obfs": "none", //或者 http
+	"port": "8888",
+  "transport_protocol": "tcp", 
+  "cypher_method":"aes-128-gcm",
 	"server_key":"", // 2022-blake3-aes-128-gcm 16个字符->base64 || 2022-blake3-aes-256-gcm 32个字符->base64
-	"obfs_settings": {
-		"path": "",
-		"host": ""
-	}
+  "header":{}
 }
 
 协议:trojan/trojan
-trojan
+trojan + tcp + tls
 {
-	"host":"",
-	"port":"",
-  "sni":"",
-  "security":"", //传输层安全
-  "alpn":"",
-  "fp":"", //Fingerprint
-  "type":"tcp", //传输协议
+	"port":"8888",
+  "transport_protocol":"tcp",
+  "enable_t_l_s": true,     
+	"host":"local.id.seewo.com",
+	"service_name":"local.id.seewo.com",
+  
+  "sni":"local.id.seewo.com",
+  "security":"tls", 
+  "alpn":"h2",
+  "fp":"chrome", 
+  "type":"tcp",
   "headerType":""
 }
+
+trojan + tcp + http + tls
+{
+	"port":"8888",
+  "transport_protocol":"tcp",
+  "enable_t_l_s": true,     
+	"host":"local.id.seewo.com",
+	"service_name":"local.id.seewo.com",
+  "header": {
+		"type": "http",
+		"request": {
+		},
+		"response": {
+		}
+	},
+  
+  "sni":"local.id.seewo.com",
+  "security":"tls", 
+  "alpn":"h2",
+  "fp":"chrome", 
+  "type":"tcp",
+  "headerType":"http"
+}
+
+协议:trojan/trojan
+trojan + ws + tls
+{
+	"port":"8888",
+  "transport_protocol":"ws",
+  "enable_t_l_s": true,     
+	"host":"local.id.seewo.com",
+	"service_name":"local.id.seewo.com",
+  
+  "sni":"local.id.seewo.com",
+  "security":"tls", 
+  "alpn":"h2",
+  "fp":"chrome", 
+  "type":"ws",
+  "headerType":""
+}
+
+
 
 ``` 
 

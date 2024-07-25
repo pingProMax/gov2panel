@@ -121,15 +121,10 @@ func (s *sUser) MUpUserMap(data *model.UserTraffic) {
 
 }
 
-// 先把原有缓存更新到数据库,再查询查询数据库更新到缓存
-func (s *sUser) MUpDbAndUserMap(uid int) (err error) {
+// 查询查询数据库更新到缓存
+func (s *sUser) MGetDb2UserMap(uid int) (err error) {
 	var userTraffic model.UserTraffic
 	err = userMap.GetVar(uid).Struct(&userTraffic)
-	if err != nil {
-		return
-	}
-
-	err = s.UpUserDUTBy([]*model.UserTraffic{&userTraffic})
 	if err != nil {
 		return
 	}
