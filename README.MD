@@ -1,5 +1,8 @@
 # GoFrame 开发的v2ray面板
 
+xrayr还尚未合并 https://github.com/XrayR-project/XrayR/pull/673 
+后端需要自己编译：https://github.com/pingProMax/XrayR 
+
 开发文档:  
 - https://goframe.org/pages/viewpage.action?pageId=1114399  
 
