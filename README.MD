@@ -10,7 +10,8 @@ xrayr还尚未合并 https://github.com/XrayR-project/XrayR/pull/673
 - https://github.com/pingProMax/gov2panel/blob/master/UpdateLog.MD  
 
 * * *  
-高性能的面板，巨量用户和巨量节点用起来cpu和内存占用率极低
+高性能的面板，巨量用户和巨量节点用起来cpu和内存占用率极低  
+请自行编译  
 * * *  
 
 # 节点
@@ -419,7 +420,7 @@ manifest/config/config.yaml
 3、启动项目  
 ``` code
 cd 项目目录
-nohup ./gov2panel &
+nohup ./gov2panel(请自行编译) &
 检查日志启动无误
 ```
 

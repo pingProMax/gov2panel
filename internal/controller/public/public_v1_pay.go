@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 
 	v1 "gov2panel/api/public/v1"
@@ -17,6 +20,7 @@ import (
 )
 
 func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (res *v1.EPayNotifyRes, err error) {
+
 	// err = service.RechargeRecords().SaveRechargeRecords(
 	// 	&entity.V2RechargeRecords{
 	// 		Amount:        100,
@@ -35,7 +39,20 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 	// fmt.Println(err, "test")
 	// return
 
-	paramList := strings.Split(req.Epay.Param, "|") //用户实际得到的金额|支付方式的id|用户id|订单号
+	r := g.RequestFromCtx(ctx)
+	// rw := r.Response.RawWriter()
+
+	paramMap := r.GetMapStrStr()
+	sign := paramMap["sign"]
+	signType := paramMap["sign_type"]
+
+	// 删除 sign 和 sign_type
+	delete(paramMap, "sign")
+	delete(paramMap, "sign_type")
+
+	urlData := notify(paramMap)
+
+	paramList := strings.Split(paramMap["param"], "|") //用户实际得到的金额|支付方式的id|用户id|订单号
 	if len(paramList) != 4 {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢1？")
 	}
@@ -47,17 +64,6 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 
 	usetId, _ := strconv.Atoi(paramList[2])
 
-	urlData := fmt.Sprintf("money=%s&name=%s&out_trade_no=%s&param=%s&pid=%s&trade_no=%s&trade_status=%s&type=%s",
-		req.Epay.Money,             //金额
-		req.Epay.Name,              //name
-		req.Epay.OutTradeNo,        //商户系统内部的订单号
-		req.Epay.Param,             //自定义
-		strconv.Itoa(req.Epay.Pid), //pid
-		req.Epay.TradeNo,           //易支付订单号
-		req.Epay.TradeStatus,       //支付状态
-		req.Epay.Type,              //支付方式
-	)
-
 	//{1040 2023091415451087211 1694677507984 wxpay product 2.1 TRADE_SUCCESS 1.00|6|3787 e5615bcd45e87e4ad8173ad60ec6a620 MD5}
 
 	epayConfig := model.EpayConfig{}
@@ -67,17 +73,17 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 	}
 
 	//验证签名
-	if req.SignType != "MD5" {
+	if signType != "MD5" {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("error")
 	}
-	fmt.Println(req.Epay.Sign, utils.MD5V(urlData, epayConfig.Key.String()), paramList)
-	if req.Epay.Sign != utils.MD5V(urlData, epayConfig.Key.String()) {
+	fmt.Println(sign, utils.MD5V(urlData, epayConfig.Key.String()), paramList)
+	if sign != utils.MD5V(urlData, epayConfig.Key.String()) {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢3？")
 	}
 
 	//充值
-	num, _ := strconv.ParseFloat(paramList[0], 64)      //用户实际到账金额
-	payNum, _ := strconv.ParseFloat(req.Epay.Money, 64) //支付金额
+	num, _ := strconv.ParseFloat(paramList[0], 64)         //用户实际到账金额
+	payNum, _ := strconv.ParseFloat(paramMap["money"], 64) //支付金额
 	err = service.RechargeRecords().SaveRechargeRecords(
 		&entity.V2RechargeRecords{
 			Amount:        num,
@@ -98,4 +104,28 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 
 	ghttp.RequestFromCtx(ctx).Response.WriteExit("success")
 	return
+}
+
+func notify(params map[string]string) string {
+
+	// 获取所有键并排序
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	// 生成查询字符串
+	var strBuilder strings.Builder
+	for _, k := range keys {
+		strBuilder.WriteString(url.QueryEscape(k) + "=" + url.QueryEscape(params[k]) + "&")
+	}
+
+	// 去掉最后的 "&" 并拼接密钥
+	queryStr := strBuilder.String()
+	if len(queryStr) > 0 {
+		queryStr = queryStr[:len(queryStr)-1]
+	}
+
+	return queryStr
 }
