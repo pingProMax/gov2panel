@@ -55,8 +55,8 @@ func (s *sInvitationRecords) GetInvitationRecordsList(req *v1.InvitationRecordsR
 			dao.V2User.Columns().Id,
 		))
 
-	db.WhereLike("user."+dao.V2User.Columns().UserName, "%"+req.UserName+"%")
-	db.WhereLike("from_user."+dao.V2User.Columns().UserName, "%"+req.FromUserName+"%")
+	db.WhereLike(fmt.Sprintf("IFNULL(user.%s,\"\")", dao.V2User.Columns().UserName), "%"+req.UserName+"%")
+	db.WhereLike(fmt.Sprintf("IFNULL(from_user.%s,\"\")", dao.V2User.Columns().UserName), "%"+req.FromUserName+"%")
 	if req.Id != 0 {
 		db.Where(dao.V2InvitationRecords.Columns().Id, req.Id)
 	}
@@ -303,7 +303,7 @@ func (s *sInvitationRecords) WithdrawalBalance(userId int) (err error) {
 			CommissionRate:    0,
 			RechargeRecordsId: 0,
 			OperateType:       2,
-			State:             0,
+			State:             -1,
 		}
 		_, err := tx.Ctx(ctx).Model(d.V2InvitationRecords.Table()).Save(ir)
 		if err != nil {
@@ -327,8 +327,8 @@ func (s *sInvitationRecords) WithdrawalBalance(userId int) (err error) {
 				UserId:      user.Id,
 				Subject:     "[提现工单]",
 				Level:       3,
-				Status:      0,
-				ReplyStatus: 0,
+				Status:      -1,
+				ReplyStatus: -1,
 			})
 		if err != nil {
 			return err
