@@ -177,11 +177,13 @@ func (s *sInvitationRecords) AdminiUpStateById(id, state int) (err error) {
 		//检查修改的数据是否有最新的提现记录， 有不让修改
 		tjCount, err := tx.Ctx(ctx).Model(d.V2InvitationRecords.Table()).
 			WhereGT(d.V2InvitationRecords.Columns().Id, id).
+			Where(d.V2InvitationRecords.Columns().UserId, ir.UserId).
+			Where(d.V2InvitationRecords.Columns().State, 1).
 			Where(d.V2InvitationRecords.Columns().OperateType, 2).Count()
 		if err != nil {
 			return err
 		}
-		if tjCount > 0 {
+		if tjCount > 0 && ir.State == 1 {
 			return errors.New("已提现无法审核")
 		}
 
