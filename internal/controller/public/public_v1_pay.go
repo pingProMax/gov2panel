@@ -78,7 +78,7 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 	}
 	fmt.Println(sign, utils.MD5V(urlData, epayConfig.Key.String()), paramList)
 	if sign != utils.MD5V(urlData, epayConfig.Key.String()) {
-		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢3？")
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢3？" + urlData)
 	}
 
 	//充值
@@ -118,7 +118,9 @@ func notify(params map[string]string) string {
 	// 生成查询字符串
 	var strBuilder strings.Builder
 	for _, k := range keys {
-		strBuilder.WriteString(url.QueryEscape(k) + "=" + url.QueryEscape(params[k]) + "&")
+		if params[k] != "" {
+			strBuilder.WriteString(k + "=" + params[k] + "&")
+		}
 	}
 
 	// 去掉最后的 "&" 并拼接密钥
@@ -127,5 +129,9 @@ func notify(params map[string]string) string {
 		queryStr = queryStr[:len(queryStr)-1]
 	}
 
+	queryStr, err := url.QueryUnescape(queryStr)
+	if err != nil {
+		return err.Error()
+	}
 	return queryStr
 }
