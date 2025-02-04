@@ -11,14 +11,14 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 )
 
-// V2UserDao is the data access object for table v2_user.
+// V2UserDao is the data access object for the table v2_user.
 type V2UserDao struct {
 	table   string        // table is the underlying table name of the DAO.
-	group   string        // group is the database configuration group name of current DAO.
+	group   string        // group is the database configuration group name of the current DAO.
 	columns V2UserColumns // columns contains all the column names of Table for convenient usage.
 }
 
-// V2UserColumns defines and stores column names for table v2_user.
+// V2UserColumns defines and stores column names for the table v2_user.
 type V2UserColumns struct {
 	Id                string //
 	InviteUserId      string // 邀请id
@@ -51,7 +51,7 @@ type V2UserColumns struct {
 	UpdatedAt         string //
 }
 
-// v2UserColumns holds the columns for table v2_user.
+// v2UserColumns holds the columns for the table v2_user.
 var v2UserColumns = V2UserColumns{
 	Id:                "id",
 	InviteUserId:      "invite_user_id",
@@ -93,36 +93,36 @@ func NewV2UserDao() *V2UserDao {
 	}
 }
 
-// DB retrieves and returns the underlying raw database management object of current DAO.
+// DB retrieves and returns the underlying raw database management object of the current DAO.
 func (dao *V2UserDao) DB() gdb.DB {
 	return g.DB(dao.group)
 }
 
-// Table returns the table name of current dao.
+// Table returns the table name of the current DAO.
 func (dao *V2UserDao) Table() string {
 	return dao.table
 }
 
-// Columns returns all column names of current dao.
+// Columns returns all column names of the current DAO.
 func (dao *V2UserDao) Columns() V2UserColumns {
 	return dao.columns
 }
 
-// Group returns the configuration group name of database of current dao.
+// Group returns the database configuration group name of the current DAO.
 func (dao *V2UserDao) Group() string {
 	return dao.group
 }
 
-// Ctx creates and returns the Model for current DAO, It automatically sets the context for current operation.
+// Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2UserDao) Ctx(ctx context.Context) *gdb.Model {
 	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.
-// It rollbacks the transaction and returns the error from function f if it returns non-nil error.
+// It rolls back the transaction and returns the error if function f returns a non-nil error.
 // It commits the transaction and returns nil if function f returns nil.
 //
-// Note that, you should not Commit or Rollback the transaction in function f
+// Note: Do not commit or roll back the transaction in function f,
 // as it is automatically handled by this function.
 func (dao *V2UserDao) Transaction(ctx context.Context, f func(ctx context.Context, tx gdb.TX) error) (err error) {
 	return dao.Ctx(ctx).Transaction(ctx, f)

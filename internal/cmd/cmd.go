@@ -43,6 +43,8 @@ var (
 						"admini_path": adminiPath,
 					})
 
+					r.SetCtxVar("setting", d)
+
 					r.Middleware.Next()
 				})
 

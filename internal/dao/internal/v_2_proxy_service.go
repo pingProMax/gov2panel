@@ -11,14 +11,14 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 )
 
-// V2ProxyServiceDao is the data access object for table v2_proxy_service.
+// V2ProxyServiceDao is the data access object for the table v2_proxy_service.
 type V2ProxyServiceDao struct {
 	table   string                // table is the underlying table name of the DAO.
-	group   string                // group is the database configuration group name of current DAO.
+	group   string                // group is the database configuration group name of the current DAO.
 	columns V2ProxyServiceColumns // columns contains all the column names of Table for convenient usage.
 }
 
-// V2ProxyServiceColumns defines and stores column names for table v2_proxy_service.
+// V2ProxyServiceColumns defines and stores column names for the table v2_proxy_service.
 type V2ProxyServiceColumns struct {
 	Id          string //
 	Agreement   string // 协议
@@ -33,9 +33,10 @@ type V2ProxyServiceColumns struct {
 	CreatedAt   string //
 	UpdatedAt   string //
 	RouteId     string // 所属路由组
+	State       string // 节点在线状态，1后端，2在线
 }
 
-// v2ProxyServiceColumns holds the columns for table v2_proxy_service.
+// v2ProxyServiceColumns holds the columns for the table v2_proxy_service.
 var v2ProxyServiceColumns = V2ProxyServiceColumns{
 	Id:          "id",
 	Agreement:   "agreement",
@@ -50,6 +51,7 @@ var v2ProxyServiceColumns = V2ProxyServiceColumns{
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 	RouteId:     "route_id",
+	State:       "state",
 }
 
 // NewV2ProxyServiceDao creates and returns a new DAO object for table data access.
@@ -61,36 +63,36 @@ func NewV2ProxyServiceDao() *V2ProxyServiceDao {
 	}
 }
 
-// DB retrieves and returns the underlying raw database management object of current DAO.
+// DB retrieves and returns the underlying raw database management object of the current DAO.
 func (dao *V2ProxyServiceDao) DB() gdb.DB {
 	return g.DB(dao.group)
 }
 
-// Table returns the table name of current dao.
+// Table returns the table name of the current DAO.
 func (dao *V2ProxyServiceDao) Table() string {
 	return dao.table
 }
 
-// Columns returns all column names of current dao.
+// Columns returns all column names of the current DAO.
 func (dao *V2ProxyServiceDao) Columns() V2ProxyServiceColumns {
 	return dao.columns
 }
 
-// Group returns the configuration group name of database of current dao.
+// Group returns the database configuration group name of the current DAO.
 func (dao *V2ProxyServiceDao) Group() string {
 	return dao.group
 }
 
-// Ctx creates and returns the Model for current DAO, It automatically sets the context for current operation.
+// Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2ProxyServiceDao) Ctx(ctx context.Context) *gdb.Model {
 	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.
-// It rollbacks the transaction and returns the error from function f if it returns non-nil error.
+// It rolls back the transaction and returns the error if function f returns a non-nil error.
 // It commits the transaction and returns nil if function f returns nil.
 //
-// Note that, you should not Commit or Rollback the transaction in function f
+// Note: Do not commit or roll back the transaction in function f,
 // as it is automatically handled by this function.
 func (dao *V2ProxyServiceDao) Transaction(ctx context.Context, f func(ctx context.Context, tx gdb.TX) error) (err error) {
 	return dao.Ctx(ctx).Transaction(ctx, f)

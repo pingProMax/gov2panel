@@ -27,30 +27,51 @@
             field: 'agreement',
             title: '协议',
           }, {
-            title: '状态',
+            title: '在线状态',
             formatter: function (value, row, index) {
-              if (onlineUserCountAndLastPushAt[row.id] == undefined) {
-                return `<span class="badge badge-dot">
-                        <i class="bg-warning"></i>
-                        <span class="status">离线</span>
-                      </span>`
-              }else{
-                let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
-                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
-                  htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="bg-success"></i>
-                        <span class="status">正常</span>
-                      </span>`
-                }else{
-                  htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="bg-dark"></i>
-                        <span class="status">异常</span>
-                      </span>`
-                }
-                return htmlStr
-                
+              let okHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-success"></i>
+                            <span class="status">在线</span>
+                          </span>`
 
+              let alwaysOkHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-success"></i>
+                            <span class="status">正常</span>
+                          </span>`
+              let noHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-warning"></i>
+                            <span class="status">离线</span>
+                          </span>`
+              let errHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-dark"></i>
+                            <span class="status">异常</span>
+                          </span>`
+              
+              switch (row.state) {
+                case 1:
+                  if (onlineUserCountAndLastPushAt[row.id] == undefined) {
+                    return noHtmlStr
+                  }else{
+                    let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
+                    if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
+                      htmlStr = htmlStr + okHtmlStr
+                    }else{
+                      htmlStr = htmlStr + errHtmlStr
+                    }
+                    return htmlStr
+                  }
+                  break;
+                
+                case 2:
+                  return alwaysOkHtmlStr
+                  break;
+              
+                default:
+                  return `系统错误`
+                  break;
               }
+              
+              
               
             }
           }, {

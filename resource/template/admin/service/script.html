@@ -61,6 +61,23 @@
 
               </div>
             </div>
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>在线状态</label>
+                <div>
+                  <div class="custom-control custom-radio ">
+                    <input name="state" class="custom-control-input" id="customRadioState" type="radio" checked=""
+                      value="1">
+                    <label class="custom-control-label" for="customRadioState">后端上报</label>
+                  </div>
+                  <div class="custom-control custom-radio ">
+                    <input name="state" class="custom-control-input" id="customRadioOnState" type="radio" value="2">
+                    <label class="custom-control-label" for="customRadioOnState">一直在线</label>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
 
           <div class="row">
@@ -660,31 +677,51 @@
               return `隐藏`;
             }
           }, {
-            title: '在线和状态',
+            title: '在线状态',
             formatter: function (value, row, index) {
-              if (onlineUserCountAndLastPushAt[row.service.id] == undefined) {
-                return `<span class="badge badge-dot">
-                        <i class="bg-warning"></i>
-                        <span class="status">离线</span>
-                      </span>`
-              } else {
-                let htmlStr = (onlineUserCountAndLastPushAt[row.service.id][1] || 0) + " | ";
+              let okHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-success"></i>
+                            <span class="status">在线</span>
+                          </span>`
 
-                if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.service.id][2]) < 300) {
-                  htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="bg-success"></i>
-                        <span class="status">正常</span>
-                      </span>`
-                } else {
-                  htmlStr = htmlStr + `<span class="badge badge-dot">
-                        <i class="bg-dark"></i>
-                        <span class="status">异常</span>
-                      </span>`
-                }
-                return htmlStr
+              let alwaysOkHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-success"></i>
+                            <span class="status">正常</span>
+                          </span>`
+              let noHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-warning"></i>
+                            <span class="status">离线</span>
+                          </span>`
+              let errHtmlStr = `<span class="badge badge-dot">
+                            <i class="bg-dark"></i>
+                            <span class="status">异常</span>
+                          </span>`
+              switch (row.service.state) { //1后端，2在线
+                case 1:
+                  if (onlineUserCountAndLastPushAt[row.service.id] == undefined) {
+                    return noHtmlStr
+                  } else {
+                    let htmlStr = (onlineUserCountAndLastPushAt[row.service.id][1] || 0) + " | ";
 
+                    if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.service.id][2]) < 300) {
+                      htmlStr = htmlStr + okHtmlStr
+                    } else {
+                      htmlStr = htmlStr + errHtmlStr
+                    }
+                    return htmlStr
+                  }
+                  break;
 
+                case 2:
+                  
+                  return alwaysOkHtmlStr
+                  break;
+              
+                default:
+                  return `系统错误`
+                  break;
               }
+              
 
             }
           }, {
