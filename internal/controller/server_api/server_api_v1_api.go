@@ -10,9 +10,9 @@ import (
 	v1 "gov2panel/api/server_api/v1"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
+	"gov2panel/internal/utils"
 
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gcache"
 )
 
 func (c *ControllerV1) Config(ctx context.Context, req *v1.ConfigReq) (res *v1.ConfigRes, err error) {
@@ -125,15 +125,10 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 	}
 
 	//服务器最后提交数据时间
-	_, exist, err := gcache.Update(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix())
+	serverLastPush := fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId))
+	err = utils.GcacheSet(ctx, serverLastPush, time.Now().Unix(), 0)
 	if err != nil {
 		return
-	}
-	if !exist {
-		err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix(), 0)
-		if err != nil {
-			return
-		}
 	}
 
 	return

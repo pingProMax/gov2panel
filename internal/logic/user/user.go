@@ -411,16 +411,9 @@ func (s *sUser) UpUserDay7Flow(data []*model.UserTraffic) (err error) {
 		if err != nil {
 			return err
 		}
-		if userFlow.IsNil() {
-			err = gcache.Set(ctx, ketStr, v.Upload+v.Download, 169*time.Hour)
-			if err != nil {
-				return err
-			}
-		} else {
-			_, _, err = gcache.Update(ctx, ketStr, userFlow.Int64()+v.Upload+v.Download)
-			if err != nil {
-				return err
-			}
+		err = utils.GcacheSet(ctx, ketStr, userFlow.Int64()+v.Upload+v.Download, 169*time.Hour)
+		if err != nil {
+			return err
 		}
 
 	}
