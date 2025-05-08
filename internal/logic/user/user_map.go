@@ -150,7 +150,7 @@ func (s *sUser) MGetUserByGroupId(GroupId int) (d []*model.UserTraffic) {
 		var user model.UserTraffic
 		err := userMap.GetVar(v).Struct(&user)
 		if err == nil {
-			if user.GroupId == GroupId {
+			if user.GroupId == GroupId && user.Banned == -1 {
 				d = append(d, &user)
 			}
 		}

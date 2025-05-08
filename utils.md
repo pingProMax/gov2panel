@@ -35,7 +35,7 @@ INSERT INTO `v2_user`(`invite_user_id`,`telegram_id`,`user_name`,`password`,`pas
 SET CGO_ENABLED=0
 SET GOOS=linux
 SET GOARCH=amd64
-go build main.go
+go build -trimpath main.go
 
 bug修复记录
 vless 订阅flow和security位置相反

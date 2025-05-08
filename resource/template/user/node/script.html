@@ -52,7 +52,8 @@
                   if (onlineUserCountAndLastPushAt[row.id] == undefined) {
                     return noHtmlStr
                   }else{
-                    let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
+                    // let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
+                    let htmlStr = "";
                     if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
                       htmlStr = htmlStr + okHtmlStr
                     }else{
