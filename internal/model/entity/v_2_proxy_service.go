@@ -18,7 +18,7 @@ type V2ProxyService struct {
 	Show        int         `json:"show"         orm:"show"         ` // 是否显示
 	Host        string      `json:"host"         orm:"host"         ` // 服务器地址
 	Port        string      `json:"port"         orm:"port"         ` // 服务器端口
-	Rate        int         `json:"rate"         orm:"rate"         ` // 倍率
+	Rate        float64     `json:"rate"         orm:"rate"         ` // 倍率
 	OrderId     int         `json:"order_id"     orm:"order_id"     ` // 顺序
 	CreatedAt   *gtime.Time `json:"created_at"   orm:"created_at"   ` //
 	UpdatedAt   *gtime.Time `json:"updated_at"   orm:"updated_at"   ` //

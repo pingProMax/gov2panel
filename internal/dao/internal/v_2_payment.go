@@ -13,9 +13,10 @@ import (
 
 // V2PaymentDao is the data access object for the table v2_payment.
 type V2PaymentDao struct {
-	table   string           // table is the underlying table name of the DAO.
-	group   string           // group is the database configuration group name of the current DAO.
-	columns V2PaymentColumns // columns contains all the column names of Table for convenient usage.
+	table    string             // table is the underlying table name of the DAO.
+	group    string             // group is the database configuration group name of the current DAO.
+	columns  V2PaymentColumns   // columns contains all the column names of Table for convenient usage.
+	handlers []gdb.ModelHandler // handlers for customized model modification.
 }
 
 // V2PaymentColumns defines and stores column names for the table v2_payment.
@@ -55,11 +56,12 @@ var v2PaymentColumns = V2PaymentColumns{
 }
 
 // NewV2PaymentDao creates and returns a new DAO object for table data access.
-func NewV2PaymentDao() *V2PaymentDao {
+func NewV2PaymentDao(handlers ...gdb.ModelHandler) *V2PaymentDao {
 	return &V2PaymentDao{
-		group:   "default",
-		table:   "v2_payment",
-		columns: v2PaymentColumns,
+		group:    "default",
+		table:    "v2_payment",
+		columns:  v2PaymentColumns,
+		handlers: handlers,
 	}
 }
 
@@ -85,7 +87,11 @@ func (dao *V2PaymentDao) Group() string {
 
 // Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2PaymentDao) Ctx(ctx context.Context) *gdb.Model {
-	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
+	model := dao.DB().Model(dao.table)
+	for _, handler := range dao.handlers {
+		model = handler(model)
+	}
+	return model.Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.

@@ -13,9 +13,10 @@ import (
 
 // V2ProxyServiceDao is the data access object for the table v2_proxy_service.
 type V2ProxyServiceDao struct {
-	table   string                // table is the underlying table name of the DAO.
-	group   string                // group is the database configuration group name of the current DAO.
-	columns V2ProxyServiceColumns // columns contains all the column names of Table for convenient usage.
+	table    string                // table is the underlying table name of the DAO.
+	group    string                // group is the database configuration group name of the current DAO.
+	columns  V2ProxyServiceColumns // columns contains all the column names of Table for convenient usage.
+	handlers []gdb.ModelHandler    // handlers for customized model modification.
 }
 
 // V2ProxyServiceColumns defines and stores column names for the table v2_proxy_service.
@@ -55,11 +56,12 @@ var v2ProxyServiceColumns = V2ProxyServiceColumns{
 }
 
 // NewV2ProxyServiceDao creates and returns a new DAO object for table data access.
-func NewV2ProxyServiceDao() *V2ProxyServiceDao {
+func NewV2ProxyServiceDao(handlers ...gdb.ModelHandler) *V2ProxyServiceDao {
 	return &V2ProxyServiceDao{
-		group:   "default",
-		table:   "v2_proxy_service",
-		columns: v2ProxyServiceColumns,
+		group:    "default",
+		table:    "v2_proxy_service",
+		columns:  v2ProxyServiceColumns,
+		handlers: handlers,
 	}
 }
 
@@ -85,7 +87,11 @@ func (dao *V2ProxyServiceDao) Group() string {
 
 // Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2ProxyServiceDao) Ctx(ctx context.Context) *gdb.Model {
-	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
+	model := dao.DB().Model(dao.table)
+	for _, handler := range dao.handlers {
+		model = handler(model)
+	}
+	return model.Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.

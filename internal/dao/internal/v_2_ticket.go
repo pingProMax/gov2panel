@@ -13,9 +13,10 @@ import (
 
 // V2TicketDao is the data access object for the table v2_ticket.
 type V2TicketDao struct {
-	table   string          // table is the underlying table name of the DAO.
-	group   string          // group is the database configuration group name of the current DAO.
-	columns V2TicketColumns // columns contains all the column names of Table for convenient usage.
+	table    string             // table is the underlying table name of the DAO.
+	group    string             // group is the database configuration group name of the current DAO.
+	columns  V2TicketColumns    // columns contains all the column names of Table for convenient usage.
+	handlers []gdb.ModelHandler // handlers for customized model modification.
 }
 
 // V2TicketColumns defines and stores column names for the table v2_ticket.
@@ -43,11 +44,12 @@ var v2TicketColumns = V2TicketColumns{
 }
 
 // NewV2TicketDao creates and returns a new DAO object for table data access.
-func NewV2TicketDao() *V2TicketDao {
+func NewV2TicketDao(handlers ...gdb.ModelHandler) *V2TicketDao {
 	return &V2TicketDao{
-		group:   "default",
-		table:   "v2_ticket",
-		columns: v2TicketColumns,
+		group:    "default",
+		table:    "v2_ticket",
+		columns:  v2TicketColumns,
+		handlers: handlers,
 	}
 }
 
@@ -73,7 +75,11 @@ func (dao *V2TicketDao) Group() string {
 
 // Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2TicketDao) Ctx(ctx context.Context) *gdb.Model {
-	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
+	model := dao.DB().Model(dao.table)
+	for _, handler := range dao.handlers {
+		model = handler(model)
+	}
+	return model.Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.

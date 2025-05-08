@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gogf/gf/v2/container/gmap"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gctx"
 )
@@ -98,15 +99,17 @@ func (s *sUser) MUpUserUAndBy(data []*model.UserTraffic) (err error) {
 // 所有数据持久化
 func (s *sUser) MSaveAllRam() (err error) {
 	data := make([]*model.UserTraffic, 0)
-	for _, v := range userMap.Keys() {
+
+	// 使用 Iterator 遍历 gmap 数据
+	userMap.Iterator(func(_, v interface{}) bool {
 		var user model.UserTraffic
-		err = userMap.GetVar(v).Struct(&user)
-		if err == nil {
+		if err := gvar.New(v).Struct(&user); err == nil {
 			data = append(data, &user)
 		}
-	}
+		return true // 继续迭代
+	})
 
-	//保存到数据库
+	// 保存到数据库
 	err = s.UpUserDUTBy(data)
 	if err != nil {
 		return err
@@ -146,15 +149,14 @@ func (s *sUser) MDelUserMap(id int) {
 // 权限组获取用户
 func (s *sUser) MGetUserByGroupId(GroupId int) (d []*model.UserTraffic) {
 	d = make([]*model.UserTraffic, 0)
-	for _, v := range userMap.Keys() {
-		var user model.UserTraffic
-		err := userMap.GetVar(v).Struct(&user)
-		if err == nil {
+	userMap.Iterator(func(_, v interface{}) bool {
+		user := new(model.UserTraffic)
+		if err := gvar.New(v).Struct(user); err == nil {
 			if user.GroupId == GroupId && user.Banned == -1 {
-				d = append(d, &user)
+				d = append(d, user)
 			}
 		}
-	}
-
+		return true
+	})
 	return
 }

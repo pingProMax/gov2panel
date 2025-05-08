@@ -158,7 +158,7 @@ func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V
 	}
 
 	if user.Balance < price {
-		return errors.New("余额不足")
+		return errors.New("余额不足，请去钱包充值")
 	}
 
 	//扣款 和 设置用户套餐

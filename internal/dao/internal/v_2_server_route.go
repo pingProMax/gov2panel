@@ -13,9 +13,10 @@ import (
 
 // V2ServerRouteDao is the data access object for the table v2_server_route.
 type V2ServerRouteDao struct {
-	table   string               // table is the underlying table name of the DAO.
-	group   string               // group is the database configuration group name of the current DAO.
-	columns V2ServerRouteColumns // columns contains all the column names of Table for convenient usage.
+	table    string               // table is the underlying table name of the DAO.
+	group    string               // group is the database configuration group name of the current DAO.
+	columns  V2ServerRouteColumns // columns contains all the column names of Table for convenient usage.
+	handlers []gdb.ModelHandler   // handlers for customized model modification.
 }
 
 // V2ServerRouteColumns defines and stores column names for the table v2_server_route.
@@ -43,11 +44,12 @@ var v2ServerRouteColumns = V2ServerRouteColumns{
 }
 
 // NewV2ServerRouteDao creates and returns a new DAO object for table data access.
-func NewV2ServerRouteDao() *V2ServerRouteDao {
+func NewV2ServerRouteDao(handlers ...gdb.ModelHandler) *V2ServerRouteDao {
 	return &V2ServerRouteDao{
-		group:   "default",
-		table:   "v2_server_route",
-		columns: v2ServerRouteColumns,
+		group:    "default",
+		table:    "v2_server_route",
+		columns:  v2ServerRouteColumns,
+		handlers: handlers,
 	}
 }
 
@@ -73,7 +75,11 @@ func (dao *V2ServerRouteDao) Group() string {
 
 // Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2ServerRouteDao) Ctx(ctx context.Context) *gdb.Model {
-	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
+	model := dao.DB().Model(dao.table)
+	for _, handler := range dao.handlers {
+		model = handler(model)
+	}
+	return model.Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.

@@ -125,9 +125,15 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 	}
 
 	//服务器最后提交数据时间
-	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix(), 0)
+	_, exist, err := gcache.Update(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix())
 	if err != nil {
 		return
+	}
+	if !exist {
+		err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(req.NodeId)), time.Now().Unix(), 0)
+		if err != nil {
+			return
+		}
 	}
 
 	return

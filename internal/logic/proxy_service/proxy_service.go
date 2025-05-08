@@ -277,13 +277,15 @@ func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []*model.UserTr
 	ctx := gctx.New()
 
 	//服务器当前用户在线数量
-	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_ONLINE_USER", strconv.Itoa(nodeId)), len(userTraffic), 3600*time.Second)
+	serverOnlineKey := fmt.Sprintf("SERVER_%s_ONLINE_USER", strconv.Itoa(nodeId))
+	err = utils.GcacheSet(ctx, serverOnlineKey, len(userTraffic), 3600*time.Second)
 	if err != nil {
 		return
 	}
 
 	//服务器最后提交数据时间
-	err = gcache.Set(ctx, fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(nodeId)), timeNow.Unix(), 0)
+	serverLastPushKey := fmt.Sprintf("SERVER_%s_LAST_PUSH_AT", strconv.Itoa(nodeId))
+	err = utils.GcacheSet(ctx, serverLastPushKey, timeNow.Unix(), 0)
 	if err != nil {
 		return
 	}
@@ -302,7 +304,7 @@ func (s *sProxyService) CacheServiceFlow(nodeId int, userTraffic []*model.UserTr
 		return
 	}
 
-	err = gcache.Set(ctx, cacheServerFlowKey, serverFlow.Int64()+upload+download, 49*time.Hour)
+	err = utils.GcacheSet(ctx, cacheServerFlowKey, serverFlow.Int64()+upload+download, 49*time.Hour)
 	if err != nil {
 		return
 	}

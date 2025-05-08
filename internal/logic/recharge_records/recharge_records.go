@@ -73,7 +73,7 @@ func (s *sRechargeRecords) SaveRechargeRecords(data *entity.V2RechargeRecords, p
 			// 查询用户余额
 			err = tx.Ctx(ctx).Model(d.V2User.Table()).Where(dao.V2User.Columns().Id, user.Id).Scan(&user)
 			if user.Balance < val {
-				return errors.New("余额不足")
+				return errors.New("余额不足，请去钱包充值")
 			}
 			if err != nil {
 				return err

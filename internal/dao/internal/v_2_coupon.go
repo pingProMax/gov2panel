@@ -13,9 +13,10 @@ import (
 
 // V2CouponDao is the data access object for the table v2_coupon.
 type V2CouponDao struct {
-	table   string          // table is the underlying table name of the DAO.
-	group   string          // group is the database configuration group name of the current DAO.
-	columns V2CouponColumns // columns contains all the column names of Table for convenient usage.
+	table    string             // table is the underlying table name of the DAO.
+	group    string             // group is the database configuration group name of the current DAO.
+	columns  V2CouponColumns    // columns contains all the column names of Table for convenient usage.
+	handlers []gdb.ModelHandler // handlers for customized model modification.
 }
 
 // V2CouponColumns defines and stores column names for the table v2_coupon.
@@ -55,11 +56,12 @@ var v2CouponColumns = V2CouponColumns{
 }
 
 // NewV2CouponDao creates and returns a new DAO object for table data access.
-func NewV2CouponDao() *V2CouponDao {
+func NewV2CouponDao(handlers ...gdb.ModelHandler) *V2CouponDao {
 	return &V2CouponDao{
-		group:   "default",
-		table:   "v2_coupon",
-		columns: v2CouponColumns,
+		group:    "default",
+		table:    "v2_coupon",
+		columns:  v2CouponColumns,
+		handlers: handlers,
 	}
 }
 
@@ -85,7 +87,11 @@ func (dao *V2CouponDao) Group() string {
 
 // Ctx creates and returns a Model for the current DAO. It automatically sets the context for the current operation.
 func (dao *V2CouponDao) Ctx(ctx context.Context) *gdb.Model {
-	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
+	model := dao.DB().Model(dao.table)
+	for _, handler := range dao.handlers {
+		model = handler(model)
+	}
+	return model.Safe().Ctx(ctx)
 }
 
 // Transaction wraps the transaction logic using function f.

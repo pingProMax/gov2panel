@@ -36,7 +36,7 @@ func MakeCaptcha() (string, string, error) {
 	driver = driverString.ConvertFonts()
 	//生成验证码
 	c := base64Captcha.NewCaptcha(driver, store)
-	id, b64s, err := c.Generate()
+	id, b64s, _, err := c.Generate()
 	return id, b64s, err
 }
 
