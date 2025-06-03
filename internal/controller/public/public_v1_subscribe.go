@@ -42,6 +42,15 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		result = ShadowrocketSub(serviceArr, user)
 	case "4": //clash
 		result = ClashSub(serviceArr, user)
+
+		//https://www.clashverge.dev/guide/url_schemes.html#content-disposition
+		//如果响应头中存在 profile-update-interval 字段，则配置文件的 更新间隔 将被设置为对应的值（单位: 小时）。
+		ghttp.RequestFromCtx(ctx).Response.Header().Add("profile-update-interval", "24")
+		//如果响应头中存在 subscription-userinfo 字段，则其对应的流量信息(单位: 字节)、到期信息(时间戳)会显示在订阅卡片上。
+		ghttp.RequestFromCtx(ctx).Response.Header().Add("subscription-userinfo", fmt.Sprintf("upload=%d; download=%d; total=%d; expire=%d", user.U, user.D, user.TransferEnable, user.ExpiredAt.Unix()))
+		//如果响应头中存在 profile-web-page-url 字段，则右键订阅卡片将会显示 首页 按钮。
+		// ghttp.RequestFromCtx(ctx).Response.Header().Add("profile-web-page-url", "")
+
 		ghttp.RequestFromCtx(ctx).Response.WriteExit([]byte(result))
 	case "5": //shadowsocks
 		result = ShadowsocksSub(serviceArr, user)
