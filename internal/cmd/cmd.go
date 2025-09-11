@@ -93,6 +93,7 @@ var (
 			})
 
 			//每天6点执行  更新过期用户的权限组和流量
+			service.User().ClearExpiredUserGroupIdAndUDTransferEnable()
 			_, err = gcron.Add(ctx, "0 0 6 * * *", func(ctx context.Context) {
 				service.User().ClearExpiredUserGroupIdAndUDTransferEnable()
 			}, "CEUP_CRON")

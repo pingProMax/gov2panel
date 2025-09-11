@@ -5,8 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	v1 "gov2panel/api/public/v1"
 	"gov2panel/internal/model/entity"
@@ -15,6 +17,7 @@ import (
 
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
@@ -34,9 +37,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 
 	switch req.Flag {
 
-	case "1": //v2rayn
-		result = V2rayNSub(serviceArr, user)
-	case "2": //v2rayng
+	case "1", "2", "6": //v2rayn //v2rayng //nekobox
 		result = V2rayNGSub(serviceArr, user)
 	case "3": //shadowrocket
 		result = ShadowrocketSub(serviceArr, user)
@@ -54,10 +55,8 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		ghttp.RequestFromCtx(ctx).Response.WriteExit([]byte(result))
 	case "5": //shadowsocks
 		result = ShadowsocksSub(serviceArr, user)
-	case "6": //nekobox
-		result = NekoBoxSub(serviceArr, user)
 	default:
-		result = V2rayNSub(serviceArr, user)
+		result = V2rayNGSub(serviceArr, user)
 	}
 
 	ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
@@ -65,10 +64,12 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	return nil, nil
 }
 
-// base64编码   单个：协议://base64编码
+// 订阅处理
 func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
 	for _, service := range serviceArr {
+		service.Host = GetRandIp(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
+
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
 		switch strings.Split(service.Agreement, "/")[1] {
@@ -96,6 +97,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 			}
 
 			result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds))
+
 		case "vless":
 			// vless://uuid@127.0.0.1:8888?encryption=none&security=reality&sni=sni.com&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
 			// vless://uuid@127.0.0.1:8888?encryption=none&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
@@ -127,6 +129,134 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				gconv.String(serviceJson["seed"]),
 				service.Name,
 			)
+
+			// 概述 https://github.com/XTLS/Xray-core/discussions/716
+			// 为什么不用新方法，因为(tcp http 无法导入path？？？)
+			// 同样 github.com/xtls/libxray 无法将vmess xhttp url解析成json。
+			// 这个bug似乎很久i了, 不理解 故意的？
+			/*
+				protocol://
+					$(uuid)
+					@
+					remote-host
+					:
+					remote-port
+				?
+					<protocol-specific fields>
+					<transport-specific fields>
+					<tls-specific fields>
+				#$(descriptive-text)
+			*/
+			// resultThis := fmt.Sprintf(
+			// 	"%s://%s@%s:%s?type=%s&encryption=%s&security=%s&path=%s&host=%s&headerType=%s&seed=%s&serviceName=%s&mode=%s&authority=%s&extra=%s&fp=%s&sni=%s&alpn=%s&flow=%s&pbk=%s&sid=%s&pqv=%s&spx=%s#%s",
+			// 	strings.Split(service.Agreement, "/")[1],
+			// 	url.QueryEscape(user.Uuid),
+			// 	service.Host,
+			// 	service.Port,
+			// 	gconv.String(serviceJson["type"]),
+			// 	gconv.String(serviceJson["encryption"]),
+			// 	gconv.String(serviceJson["security"]),
+			// 	url.QueryEscape(gconv.String(serviceJson["path"])),
+			// 	url.QueryEscape(gconv.String(serviceJson["host"])),
+			// 	gconv.String(serviceJson["headerType"]),
+			// 	url.QueryEscape(gconv.String(serviceJson["seed"])),
+			// 	url.QueryEscape(gconv.String(serviceJson["serviceName"])),
+			// 	url.QueryEscape(gconv.String(serviceJson["mode"])),
+			// 	url.QueryEscape(gconv.String(serviceJson["authority"])),
+			// 	url.QueryEscape(gconv.String(serviceJson["extra"])),
+			// 	gconv.String(serviceJson["fp"]),
+			// 	gconv.String(serviceJson["sni"]),
+			// 	url.QueryEscape(gconv.String(serviceJson["alpn"])),
+			// 	gconv.String(serviceJson["flow"]),
+			// 	gconv.String(serviceJson["pbk"]),
+			// 	gconv.String(serviceJson["sid"]),
+			// 	gconv.String(serviceJson["pqv"]),
+			// 	url.QueryEscape(gconv.String(serviceJson["spx"])),
+			// 	service.Name,
+			// )
+
+			// u, _ := url.Parse(resultThis)
+
+			// // 获取查询参数
+			// query := u.Query()
+
+			// // 删除值为空字符串的参数
+			// for key, values := range query {
+			// 	filtered := values[:0]
+			// 	for _, v := range values {
+			// 		if v != "" {
+			// 			filtered = append(filtered, v)
+			// 		}
+			// 	}
+			// 	if len(filtered) == 0 {
+			// 		query.Del(key)
+			// 	} else {
+			// 		query[key] = filtered
+			// 	}
+			// }
+
+			// // 重新设置 URL 的查询参数
+			// u.RawQuery = query.Encode()
+
+			// result = result + u.String() + "\n"
+
+			//对应的配置文档
+			/*
+				{
+				  //https://github.com/XTLS/Xray-core/discussions/716
+				  //订阅用数据
+				  "type": "", //传输方式 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一
+				  "encryption": "", //加密方式， VMess时 默认为 auto；VLESS时 默认为 none；
+				  "security": "",  //底层传输安全，当前可选值有 none、tls、reality；默认为 none，
+				  "path": "", //路径
+				  "host": "", //Host
+				  "headerType": "", //(mKCP) 的伪装头部类型 当前可选值有 none / srtp / utp / wechat-video / dtls / wireguard 默认值为 none ，
+				  "seed": "", //(mKCP) 种子，
+				  "serviceName": "", //(gRPC) 的 ServiceName 不可为空字符串
+				  "mode": "",  // (gRPC) mode gun、multi、guna ；xhtp mode
+				  "authority": "", // (gRPC) authority
+				  "extra": "", // (XHTTP) extra
+				  "fp":"", // LS Client Hello 指纹 若使用 REALITY，此项不可省略
+				  "sni": "", // TLS SNI
+				  "alpn": "",
+				  "flow": "", //XTLS 的流控方式。可选值为 xtls-rprx-vision 等 若使用 若使用 XTLS，此项不可省略，否则无此项。此项不可为空字符串
+				  "pbk": "", //REALITY 的密码，对应配置文件中的 password 项目
+				  "sid": "", //REALITY 的 ID，对应配置文件中的 shortId 项目
+				  "pqv": "", //REALITY 的 ML-DSA-65 公钥，对应配置文件中的 mldsa65Verify 项目
+				  "spx": "", //REALITY 的爬虫，对应配置文件中的 spiderX 项目
+
+				  //后端对接用数据
+				  "xrayConifg":{
+
+				  }
+				}
+
+				{
+				  "type": "tcp",
+				  "encryption": "auto",
+				  "security": "none",
+				  "path": "",
+				  "host": "",
+				  "headerType": "none",
+				  "seed": "",
+				  "serviceName": "",
+				  "mode": "",
+				  "authority": "",
+				  "extra": "",
+				  "fp":"",
+				  "sni": "",
+				  "alpn": "",
+				  "flow": "",
+				  "pbk": "",
+				  "sid": "",
+				  "pqv": "",
+				  "spx": "",
+
+				  "xrayConifg":{
+
+				  }
+				}
+			*/
 
 		case "ss2022":
 			ssPasswd := user.Uuid
@@ -197,142 +327,22 @@ func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (
 
 // v2rayNG订阅
 func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
-	s1 := map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                  //链接地址
-		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"net":  "tcp",
-		"port": "80",      //端口
-		"id":   user.Uuid, //uuid
-		"aid":  "0",
-	}
-	ds1, err := json.Marshal(s1)
-	if err != nil {
-		return err.Error()
+	result = result + fmt.Sprintf("vmess://%s@v2ray.run:80#%s\n",
+		user.Uuid,
+		fmt.Sprintf("套餐到期：%s", user.ExpiredAt.Format("Y-m-d H:i")),
+	)
+
+	if user.ExpiredAt.Before(gtime.New()) {
+		return
 	}
 
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
-
-	s1 = map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                                                          //链接地址
-		"ps":   "剩余流量：" + fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)), //名字
-		"port": "80",                                                                                 //端口
-		"id":   user.Uuid,
-		"aid":  "0",
-		"net":  "tcp",
-		"type": "none",
-		"tls":  "",
-		"sni":  "",
-		"alpn": "",
-		"host": "",
-		"path": "",
-		"scy":  "",
-		"fp":   "", //uuid
-
+	result = result + fmt.Sprintf("vmess://%s@v2ray.run:80#%s\n",
+		user.Uuid,
+		fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
+	)
+	if user.TransferEnable-user.U-user.D <= 0 {
+		return
 	}
-	ds1, err = json.Marshal(s1)
-	if err != nil {
-		return err.Error()
-	}
-
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
-
-	result = result + base64Sub(serviceArr, user)
-
-	return
-}
-
-// v2rayN订阅
-func V2rayNSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
-	s1 := map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                  //链接地址
-		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"net":  "tcp",
-		"port": "80",      //端口
-		"id":   user.Uuid, //uuid
-		"aid":  "0",
-	}
-	ds1, err := json.Marshal(s1)
-	if err != nil {
-		return err.Error()
-	}
-
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
-
-	s1 = map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                                                          //链接地址
-		"ps":   "剩余流量：" + fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)), //名字
-		"port": "80",                                                                                 //端口
-		"id":   user.Uuid,
-		"aid":  "0",
-		"net":  "tcp",
-		"type": "none",
-		"tls":  "",
-		"sni":  "",
-		"alpn": "",
-		"host": "",
-		"path": "",
-		"scy":  "",
-		"fp":   "", //uuid
-
-	}
-	ds1, err = json.Marshal(s1)
-	if err != nil {
-		return err.Error()
-	}
-
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
-
-	result = result + base64Sub(serviceArr, user)
-
-	return
-}
-
-// NekoBox订阅
-func NekoBoxSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
-	s1 := map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                  //链接地址
-		"ps":   "套餐到期：" + user.ExpiredAt.Format("Y-m-d H:i"), //名字
-		"net":  "tcp",
-		"port": "80",      //端口
-		"id":   user.Uuid, //uuid
-		"aid":  "0",
-	}
-	ds1, err := json.Marshal(s1)
-	if err != nil {
-		return err.Error()
-	}
-
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
-
-	s1 = map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1",                                                                          //链接地址
-		"ps":   "剩余流量：" + fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)), //名字
-		"port": "80",                                                                                 //端口
-		"id":   user.Uuid,
-		"aid":  "0",
-		"net":  "tcp",
-		"type": "none",
-		"tls":  "",
-		"sni":  "",
-		"alpn": "",
-		"host": "",
-		"path": "",
-		"scy":  "",
-		"fp":   "", //uuid
-
-	}
-	ds1, err = json.Marshal(s1)
-	if err != nil {
-		return err.Error()
-	}
-
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
 
 	result = result + base64Sub(serviceArr, user)
 
@@ -364,6 +374,7 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 	)
 
 	for _, service := range serviceArr {
+		service.Host = GetRandIp(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 
 		serviceJson := make(map[string]interface{})
@@ -422,6 +433,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 	nodeInfoArr := make([]string, 0)
 
 	for _, service := range serviceArr {
+		service.Host = GetRandIp(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
@@ -544,4 +556,15 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 	result = strings.ReplaceAll(result, "{{node_name}}", strings.Join(nodeNameArr, "\n"))
 
 	return
+}
+
+// 获取随机IP 127.0.0.1,127.0.0.2,127.0.0.3 这样的格式随机获取一个
+func GetRandIp(ipStr string) string {
+	if strings.Contains(ipStr, ",") {
+		ips := strings.Split(ipStr, ",")
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		return ips[r.Intn(len(ips))]
+	}
+	return ipStr
+
 }

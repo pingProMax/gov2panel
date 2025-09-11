@@ -1,5 +1,9 @@
 
 <script>
+    const domainsStr = `{{.setting.subscribe_domain}}`
+
+    
+
     $(function () {
         let y = {{.total_used_traffic}};
         let z = {{.transfer_enable}};
@@ -30,8 +34,104 @@
             $("#expired_at_id").css('color','red')
         } 
 
+        {{if ne .data.Id 0}}
+        checkDo()
+        {{end}}
+
     })
 
+
+    let checking = false;
+    function checkDo() {
+        if (checking) return; // 正在检测，直接返回
+        checking = true;
+        
+        const $btn = $("#check-btn");
+        $btn.css({ color: "gray", cursor: "not-allowed" }).text("检测中...");
+
+
+        //检测可用订阅
+        const domains = domainsStr.split("\n").filter(s => s.trim() !== "");
+
+        findAvailableDomain(domains).then(domain => {
+            if (domain) {
+                console.log("可用订阅地址:", domain);
+                updatePageDomain(domain)
+                // TODO: 更新页面
+            } else {
+                alert("没有可用订阅地址，请尝试手动导入，或者联系管理员！")
+            }
+            // 异步完成后再恢复按钮
+            $btn.css({ color: "green", cursor: "pointer" }).text("检测");
+            checking = false;
+        });
+
+    }
+
+
+    // 批量检测并找第一个可用的
+    async function findAvailableDomain(domains) {
+        for (const d of domains) {
+            const ok = await checkDomainStatus(d);
+            if (ok) return d;
+        }
+        return null;
+    }
+
+    // 只用 Image 检测域名是否可用
+    function checkDomainStatus(url) {
+        return new Promise((resolve) => {
+            let finished = false;
+
+            const done = (ok) => {
+                if (finished) return;
+                finished = true;
+                resolve(ok);
+            };
+
+            const tester = new Image();
+            tester.src = `${url}/favicon.ico?t=${Date.now()}`;
+
+            tester.onload = () => {
+               done(true)
+            };
+            
+            tester.onerror = () => {
+                fetch(url, { mode: 'no-cors', method: 'HEAD' })
+                    .then(() => done(true))
+                    .catch(() => done(false));
+            };
+
+            // 超时保护
+            setTimeout(() => done(false), 5000);
+        });
+    }
+
+    
+    // 替换页面里所有 %domain%
+    function updatePageDomain(domain) {
+        if (!domain) return;
+
+        // 1️⃣ 替换 <td class="budget"> 内文本
+        document.querySelectorAll("td.budget").forEach(td => {
+            // 初始化 data-template，如果没有就创建
+            if (!td.dataset.template) td.dataset.template = td.innerText || "";
+            td.innerText = td.dataset.template.replace(/\%domain\%/g, domain);
+        });
+
+        // 2️⃣ 替换 td onclick 内的复制链接
+        document.querySelectorAll("td[onclick]").forEach(td => {
+            if (!td.dataset.template) td.dataset.template = td.getAttribute("onclick") || "";
+            const newClick = td.dataset.template.replace(/\%domain\%/g, domain);
+            td.setAttribute("onclick", newClick);
+        });
+
+        // 3️⃣ 替换 clash 导入链接
+        document.querySelectorAll("a[href^='clash://']").forEach(a => {
+            if (!a.dataset.template) a.dataset.template = a.href || "";
+            a.href = a.dataset.template.replace(/\%domain\%/g, encodeURIComponent(domain));
+        });
+    }
 
     function myFunction(text) {
         let input_dom = document.createElement('input');

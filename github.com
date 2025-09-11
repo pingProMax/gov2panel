@@ -1,1 +1,0 @@
-C:/Users/ninia/go/pkg/mod/github.com

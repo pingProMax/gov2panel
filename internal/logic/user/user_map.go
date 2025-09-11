@@ -28,7 +28,7 @@ func init() {
 
 }
 
-// 内存map数据
+// 内存map数据 用户id *model.UserTraffic
 var userMap = gmap.NewHashMap(true)
 
 // 启动 把有效用户 存入到内存

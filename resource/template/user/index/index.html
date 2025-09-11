@@ -84,6 +84,24 @@
             </tr>
           </thead>
           <tbody class="list">
+
+            <tr>
+              <th scope="row">
+                <div class="media align-items-center">
+                  <div class="media-body">
+                    <span class="name mb-0 text-sm">在线检测订阅</span>
+                  </div>
+                </div>
+              </th>
+              <td data-template="检测订阅地址时请关闭代理，自动更换可用订阅地址。">
+                检测订阅地址时请关闭代理，会自动更换可用订阅地址。
+              </td>
+
+              <td class="text-right" style="cursor: pointer;color: green;" onclick="checkDo()" id="check-btn">
+                检测
+              </td>
+            </tr>
+
             <tr>
               <th scope="row">
                 <div class="media align-items-center">
@@ -95,11 +113,11 @@
                   </div>
                 </div>
               </th>
-              <td class="budget">
-                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=1
+              <td class="budget" data-template="%domain%api/subscribe?token={{.user.Token}}&flag=1">
+                
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=1')">
+              <td class="text-right" style="cursor: pointer;" data-template="myFunction('%domain%api/subscribe?token={{.user.Token}}&flag=1')" onclick="">
                 复制
               </td>
             </tr>
@@ -115,11 +133,11 @@
                   </div>
                 </div>
               </th>
-              <td class="budget">
-                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=2
+              <td class="budget" data-template="%domain%api/subscribe?token={{.user.Token}}&flag=2">
+                
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=2')">
+              <td class="text-right" style="cursor: pointer;" data-template="myFunction('%domain%api/subscribe?token={{.user.Token}}&flag=2')" onclick="">
                 复制
               </td>
             </tr>
@@ -135,11 +153,11 @@
                   </div>
                 </div>
               </th>
-              <td class="budget">
-                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=3
+              <td class="budget" data-template="%domain%api/subscribe?token={{.user.Token}}&flag=3">
+                
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=3')">
+              <td class="text-right" style="cursor: pointer;" data-template="myFunction('%domain%api/subscribe?token={{.user.Token}}&flag=3')" onclick="">
                 复制
               </td>
             </tr>
@@ -155,12 +173,12 @@
                   </div>
                 </div>
               </th>
-              <td class="budget">
-                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=4
+              <td class="budget" data-template="%domain%api/subscribe?token={{.user.Token}}&flag=4">
+                
               </td>
               
               <td class="text-right" style="cursor: pointer;" >
-                <a href="clash://install-config?url={{.setting.subscribe_domain | url}}{{"api/subscribe?token=" | url}}{{.user.Token}}{{"&flag=4" | url}}">导入</a>
+                <a data-template="clash://install-config?url=%domain%{{"api/subscribe?token=" | url}}{{.user.Token}}{{"&flag=4" | url}}" href="">导入</a>
               </td>
             </tr>
 
@@ -175,11 +193,11 @@
                   </div>
                 </div>
               </th>
-              <td class="budget">
-                {{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=5
+              <td class="budget" data-template="%domain%api/subscribe?token={{.user.Token}}&flag=5">
+
               </td>
               
-              <td class="text-right" style="cursor: pointer;" onclick="myFunction('{{.setting.subscribe_domain}}api/subscribe?token={{.user.Token}}&flag=5')">
+              <td class="text-right" style="cursor: pointer;" data-template="myFunction('%domain%api/subscribe?token={{.user.Token}}&flag=5')" onclick="">
                 复制
               </td>
             </tr>
