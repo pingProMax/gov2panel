@@ -666,7 +666,7 @@
                 AE(row)
               },
               'click #copy_sub': function (e, value, row, index) {
-                copy_text("{{.setting.subscribe_domain}}api/subscribe?token=" + row.user.token)
+                copy_text("api/subscribe?token=" + row.user.token)
               },
               'click #reset_uuid_token': function (e, value, row, index) {
                 reset_uuid_token(row.user.id)
@@ -749,6 +749,7 @@
   }
 
   function copy_text(text) {
+      text = window.location.protocol + "//" + window.location.host + "/" + text
       let input_dom = document.createElement('input');
       input_dom.value = text;
       document.body.appendChild(input_dom);//向页面底部追加输入框
