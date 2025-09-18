@@ -15,7 +15,7 @@ type (
 		// 获取工单信息数据
 		GetTicketMessageArrByTicketId(ticketId int) (m []*model.TicketMessageInfo, err error)
 		// 获取工单信息数据
-		GetTicketMessageArrByTicketIdAndUserId(ticketId, userId int) (m []*model.TicketMessageInfo, err error)
+		GetTicketMessageArrByTicketIdAndUserId(ticketId int, userId int) (m []*model.TicketMessageInfo, err error)
 		// 管理员回复工单
 		SaveTicketMessageAdmin(data *entity.V2TicketMessage) (err error)
 		// 用户回复工单

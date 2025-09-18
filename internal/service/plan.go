@@ -25,7 +25,7 @@ type (
 		GetPlanResetTrafficMethod1List() (m []*entity.V2Plan, err error)
 		// 根据id获取
 		GetPlanById(id int) (d *entity.V2Plan, err error)
-		// 用户续费套餐处理
+		// 用户购买/续费套餐处理
 		UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V2User) (err error)
 	}
 )

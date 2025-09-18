@@ -13,7 +13,7 @@ import (
 type (
 	ITicket interface {
 		// 获取工单数据
-		GetUserList(req *entity.V2Ticket, userName string, orderBy, orderDirection string, offset, limit int) (data []*model.TicketInfo, totle int, err error)
+		GetUserList(req *entity.V2Ticket, userName string, orderBy string, orderDirection string, offset int, limit int) (data []*model.TicketInfo, totle int, err error)
 		// AE设置
 		AETicket(data *entity.V2Ticket) (err error)
 		// 删除
@@ -23,13 +23,13 @@ type (
 		// 用户关闭工单
 		CloseTicketByUserIdAndId(ids []int, userId int) (err error)
 		// 获取工单 根据id和用户id
-		GetTicketByIdAndUserId(ticketId, userId int) (data *entity.V2Ticket, err error)
+		GetTicketByIdAndUserId(ticketId int, userId int) (data *entity.V2Ticket, err error)
 		// 更新工单 根据id
-		UpTicketStatusAndReplyStatusById(ticketId, status, reply_status int) (err error)
+		UpTicketStatusAndReplyStatusById(ticketId int, status int, reply_status int) (err error)
 		// 获取 打开工单的数量
 		GetOpenTicketCount() (totle int, err error)
 		// 获取所有
-		GetTicketList(req *entity.V2Ticket, userName string, orderBy, orderDirection string, offset, limit int) (m []*model.TicketInfo, total int, err error)
+		GetTicketList(req *entity.V2Ticket, userName string, orderBy string, orderDirection string, offset int, limit int) (m []*model.TicketInfo, total int, err error)
 	}
 )
 

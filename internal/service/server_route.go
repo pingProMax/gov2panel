@@ -13,7 +13,7 @@ import (
 type (
 	IServerRoute interface {
 		// 获取所有
-		GetServerRouteList(req *v1.ServerRouteReq, orderBy, orderDirection string, offset, limit int) (m []*entity.V2ServerRoute, total int, err error)
+		GetServerRouteList(req *v1.ServerRouteReq, orderBy string, orderDirection string, offset int, limit int) (m []*entity.V2ServerRoute, total int, err error)
 		// 获取所有
 		ServerRouteAll() (m []*entity.V2ServerRoute, err error)
 		// AE设置

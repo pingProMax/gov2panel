@@ -23,7 +23,7 @@ import (
 
 func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error) {
 	res = &v1.SubscribeRes{}
-	user, err := service.User().GetUserByTokenAndUDAndGTExpiredAt(req.Token)
+	user, err := service.User().GetUserByToken(req.Token)
 	if err != nil {
 		return
 	}
@@ -34,6 +34,14 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	}
 
 	result := ""
+
+	//app
+	if req.FlagInfoHide {
+		result = base64Sub(serviceArr, user)
+		ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
+
+		return nil, nil
+	}
 
 	switch req.Flag {
 
@@ -319,6 +327,13 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 // ShadowrocketSub订阅
 func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
 	result = result + fmt.Sprintf("STATUS=↑:%.2fGB,↓:%.2fGB,TOT:%.2fGBExpires:%s\n", utils.BytesToGB(user.U), utils.BytesToGB(user.D), utils.BytesToGB(user.TransferEnable), user.ExpiredAt)
+	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
+	if isExpired {
+		return
+	}
+	if user.TransferEnable-user.U-user.D <= 0 {
+		return
+	}
 
 	result = result + base64Sub(serviceArr, user)
 
@@ -327,19 +342,48 @@ func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (
 
 // v2rayNG订阅
 func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
-	result = result + fmt.Sprintf("vmess://%s@v2ray.run:80#%s\n",
-		user.Uuid,
-		fmt.Sprintf("套餐到期：%s", user.ExpiredAt.Format("Y-m-d H:i")),
-	)
 
-	if user.ExpiredAt.Before(gtime.New()) {
+	//-----到期时间
+	expiredAtStr := user.ExpiredAt.Format("Y-m-d H:i")
+	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
+	ps1 := fmt.Sprintf("套餐到期：%s", expiredAtStr)
+	if isExpired {
+		ps1 = fmt.Sprintf("套餐已到期！到期时间：%s", expiredAtStr)
+	}
+	s1 := map[string]string{
+		"v":    "2",
+		"add":  "127.0.0.1", //链接地址
+		"ps":   ps1,         //名字
+		"port": "443",       //端口
+		"id":   user.Uuid,   //uuid
+		"net":  "tcp",
+	}
+	ds1, err := json.Marshal(s1)
+	if err != nil {
+		return err.Error()
+	}
+	result += fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds1))
+	if isExpired {
 		return
 	}
-
-	result = result + fmt.Sprintf("vmess://%s@v2ray.run:80#%s\n",
-		user.Uuid,
-		fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
-	)
+	//-----剩余流量
+	ps2 := fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D))
+	if user.TransferEnable-user.U-user.D <= 0 {
+		ps2 = "流量已用完！！！"
+	}
+	s2 := map[string]string{
+		"v":    "2",
+		"add":  "127.0.0.1", //链接地址
+		"ps":   ps2,         //名字
+		"port": "443",       //端口
+		"id":   user.Uuid,   //uuid
+		"net":  "tcp",
+	}
+	ds2, err := json.Marshal(s2)
+	if err != nil {
+		return err.Error()
+	}
+	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds2))
 	if user.TransferEnable-user.U-user.D <= 0 {
 		return
 	}
@@ -372,6 +416,14 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		"80",
 		"剩余流量："+fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
 	)
+
+	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
+	if isExpired {
+		return
+	}
+	if user.TransferEnable-user.U-user.D <= 0 {
+		return
+	}
 
 	for _, service := range serviceArr {
 		service.Host = GetRandIp(service.Host)
@@ -419,6 +471,14 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 
 // Clash订阅
 func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+
+	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
+	if isExpired {
+		return
+	}
+	if user.TransferEnable-user.U-user.D <= 0 {
+		return
+	}
 
 	content, err := os.ReadFile("./manifest/config/clash.yaml")
 	if err != nil {

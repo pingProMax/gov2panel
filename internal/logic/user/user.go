@@ -268,6 +268,13 @@ func (s *sUser) GetUserByTokenAndUDAndGTExpiredAt(token string) (u *entity.V2Use
 	return u, err
 }
 
+// 根据 token 获取用户
+func (s *sUser) GetUserByToken(token string) (u *entity.V2User, err error) {
+	u = new(entity.V2User)
+	err = s.Cornerstone.GetDB().Where(dao.V2User.Columns().Token, token).Scan(u)
+	return u, err
+}
+
 // 邀请码获取 邀请用户id
 func (s *sUser) GetUserByCommissionCode(commissionCode string) (u *entity.V2User, err error) {
 	u = new(entity.V2User)

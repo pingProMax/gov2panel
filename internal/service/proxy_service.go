@@ -14,7 +14,7 @@ import (
 type (
 	IProxyService interface {
 		// 获取所有
-		GetProxyServiceList(req *v1.ProxyServiceReq, orderBy, orderDirection string, offset, limit int) (m []*model.ProxyServiceInfo, total int, err error)
+		GetProxyServiceList(req *v1.ProxyServiceReq, orderBy string, orderDirection string, offset int, limit int) (m []*model.ProxyServiceInfo, total int, err error)
 		// 获取所有服务器信息
 		GetProxyServiceAllList() (m []*entity.V2ProxyService, err error)
 		// AE设置

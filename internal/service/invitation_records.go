@@ -14,9 +14,9 @@ import (
 type (
 	IInvitationRecords interface {
 		// 获取数据
-		GetInvitationRecordsList(req *v1.InvitationRecordsReq, orderBy, orderDirection string, offset, limit int) (m []*model.InvitationRecordsInfo, total int, err error)
+		GetInvitationRecordsList(req *v1.InvitationRecordsReq, orderBy string, orderDirection string, offset int, limit int) (m []*model.InvitationRecordsInfo, total int, err error)
 		// 获取数据根据用户id
-		GetInvitationRecordsListByUserId(userId int, orderBy, orderDirection string, offset, limit int) (m []*model.InvitationRecordsInfo, total int, err error)
+		GetInvitationRecordsListByUserId(userId int, orderBy string, orderDirection string, offset int, limit int) (m []*model.InvitationRecordsInfo, total int, err error)
 		// 获取数据根据id
 		GetOneById(id int) (d *entity.V2InvitationRecords, err error)
 		// 获取数据根据id
@@ -24,9 +24,9 @@ type (
 		// 添加
 		Insert(data *entity.V2InvitationRecords) (err error)
 		// 更新
-		UpInvitationRecordsStateById(id, state int) (err error)
+		UpInvitationRecordsStateById(id int, state int) (err error)
 		// 审核状态
-		AdminiUpStateById(id, state int) (err error)
+		AdminiUpStateById(id int, state int) (err error)
 		// CommissionTransferBalance佣金转余额
 		CommissionTransferBalance(userId int) (err error)
 		// 佣金提现
