@@ -343,6 +343,28 @@ func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (
 // v2rayNG订阅
 func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
 
+	//-----剩余流量
+	ps2 := fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D))
+	if user.TransferEnable-user.U-user.D <= 0 {
+		ps2 = "流量已用完！！！"
+	}
+	s2 := map[string]string{
+		"v":    "2",
+		"add":  "127.0.0.1", //链接地址
+		"ps":   ps2,         //名字
+		"port": "443",       //端口
+		"id":   user.Uuid,   //uuid
+		"net":  "tcp",
+	}
+	ds2, err := json.Marshal(s2)
+	if err != nil {
+		return err.Error()
+	}
+	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds2))
+	if user.TransferEnable-user.U-user.D <= 0 {
+		return
+	}
+
 	//-----到期时间
 	expiredAtStr := user.ExpiredAt.Format("Y-m-d H:i")
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
@@ -366,27 +388,6 @@ func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (resul
 	if isExpired {
 		return
 	}
-	//-----剩余流量
-	ps2 := fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D))
-	if user.TransferEnable-user.U-user.D <= 0 {
-		ps2 = "流量已用完！！！"
-	}
-	s2 := map[string]string{
-		"v":    "2",
-		"add":  "127.0.0.1", //链接地址
-		"ps":   ps2,         //名字
-		"port": "443",       //端口
-		"id":   user.Uuid,   //uuid
-		"net":  "tcp",
-	}
-	ds2, err := json.Marshal(s2)
-	if err != nil {
-		return err.Error()
-	}
-	result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds2))
-	if user.TransferEnable-user.U-user.D <= 0 {
-		return
-	}
 
 	result = result + base64Sub(serviceArr, user)
 
@@ -403,9 +404,8 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		),
 		"127.0.0.1",
 		"80",
-		"套餐到期："+user.ExpiredAt.Format("Y-m-d H:i"),
+		"剩余流量："+fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
 	)
-
 	result = result + fmt.Sprintf(
 		"%s://%s@%s:%s#%s\n",
 		"ss",
@@ -414,7 +414,7 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		),
 		"127.0.0.1",
 		"80",
-		"剩余流量："+fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
+		"套餐到期："+user.ExpiredAt.Format("Y-m-d H:i"),
 	)
 
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
