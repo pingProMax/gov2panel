@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -83,7 +84,7 @@ func (s *sPayment) GetPaymentShowList() (m []*entity.V2Payment, err error) {
 }
 
 // 支付业务，获取支付url
-func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err error) {
+func (s *sPayment) GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (urlStr string, err error) {
 	payment := new(entity.V2Payment)
 	err = s.Cornerstone.GetOneById(res.PaymentId, payment)
 	if err != nil {
@@ -105,8 +106,8 @@ func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err erro
 		HandlingFeeAmount = HandlingFeeAmount + payment.HandlingFeeFixed
 	}
 
-	priceStr := strconv.FormatFloat(res.Amount, 'f', 2, 64)                                       //金额
-	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, payment.Id, res.TUserID) //订单号 系统用
+	priceStr := strconv.FormatFloat(res.Amount, 'f', 2, 64)                                                             //金额
+	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, payment.Id, service.User().GetCtxUser(ctx).Id) //订单号 系统用
 
 	out_trade_no := strconv.FormatInt(time.Now().UnixNano()/int64(time.Millisecond), 10)
 
@@ -125,7 +126,7 @@ func (s *sPayment) GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err erro
 			transactionId, //name
 			payment.NotifyDomain+"/pay/e_pay_notify", //服务器异步通知地址
 			out_trade_no, //订单号
-			priceStr+"|"+strconv.Itoa(payment.Id)+"|"+strconv.Itoa(res.TUserID)+"|"+transactionId, //自定义 用户实际得到的金额|支付方式的id|用户id|订单号
+			priceStr+"|"+strconv.Itoa(payment.Id)+"|"+strconv.Itoa(service.User().GetCtxUser(ctx).Id)+"|"+transactionId, //自定义 用户实际得到的金额|支付方式的id|用户id|订单号
 			epayConfig.Pid.String(),     //pid
 			res.Redirect+"/user/wallet", //页面跳转通知地址
 		)

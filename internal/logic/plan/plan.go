@@ -114,7 +114,9 @@ func (s *sPlan) GetPlanById(id int) (d *entity.V2Plan, err error) {
 }
 
 // 用户购买/续费套餐处理
-func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V2User) (err error) {
+func (s *sPlan) UserBuyAndRenew(ctx context.Context, code string, plan *entity.V2Plan) (err error) {
+
+	user := service.User().GetCtxUser(ctx)
 
 	//套餐最终价格
 	var price float64
@@ -140,7 +142,7 @@ func (s *sPlan) UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V
 
 	if code != "" {
 		//检查优惠码
-		couponRes, err = service.Coupon().CheckCouponCanUseByCode(&userv1.CouponReq{Code: code, PlanId: plan.Id, TUserID: user.Id})
+		couponRes, err = service.Coupon().CheckCouponCanUseByCode(ctx, &userv1.CouponReq{Code: code, PlanId: plan.Id})
 		if err != nil {
 			return err
 		}

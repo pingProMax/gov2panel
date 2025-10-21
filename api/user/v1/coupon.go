@@ -7,10 +7,9 @@ import (
 )
 
 type CouponReq struct {
-	g.Meta  `path:"/coupon" tags:"Coupon" method:"post" summary:"优惠卷信息获取"`
-	Code    string `json:"code"`
-	PlanId  int    `json:"plan_id"`
-	TUserID int
+	g.Meta `path:"/coupon" tags:"Coupon" method:"post" summary:"优惠卷信息获取"`
+	Code   string `json:"code"`
+	PlanId int    `json:"plan_id"`
 }
 type CouponRes struct {
 	g.Meta `mime:"text/html" example:"string"`

@@ -11,7 +11,6 @@ import (
 	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
-	"time"
 )
 
 type (
@@ -65,7 +64,7 @@ type (
 		// 获取用户数据
 		GetUserList(req *v1.UserReq, orderBy string, orderDirection string, offset int, limit int) (items []*model.UserInfo, total int, err error)
 		// 修改密码
-		UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error)
+		UpUserPasswdById(ctx context.Context, req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error)
 		// 获取当月注册量
 		GetNowMonthCount() (count int, err error)
 		// 重置用户的Token和uuid
@@ -74,8 +73,9 @@ type (
 		GetNowMonthDayCount() (count []int, err error)
 		// 获取订阅组用户数量
 		GetUserCountByPlanID(id int) (count int, err error)
-		Logout(ctx context.Context)
-		Refresh(ctx context.Context) (tokenString string, expire time.Time)
+		// 创建 token
+		CreateToken(ctx context.Context, user *entity.V2User) (signedToken string, claims *model.JWTClaims, err error)
+		GetCtxUser(ctx context.Context) *entity.V2User
 		// 启动 把有效用户 存入到内存
 		MSaveToRam() (err error)
 		// 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）

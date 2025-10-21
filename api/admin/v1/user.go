@@ -3,7 +3,6 @@ package v1
 import (
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
-	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -58,20 +57,10 @@ type UserUpBanned1Res struct {
 }
 
 type LogoutReq struct {
-	g.Meta  `path:"/logout" tags:"User" method:"get" summary:"退出登录"`
-	TUserID int
+	g.Meta `path:"/logout" tags:"User" method:"get" summary:"退出登录"`
 }
 type LogoutRes struct {
 	g.Meta `mime:"text/html" example:"string"`
-}
-
-type RefreshReq struct {
-	g.Meta  `path:"/refresh" tags:"User" method:"post" summary:"刷新token"`
-	TUserID int
-}
-type RefreshRes struct {
-	Token  string    `json:"token"`
-	Expire time.Time `json:"expire"`
 }
 
 type ResetTokenAndUuidReq struct {

@@ -107,6 +107,26 @@
         });
     }
 
+    // async function checkDomainStatus(url) {
+    //     const controller = new AbortController();
+    //     const timeout = setTimeout(() => controller.abort(), 5000);
+
+    //     try {
+    //         // 尝试发一个轻量级请求
+    //         await fetch(`${url}/favicon.ico`, {
+    //             method: 'HEAD',
+    //             mode: 'no-cors',
+    //             signal: controller.signal
+    //         });
+    //         clearTimeout(timeout);
+    //         return true;
+    //     } catch (e) {
+    //         clearTimeout(timeout);
+    //         return false;
+    //     }
+    // }
+
+
     
     // 替换页面里所有 %domain%
     function updatePageDomain(domain) {

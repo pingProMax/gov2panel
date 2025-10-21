@@ -25,7 +25,7 @@ func (c *ControllerV1) Flow(ctx context.Context, req *v1.FlowReq) (res *v1.FlowR
 			timeNow = timeNow.Add(-time.Duration(1) * 24 * time.Hour)
 		}
 		dataStr := fmt.Sprintf("%s%s%s", strconv.Itoa(timeNow.Year()), strconv.Itoa(int(timeNow.Month())), strconv.Itoa(timeNow.Day()))
-		ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(req.TUserID), dataStr)
+		ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(c.getUser(ctx).Id), dataStr)
 		userFlow, err := gcache.Get(ctx, ketStr)
 		if err != nil {
 			return res, err

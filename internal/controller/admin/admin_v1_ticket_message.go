@@ -27,7 +27,7 @@ func (c *ControllerV1) TicketMessage(ctx context.Context, req *v1.TicketMessageR
 
 func (c *ControllerV1) TicketMessageAdd(ctx context.Context, req *v1.TicketMessageAddReq) (res *v1.TicketMessageAddRes, err error) {
 	res = &v1.TicketMessageAddRes{}
-	req.V2TicketMessage.UserId = g.RequestFromCtx(ctx).Get("TUserID").Int()
+	req.V2TicketMessage.UserId = c.getUser(ctx).Id
 	req.V2TicketMessage.Message = ghtml.Entities(req.V2TicketMessage.Message)
 	err = service.TicketMessage().SaveTicketMessageAdmin(&req.V2TicketMessage)
 	return

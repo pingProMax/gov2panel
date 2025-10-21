@@ -8,16 +8,14 @@ import (
 )
 
 type WalletReq struct {
-	g.Meta  `path:"/wallet" tags:"Wallet" method:"get" summary:"钱包页面"`
-	TUserID int
+	g.Meta `path:"/wallet" tags:"Wallet" method:"get" summary:"钱包页面"`
 }
 type WalletRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
 
 type V2RechargeRecordsReq struct {
-	g.Meta  `path:"/recharge_records" tags:"Wallet" method:"post" summary:"充值消费记录"`
-	TUserID int
+	g.Meta `path:"/recharge_records" tags:"Wallet" method:"post" summary:"充值消费记录"`
 
 	OffsetLimit
 }
@@ -28,8 +26,7 @@ type V2RechargeRecordsRes struct {
 }
 
 type InvitationRecordsReq struct {
-	g.Meta  `path:"/invitation_records" tags:"InvitationRecords" method:"post" summary:"邀请收入记录"`
-	TUserID int
+	g.Meta `path:"/invitation_records" tags:"InvitationRecords" method:"post" summary:"邀请收入记录"`
 	OffsetLimit
 }
 
@@ -40,8 +37,7 @@ type InvitationRecordsRes struct {
 }
 
 type RechargeReq struct {
-	g.Meta  `path:"/recharge" tags:"Wallet" method:"get" summary:"充值页面"`
-	TUserID int
+	g.Meta `path:"/recharge" tags:"Wallet" method:"get" summary:"充值页面"`
 }
 
 type RechargeRes struct {
@@ -49,8 +45,7 @@ type RechargeRes struct {
 }
 
 type GetPayListReq struct {
-	g.Meta  `path:"/pay_list" tags:"Wallet" method:"post" summary:"获取支付列表 api"`
-	TUserID int
+	g.Meta `path:"/pay_list" tags:"Wallet" method:"post" summary:"获取支付列表 api"`
 }
 
 type GetPayListRes struct {
@@ -60,7 +55,6 @@ type GetPayListRes struct {
 
 type PayRedirectionReq struct {
 	g.Meta    `path:"/pay_redirection" tags:"Wallet" method:"post" summary:"支付重定向"`
-	TUserID   int
 	PaymentId int     `json:"payment_id"`
 	Amount    float64 `json:"amount"`
 	Redirect  string  `json:"redirect"`
@@ -72,8 +66,7 @@ type PayRedirectionRes struct {
 }
 
 type CommissionTransferBalanceReq struct {
-	g.Meta  `path:"/commission_transfer_balance" tags:"Wallet" method:"post" summary:"佣金转余额"`
-	TUserID int
+	g.Meta `path:"/commission_transfer_balance" tags:"Wallet" method:"post" summary:"佣金转余额"`
 }
 
 type CommissionTransferBalanceRes struct {
@@ -81,8 +74,7 @@ type CommissionTransferBalanceRes struct {
 }
 
 type CWithdrawalBalanceReq struct {
-	g.Meta  `path:"/withdrawal_balance" tags:"Wallet" method:"post" summary:"佣金提现"`
-	TUserID int
+	g.Meta `path:"/withdrawal_balance" tags:"Wallet" method:"post" summary:"佣金提现"`
 }
 
 type CWithdrawalBalanceRes struct {

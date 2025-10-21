@@ -18,7 +18,7 @@ func (c *ControllerV1) Ticket(ctx context.Context, req *v1.TicketReq) (res *v1.T
 		setTplUser(ctx, "ticket", nil)
 	case "POST":
 		res = &v1.TicketRes{}
-		req.UserId = req.TUserID
+		req.UserId = c.getUser(ctx).Id
 		req.ReplyStatus = 0
 		req.Status = 0
 		req.Level = 0
@@ -31,7 +31,7 @@ func (c *ControllerV1) Ticket(ctx context.Context, req *v1.TicketReq) (res *v1.T
 }
 
 func (c *ControllerV1) TicketClose(ctx context.Context, req *v1.TicketCloseReq) (res *v1.TicketCloseRes, err error) {
-	err = service.Ticket().CloseTicketByUserIdAndId(req.Ids, req.TUserID)
+	err = service.Ticket().CloseTicketByUserIdAndId(req.Ids, c.getUser(ctx).Id)
 	if err != nil {
 		return res, err
 	}
@@ -39,7 +39,7 @@ func (c *ControllerV1) TicketClose(ctx context.Context, req *v1.TicketCloseReq) 
 }
 
 func (c *ControllerV1) TicketCreate(ctx context.Context, req *v1.TicketCreateReq) (res *v1.TicketCreateRes, err error) {
-	req.V2Ticket.UserId = req.TUserID
+	req.V2Ticket.UserId = c.getUser(ctx).Id
 	req.V2Ticket.Status = -1
 	req.V2Ticket.ReplyStatus = -1
 	if strings.TrimSpace(req.V2Ticket.Subject) == "" {
@@ -53,13 +53,13 @@ func (c *ControllerV1) TicketCreate(ctx context.Context, req *v1.TicketCreateReq
 
 func (c *ControllerV1) TicketMessage(ctx context.Context, req *v1.TicketMessageReq) (res *v1.TicketMessageRes, err error) {
 	res = &v1.TicketMessageRes{}
-	res.Data, err = service.TicketMessage().GetTicketMessageArrByTicketIdAndUserId(req.TicketId, req.TUserID)
+	res.Data, err = service.TicketMessage().GetTicketMessageArrByTicketIdAndUserId(req.TicketId, c.getUser(ctx).Id)
 	return
 }
 
 func (c *ControllerV1) TicketMessageAdd(ctx context.Context, req *v1.TicketMessageAddReq) (res *v1.TicketMessageAddRes, err error) {
 	res = &v1.TicketMessageAddRes{}
-	req.V2TicketMessage.UserId = g.RequestFromCtx(ctx).Get("TUserID").Int()
+	req.V2TicketMessage.UserId = c.getUser(ctx).Id
 	req.V2TicketMessage.Message = ghtml.Entities(req.V2TicketMessage.Message)
 	err = service.TicketMessage().SaveTicketMessageUser(&req.V2TicketMessage)
 	return

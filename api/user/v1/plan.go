@@ -34,21 +34,19 @@ type PlanRenewRes struct {
 }
 
 type BuyReq struct {
-	g.Meta  `path:"/buy" tags:"Buy" method:"post" summary:"购买"`
-	PlanId  int    `json:"plan_id"` //订阅id
-	Code    string `json:"code"`    //优惠码
-	Uuid    string `json:"uuid"`    //
-	TUserID int    //用户id
+	g.Meta `path:"/buy" tags:"Buy" method:"post" summary:"购买"`
+	PlanId int    `json:"plan_id"` //订阅id
+	Code   string `json:"code"`    //优惠码
+	Uuid   string `json:"uuid"`    //
 }
 type BuyRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
 
 type RenewReq struct {
-	g.Meta  `path:"/renew" tags:"Buy" method:"post" summary:"续费"`
-	Code    string `json:"code"` //优惠码
-	Uuid    string `json:"uuid"` //
-	TUserID int    //用户id
+	g.Meta `path:"/renew" tags:"Buy" method:"post" summary:"续费"`
+	Code   string `json:"code"` //优惠码
+	Uuid   string `json:"uuid"` //
 }
 type RenewRes struct {
 	g.Meta `mime:"text/html" example:"string"`

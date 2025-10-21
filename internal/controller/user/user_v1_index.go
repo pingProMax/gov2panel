@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	v1 "gov2panel/api/user/v1"
-	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
 
@@ -14,12 +13,7 @@ import (
 
 func (c *ControllerV1) Index(ctx context.Context, req *v1.IndexReq) (res *v1.IndexRes, err error) {
 
-	var user entity.V2User
-	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
-	if err != nil {
-		g.RequestFromCtx(ctx).Response.Write(err.Error())
-		return
-	}
+	user := c.getUser(ctx)
 	plan, _ := service.Plan().GetPlanById(user.GroupId)
 
 	switch g.RequestFromCtx(ctx).Method {

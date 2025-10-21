@@ -1,6 +1,7 @@
 package coupon
 
 import (
+	"context"
 	"errors"
 	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/dao"
@@ -60,7 +61,7 @@ func (s *sCoupon) GetCouponByCode(code string) (d *entity.V2Coupon, err error) {
 }
 
 // 优惠码是否可用
-func (s *sCoupon) CheckCouponCanUseByCode(req *userv1.CouponReq) (res *userv1.CouponRes, err error) {
+func (s *sCoupon) CheckCouponCanUseByCode(ctx context.Context, req *userv1.CouponReq) (res *userv1.CouponRes, err error) {
 	res = &userv1.CouponRes{}
 
 	coupon, err := s.GetCouponByCode(req.Code)
@@ -83,7 +84,7 @@ func (s *sCoupon) CheckCouponCanUseByCode(req *userv1.CouponReq) (res *userv1.Co
 
 		//判断每个用户可以使用次数
 		if coupon.LimitUse != -1 {
-			couponUseList, err := service.CouponUse().GetCouponUseByUserIdAndCouponId(req.TUserID, coupon.Id)
+			couponUseList, err := service.CouponUse().GetCouponUseByUserIdAndCouponId(service.User().GetCtxUser(ctx).Id, coupon.Id)
 			if err != nil {
 				return res, err
 			}

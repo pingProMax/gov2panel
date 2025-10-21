@@ -13,16 +13,17 @@ import (
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
-	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -32,25 +33,7 @@ type sUser struct {
 
 func init() {
 	service.RegisterUser(New())
-	jwtkey, err := g.Cfg().Get(gctx.New(), "jwtkey")
-	if err != nil {
-		panic(err.Error())
-	}
-	auth := jwt.New(&jwt.GfJWTMiddleware{
-		Realm:           "gov2panel",
-		Key:             jwtkey.Bytes(),
-		Timeout:         time.Hour * 168,
-		MaxRefresh:      time.Hour * 168,
-		IdentityKey:     "TUserID",
-		TokenLookup:     "header: Authorization, query: token, cookie: jwt",
-		TokenHeadName:   "Bearer",
-		TimeFunc:        time.Now,
-		Authenticator:   Authenticator,
-		Unauthorized:    Unauthorized,
-		PayloadFunc:     PayloadFunc,
-		IdentityHandler: IdentityHandler,
-	})
-	authService = auth
+
 }
 
 func New() *sUser {
@@ -445,6 +428,10 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 		return nil, errors.New("账号或密码错误")
 	}
 
+	if user.Banned == 1 {
+		return nil, errors.New("账号被冻结请联系管理员")
+	}
+
 	switch user.PasswordAlgo {
 	case "MD5":
 		passwd = utils.MD5V(passwd, user.PasswordSalt)
@@ -457,10 +444,6 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 			return nil, err
 		}
 
-		if user.Banned == 1 {
-			return nil, errors.New("账号被冻结请联系管理员")
-		}
-
 		return
 
 	case "BCRYPT":
@@ -468,9 +451,6 @@ func (s *sUser) Login(userName, passwd string) (user *entity.V2User, err error) 
 			return nil, errors.New("账号或密码错误")
 		}
 
-		if user.Banned == 1 {
-			return nil, errors.New("账号被冻结请联系管理员")
-		}
 		return
 	default:
 		return nil, errors.New("账号异常请联系管理员！！！")
@@ -604,9 +584,9 @@ func (s *sUser) GetUserList(req *v1.UserReq, orderBy, orderDirection string, off
 }
 
 // 修改密码
-func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error) {
+func (s *sUser) UpUserPasswdById(ctx context.Context, req *userv1.UserUpPasswdReq) (res *userv1.UserUpPasswdRes, err error) {
 	res = &userv1.UserUpPasswdRes{}
-	u, err := s.GetUserByIdAndCheck(req.TUserID)
+	u, err := s.GetUserByIdAndCheck(s.GetCtxUser(ctx).Id)
 	if err != nil {
 		return res, err
 	}
@@ -633,7 +613,7 @@ func (s *sUser) UpUserPasswdById(req *userv1.UserUpPasswdReq) (res *userv1.UserU
 			dao.V2User.Columns().PasswordAlgo: "MD5",
 			dao.V2User.Columns().Password:     utils.MD5V(req.NewPasswd, passwordSalt),
 			dao.V2User.Columns().PasswordSalt: passwordSalt,
-		}).Where(dao.V2User.Columns().Id, req.TUserID).Update()
+		}).Where(dao.V2User.Columns().Id, s.GetCtxUser(ctx).Id).Update()
 
 	return
 }
@@ -725,87 +705,33 @@ func (s *sUser) GetUserCountByPlanID(id int) (count int, err error) {
 	return gdbU.Count()
 }
 
-func (s *sUser) Logout(ctx context.Context) {
-	authService.LogoutHandler(ctx)
-}
-
-func (s *sUser) Refresh(ctx context.Context) (tokenString string, expire time.Time) {
-	return authService.RefreshHandler(ctx)
-}
-
-// jwt 处理 ------------------------------------------------------------------
-var authService *jwt.GfJWTMiddleware
-
-func Auth() *jwt.GfJWTMiddleware {
-	return authService
-}
-
-// PayloadFunc is a callback function that will be called during login.
-// Using this function it is possible to add additional payload data to the webtoken.
-// The data is then made available during requests via c.Get("JWT_PAYLOAD").
-// Note that the payload is not encrypted.
-// The attributes mentioned on jwt.io can't be used as keys for the map.
-// Optional, by default no additional data will be set.
-// PayloadFunc是一个回调函数，将在登录期间调用。
-// 使用此函数可以向网络令牌添加额外的有效负载数据。
-// 然后通过c.Get（“JWT_PAYLOAD”）在请求期间提供数据。
-// 请注意，有效载荷未加密。
-// jwt.io上提到的属性不能用作贴图的关键点。
-// 可选，默认情况下不会设置其他数据。
-func PayloadFunc(data interface{}) jwt.MapClaims {
-	claims := jwt.MapClaims{}
-	params := data.(*entity.V2User)
-	claims["TUserID"] = params.Id
-	claims["TUserName"] = params.UserName
-	claims["TPasswd"] = params.Password
-	return claims
-}
-
-// IdentityHandler get the identity from JWT and set the identity for every request
-// Using this function, by r.GetParam("id") get identity
-// IdentityHandler从JWT获取标识，并为每个请求设置标识
-// 使用此函数，通过r.GetParam（“id”）获取标识
-func IdentityHandler(ctx context.Context) interface{} {
-	claims := jwt.ExtractClaims(ctx)
-	return claims[authService.IdentityKey]
-}
-
-// Unauthorized is used to define customized Unauthorized callback function.
-// Unauthorized用于定义自定义的Unauthorized回调函数。
-func Unauthorized(ctx context.Context, code int, message string) {
-	r := g.RequestFromCtx(ctx)
-	if r.RequestURI != "/login" {
-		r.Response.RedirectTo("/login", http.StatusFound)
-	} else {
-		r.Response.WriteJson(g.Map{
-			"code":    code,
-			"message": message,
-		})
+// 创建 token
+func (s *sUser) CreateToken(ctx context.Context, user *entity.V2User) (signedToken string, claims *model.JWTClaims, err error) {
+	// Create claims with user information
+	claims = &model.JWTClaims{
+		UserName: user.UserName,
+		TUserID:  user.Id,
+		TPasswd:  user.Password,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
 	}
 
-	r.ExitAll()
-}
-
-// Authenticator is used to validate login parameters.
-// It must return user data as user identifier, it will be stored in Claim Array.
-// if your identityKey is 'id', your user data must have 'id'
-// Check error (e) to determine the appropriate error message.
-// Authenticator用于验证登录参数。
-// 它必须将用户数据作为用户标识符返回，它将存储在Claim Array中。
-// 如果您的identityKey是“id”，则用户数据必须具有“id”
-// 检查错误（e）以确定适当的错误消息。
-func Authenticator(ctx context.Context) (interface{}, error) {
-	var (
-		r = g.RequestFromCtx(ctx)
-	)
-
-	if user, err := service.User().Login(r.Get("UserName").String(), r.Get("Passwd").String()); err != nil {
-		return user, err
-	} else {
-		if user != nil {
-			return user, nil
-		}
+	// Generate token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err = token.SignedString(g.Cfg().MustGet(gctx.New(), "jwtkey").Bytes())
+	if err != nil {
+		return "", nil, gerror.NewCode(gcode.CodeInternalError, "Failed to generate token")
 	}
 
-	return nil, jwt.ErrFailedAuthentication
+	return
+}
+
+// 从上下文获取用户信息
+func (s *sUser) GetCtxUser(ctx context.Context) *entity.V2User {
+	user := &entity.V2User{}
+	g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(user)
+	return user
 }

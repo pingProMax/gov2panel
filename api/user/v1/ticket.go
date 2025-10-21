@@ -8,8 +8,7 @@ import (
 )
 
 type TicketReq struct {
-	g.Meta  `path:"/ticket" tags:"Ticket" method:"get,post" summary:"工单"`
-	TUserID int
+	g.Meta `path:"/ticket" tags:"Ticket" method:"get,post" summary:"工单"`
 	entity.V2Ticket
 	OffsetLimit
 }
@@ -20,9 +19,8 @@ type TicketRes struct {
 }
 
 type TicketCloseReq struct {
-	g.Meta  `path:"/ticket/close" tags:"Ticket" method:"post" summary:"工单关闭"`
-	Ids     []int `json:"ids"`
-	TUserID int
+	g.Meta `path:"/ticket/close" tags:"Ticket" method:"post" summary:"工单关闭"`
+	Ids    []int `json:"ids"`
 }
 type TicketCloseRes struct {
 	g.Meta `mime:"text/html" example:"string"`
@@ -31,15 +29,13 @@ type TicketCloseRes struct {
 type TicketCreateReq struct {
 	g.Meta `path:"/ticket/create" tags:"Ticket" method:"post" summary:"创建工单"`
 	entity.V2Ticket
-	TUserID int
 }
 type TicketCreateRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
 
 type TicketMessageReq struct {
-	g.Meta  `path:"/ticket/ticket_msg" tags:"TicketMessage" method:"get,post" summary:"工单信息获取"`
-	TUserID int
+	g.Meta `path:"/ticket/ticket_msg" tags:"TicketMessage" method:"get,post" summary:"工单信息获取"`
 	entity.V2TicketMessage
 }
 type TicketMessageRes struct {
@@ -48,8 +44,7 @@ type TicketMessageRes struct {
 }
 
 type TicketMessageAddReq struct {
-	g.Meta  `path:"/ticket/ticket_msg/add" tags:"TicketMessageAdd" method:"post" summary:"工单信息回复获取"`
-	TUserID int
+	g.Meta `path:"/ticket/ticket_msg/add" tags:"TicketMessageAdd" method:"post" summary:"工单信息回复获取"`
 	entity.V2TicketMessage
 }
 type TicketMessageAddRes struct {

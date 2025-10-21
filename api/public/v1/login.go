@@ -7,7 +7,9 @@ import (
 )
 
 type LoginReq struct {
-	g.Meta `path:"/login" tags:"Login" method:"get,post" summary:"登录"`
+	g.Meta   `path:"/login" tags:"Login" method:"get,post" summary:"登录"`
+	UserName string
+	Passwd   string
 }
 type LoginRes struct {
 	Token  string    `json:"token"`

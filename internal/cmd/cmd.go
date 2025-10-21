@@ -13,7 +13,7 @@ import (
 	"gov2panel/internal/controller/public"
 	"gov2panel/internal/controller/server_api"
 	user_c "gov2panel/internal/controller/user"
-	"gov2panel/internal/logic/user"
+	"gov2panel/internal/middleware"
 	"gov2panel/internal/service"
 )
 
@@ -30,8 +30,8 @@ var (
 			}
 
 			s.Group("/", func(group *ghttp.RouterGroup) {
-
 				group.Middleware(func(r *ghttp.Request) { //设置参数
+					r.Response.CORSDefault() //跨域处理
 
 					d, err := service.Setting().GetSettingAllMap()
 					if err != nil {
@@ -52,7 +52,6 @@ var (
 				group.Bind(
 					public.NewV1(),
 				)
-				group.Middleware(user.Middleware().CORS) //跨域处理
 
 				group.Group("/api/server", func(group *ghttp.RouterGroup) {
 					group.Middleware(func(r *ghttp.Request) { //设置参数
@@ -75,7 +74,7 @@ var (
 				})
 
 				group.Group("/"+adminiPath.String(), func(group *ghttp.RouterGroup) {
-					group.Middleware(user.Middleware().AuthAdmin) //权限处理
+					group.Middleware(middleware.AdminJWTAuth) //权限处理
 					group.Bind(
 						admin.NewV1(),
 					)
@@ -83,7 +82,7 @@ var (
 				})
 
 				group.Group("/user", func(group *ghttp.RouterGroup) {
-					group.Middleware(user.Middleware().AuthUser) //权限处理
+					group.Middleware(middleware.UserJWTAuth) //权限处理
 					group.Bind(
 						user_c.NewV1(),
 					)

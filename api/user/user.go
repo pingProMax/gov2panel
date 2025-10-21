@@ -1,13 +1,13 @@
 // =================================================================================
-// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT. 
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
 // =================================================================================
 
 package user
 
 import (
 	"context"
-	
-	"gov2panel/api/user/v1"
+
+	v1 "gov2panel/api/user/v1"
 )
 
 type IUserV1 interface {
@@ -32,7 +32,6 @@ type IUserV1 interface {
 	UserUpPasswd(ctx context.Context, req *v1.UserUpPasswdReq) (res *v1.UserUpPasswdRes, err error)
 	ResetTokenAndUuid(ctx context.Context, req *v1.ResetTokenAndUuidReq) (res *v1.ResetTokenAndUuidRes, err error)
 	Logout(ctx context.Context, req *v1.LogoutReq) (res *v1.LogoutRes, err error)
-	Refresh(ctx context.Context, req *v1.RefreshReq) (res *v1.RefreshRes, err error)
 	Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.WalletRes, err error)
 	V2RechargeRecords(ctx context.Context, req *v1.V2RechargeRecordsReq) (res *v1.V2RechargeRecordsRes, err error)
 	InvitationRecords(ctx context.Context, req *v1.InvitationRecordsReq) (res *v1.InvitationRecordsRes, err error)
@@ -42,5 +41,3 @@ type IUserV1 interface {
 	CommissionTransferBalance(ctx context.Context, req *v1.CommissionTransferBalanceReq) (res *v1.CommissionTransferBalanceRes, err error)
 	CWithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error)
 }
-
-

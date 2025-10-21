@@ -4,7 +4,6 @@ import (
 	"context"
 
 	v1 "gov2panel/api/user/v1"
-	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -12,15 +11,14 @@ import (
 
 func (c *ControllerV1) Wallet(ctx context.Context, req *v1.WalletReq) (res *v1.WalletRes, err error) {
 	res = &v1.WalletRes{}
-	inviteCount, err := service.User().GetInviteCountByUserId(req.TUserID)
+	inviteCount, err := service.User().GetInviteCountByUserId(c.getUser(ctx).Id)
 	if err != nil {
 		return res, err
 	}
-	var user entity.V2User
 
-	g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
+	user := c.getUser(ctx)
 
-	cType, cRate := service.User().GetUserCTypeAndCRate(&user)
+	cType, cRate := service.User().GetUserCTypeAndCRate(user)
 	setTplUser(ctx, "wallet", g.Map{
 		"inviteCount": inviteCount,
 		"cType":       cType,
@@ -34,14 +32,14 @@ func (c *ControllerV1) V2RechargeRecords(ctx context.Context, req *v1.V2Recharge
 
 	res = &v1.V2RechargeRecordsRes{}
 	//获取用户充值消费记录
-	res.V2RechargeRecordsData, res.V2RechargeRecordsTotle, err = service.RechargeRecords().GetRechargeRecordsListByUserId(req.TUserID, "id", "desc", req.Offset, req.Limit)
+	res.V2RechargeRecordsData, res.V2RechargeRecordsTotle, err = service.RechargeRecords().GetRechargeRecordsListByUserId(c.getUser(ctx).Id, "id", "desc", req.Offset, req.Limit)
 
 	return
 }
 
 func (c *ControllerV1) InvitationRecords(ctx context.Context, req *v1.InvitationRecordsReq) (res *v1.InvitationRecordsRes, err error) {
 	res = &v1.InvitationRecordsRes{}
-	res.Data, res.Totle, err = service.InvitationRecords().GetInvitationRecordsListByUserId(req.TUserID, "id", "desc", req.Offset, req.Limit)
+	res.Data, res.Totle, err = service.InvitationRecords().GetInvitationRecordsListByUserId(c.getUser(ctx).Id, "id", "desc", req.Offset, req.Limit)
 	return
 }
 
@@ -61,20 +59,20 @@ func (c *ControllerV1) GetPayList(ctx context.Context, req *v1.GetPayListReq) (r
 // 支付重定向
 func (c *ControllerV1) PayRedirection(ctx context.Context, req *v1.PayRedirectionReq) (res *v1.PayRedirectionRes, err error) {
 	res = &v1.PayRedirectionRes{}
-	res.Url, err = service.Payment().GetPayUrl(req)
+	res.Url, err = service.Payment().GetPayUrl(ctx, req)
 	return
 }
 
 // 佣金转余额
 func (c *ControllerV1) CommissionTransferBalance(ctx context.Context, req *v1.CommissionTransferBalanceReq) (res *v1.CommissionTransferBalanceRes, err error) {
 	res = &v1.CommissionTransferBalanceRes{}
-	err = service.InvitationRecords().CommissionTransferBalance(req.TUserID)
+	err = service.InvitationRecords().CommissionTransferBalance(c.getUser(ctx).Id)
 	return
 }
 
 // 佣金转余额
 func (c *ControllerV1) CWithdrawalBalance(ctx context.Context, req *v1.CWithdrawalBalanceReq) (res *v1.CWithdrawalBalanceRes, err error) {
 	res = &v1.CWithdrawalBalanceRes{}
-	err = service.InvitationRecords().WithdrawalBalance(req.TUserID)
+	err = service.InvitationRecords().WithdrawalBalance(c.getUser(ctx).Id)
 	return
 }

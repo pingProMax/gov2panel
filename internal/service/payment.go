@@ -6,6 +6,7 @@
 package service
 
 import (
+	"context"
 	v1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
 )
@@ -23,7 +24,7 @@ type (
 		// 获取显示的支付
 		GetPaymentShowList() (m []*entity.V2Payment, err error)
 		// 支付业务，获取支付url
-		GetPayUrl(res *v1.PayRedirectionReq) (urlStr string, err error)
+		GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (urlStr string, err error)
 	}
 )
 

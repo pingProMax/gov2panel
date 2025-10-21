@@ -8,5 +8,5 @@ import (
 )
 
 func (c *ControllerV1) Coupon(ctx context.Context, req *v1.CouponReq) (res *v1.CouponRes, err error) {
-	return service.Coupon().CheckCouponCanUseByCode(req)
+	return service.Coupon().CheckCouponCanUseByCode(ctx, req)
 }

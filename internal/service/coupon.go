@@ -6,6 +6,7 @@
 package service
 
 import (
+	"context"
 	userv1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
 )
@@ -21,7 +22,7 @@ type (
 		// 根据code 获取
 		GetCouponByCode(code string) (d *entity.V2Coupon, err error)
 		// 优惠码是否可用
-		CheckCouponCanUseByCode(req *userv1.CouponReq) (res *userv1.CouponRes, err error)
+		CheckCouponCanUseByCode(ctx context.Context, req *userv1.CouponReq) (res *userv1.CouponRes, err error)
 	}
 )
 

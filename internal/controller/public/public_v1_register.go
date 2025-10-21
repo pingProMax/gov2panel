@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	v1 "gov2panel/api/public/v1"
-	"gov2panel/internal/logic/user"
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -38,9 +37,6 @@ func (c *ControllerV1) Register(ctx context.Context, req *v1.RegisterReq) (res *
 		if err != nil {
 			return nil, err
 		}
-
-		res.Token, res.Expire = user.Auth().LoginHandler(ctx)
-
 		return
 
 	default:

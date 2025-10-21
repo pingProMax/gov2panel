@@ -5,8 +5,7 @@ import (
 )
 
 type FlowReq struct {
-	g.Meta  `path:"/flow" tags:"Flow" method:"get" summary:"流量"`
-	TUserID int
+	g.Meta `path:"/flow" tags:"Flow" method:"get" summary:"流量"`
 }
 type FlowRes struct {
 	g.Meta `mime:"text/html" example:"string"`

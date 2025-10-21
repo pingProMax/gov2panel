@@ -7,7 +7,6 @@ import (
 	"time"
 
 	v1 "gov2panel/api/user/v1"
-	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -45,12 +44,7 @@ func (c *ControllerV1) PlanRenew(ctx context.Context, req *v1.PlanRenewReq) (res
 		return res, gerror.NewCode(gcode.CodeNotFound)
 	}
 
-	var user entity.V2User
-	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
-	if err != nil {
-		g.RequestFromCtx(ctx).Response.Write(err.Error())
-		return
-	}
+	user := c.getUser(ctx)
 
 	if res.Data.Id != user.GroupId {
 		ghttp.RequestFromCtx(ctx).Response.RedirectTo("/user", http.StatusFound)
@@ -77,13 +71,6 @@ func (c *ControllerV1) Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes,
 		gcache.Remove(ctx, req.Uuid)
 	}
 
-	var user entity.V2User
-	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
-	if err != nil {
-		g.RequestFromCtx(ctx).Response.Write(err.Error())
-		return
-	}
-
 	//检查要购买的套餐
 	plan, err := service.Plan().GetPlanById(req.PlanId)
 	if err != nil {
@@ -99,7 +86,7 @@ func (c *ControllerV1) Buy(ctx context.Context, req *v1.BuyReq) (res *v1.BuyRes,
 		return res, errors.New("套餐设置不对请联系管理员")
 	}
 
-	err = service.Plan().UserBuyAndRenew(req.Code, plan, &user)
+	err = service.Plan().UserBuyAndRenew(ctx, req.Code, plan)
 	return
 }
 
@@ -117,12 +104,7 @@ func (c *ControllerV1) Renew(ctx context.Context, req *v1.RenewReq) (res *v1.Ren
 		gcache.Remove(ctx, req.Uuid)
 	}
 
-	var user entity.V2User
-	err = g.RequestFromCtx(ctx).GetCtxVar("database_user").Struct(&user)
-	if err != nil {
-		g.RequestFromCtx(ctx).Response.Write(err.Error())
-		return
-	}
+	user := c.getUser(ctx)
 
 	//检查套餐
 	plan, err := service.Plan().GetPlanById(user.GroupId)
@@ -139,6 +121,6 @@ func (c *ControllerV1) Renew(ctx context.Context, req *v1.RenewReq) (res *v1.Ren
 		return res, errors.New("当前套餐不允许续费！")
 	}
 
-	err = service.Plan().UserBuyAndRenew(req.Code, plan, &user)
+	err = service.Plan().UserBuyAndRenew(ctx, req.Code, plan)
 	return
 }

@@ -35,7 +35,6 @@
                     notify('danger', data.message)
                     return
                 }
-                Cookies.set("jwt", data.data.token, { expires: new Date(data.data.expire) })
                 notify('success', "登录成功")
                 location.href = "/user"
                 

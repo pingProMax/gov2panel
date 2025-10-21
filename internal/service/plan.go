@@ -6,6 +6,7 @@
 package service
 
 import (
+	"context"
 	"gov2panel/internal/model/entity"
 )
 
@@ -26,7 +27,7 @@ type (
 		// 根据id获取
 		GetPlanById(id int) (d *entity.V2Plan, err error)
 		// 用户购买/续费套餐处理
-		UserBuyAndRenew(code string, plan *entity.V2Plan, user *entity.V2User) (err error)
+		UserBuyAndRenew(ctx context.Context, code string, plan *entity.V2Plan) (err error)
 	}
 )
 
