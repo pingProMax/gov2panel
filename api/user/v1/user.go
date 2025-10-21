@@ -1,18 +1,14 @@
 package v1
 
 import (
-	"gov2panel/internal/model/entity"
-
 	"github.com/gogf/gf/v2/frame/g"
 )
 
 type UserReq struct {
 	g.Meta `path:"/user" tags:"User" method:"get,post" summary:"个人中心"`
-	entity.V2User
 }
 type UserRes struct {
 	g.Meta `mime:"text/html" example:"string"`
-	Data   []*entity.V2User `json:"data"`
 }
 
 type UserUpPasswdReq struct {

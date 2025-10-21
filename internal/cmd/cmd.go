@@ -32,7 +32,6 @@ var (
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(func(r *ghttp.Request) { //设置参数
 					r.Response.CORSDefault() //跨域处理
-
 					d, err := service.Setting().GetSettingAllMap()
 					if err != nil {
 						panic(err.Error())

@@ -75,7 +75,16 @@ func AdminJWTAuth(r *ghttp.Request) {
 func UserJWTAuth(r *ghttp.Request) {
 	req := ghttp.RequestFromCtx(r.GetCtx())
 
-	tokenString := r.Cookie.Get("jwt").String()
+	cookieJwtStr := r.Cookie.Get("jwt").String()
+	tokenStr := r.Get("token").String() //适配移动端app传token方式
+	// 使用条件判断来模拟三元运算符
+	tokenString := ""
+	if cookieJwtStr != "" {
+		tokenString = cookieJwtStr
+	} else if tokenStr != "" {
+		tokenString = tokenStr
+	}
+
 	if tokenString == "" {
 		req.Response.RedirectTo("/", http.StatusFound)
 		// r.SetError(gerror.NewCode(gcode.CodeNotAuthorized, "No token provided"))

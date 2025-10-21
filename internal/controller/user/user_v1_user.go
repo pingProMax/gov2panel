@@ -8,13 +8,11 @@ import (
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserRes, err error) {
-	res = &v1.UserRes{}
-	setTplUser(ctx, "user", g.Map{"data": res.Data})
+	setTplUser(ctx, "user", nil)
 	return
 }
 
