@@ -393,7 +393,7 @@ func (s *sUser) UpUserDay7Flow(data []*model.UserTraffic) (err error) {
 	//用户流量使用缓存
 
 	ctx := gctx.New()
-	//服务器当天的流量使用情况 (记录7天的)
+	//用户每天的流量使用情况 (记录7天的)
 	for _, v := range data {
 
 		ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(v.UID), utils.GetDateNowStr())

@@ -109,11 +109,32 @@ func (s *sUser) MSaveAllRam() (err error) {
 		return true // 继续迭代
 	})
 
-	// 保存到数据库
-	err = s.UpUserDUTBy(data)
-	if err != nil {
-		return err
+	// 分批次保存到数据库
+	batchSize := 1000
+	for i := 0; i < len(data); i += batchSize {
+		end := i + batchSize
+		if end > len(data) {
+			end = len(data)
+		}
+
+		// 获取当前批次数据
+		batchData := data[i:end]
+		if len(batchData) == 0 {
+			continue
+		}
+
+		// 保存当前批次到数据库
+		err = s.UpUserDUTBy(batchData)
+		if err != nil {
+			return fmt.Errorf("failed to save batch data: %w", err)
+		}
 	}
+
+	// 一次性保存到数据库
+	// err = s.UpUserDUTBy(data)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return
 }
@@ -124,7 +145,7 @@ func (s *sUser) MUpUserMap(data *model.UserTraffic) {
 
 }
 
-// 查询查询数据库更新到缓存
+// 查询数据库更新到缓存
 func (s *sUser) MGetDb2UserMap(uid int) (err error) {
 	var userTraffic model.UserTraffic
 	err = userMap.GetVar(uid).Struct(&userTraffic)
