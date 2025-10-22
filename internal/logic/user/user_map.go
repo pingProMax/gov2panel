@@ -7,6 +7,7 @@ import (
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
+	"gov2panel/internal/utils"
 	"time"
 
 	"github.com/gogf/gf/v2/container/gmap"
@@ -50,13 +51,13 @@ func (s *sUser) MSaveToRam() (err error) {
 		userMap.Set(user.Id, model.UserToUserTraffic(user))
 	}
 
-	fmt.Println(userArr)
+	// fmt.Println(userArr)
 
 	return nil
 }
 
 // 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）
-func (s *sUser) MUpUserUAndBy(data []*model.UserTraffic) (err error) {
+func (s *sUser) MUpUserUAndBy(ctx context.Context, data []*model.UserTraffic) (err error) {
 
 	for _, u := range data {
 		if !userMap.GetVar(u.UID).IsNil() {
@@ -86,13 +87,10 @@ func (s *sUser) MUpUserUAndBy(data []*model.UserTraffic) (err error) {
 			}
 		}
 
+		s.UpUserDay7Flow(ctx, u.UID, u.Upload+u.Download, utils.GetDateNowStr())
+
 	}
 
-	//用户流量7天使用缓存
-	err = s.UpUserDay7Flow(data)
-	if err != nil {
-		return
-	}
 	return
 }
 

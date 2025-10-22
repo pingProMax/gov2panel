@@ -608,7 +608,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 		}
 
 		j, _ := gjson.EncodeString(d)
-		fmt.Println(string(j))
+
 		nodeInfoArr = append(nodeInfoArr, "  - "+j)
 	}
 

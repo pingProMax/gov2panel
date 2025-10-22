@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	v1 "gov2panel/api/admin/v1"
@@ -13,6 +14,7 @@ import (
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -338,7 +340,7 @@ func (s *sUser) UpUserUAndDBy(data []*model.UserTraffic) (err error) {
 	sqlWhere = fmt.Sprintf("WHERE `%s` IN (%s)", colId, sqlWhere)
 
 	sql = sql + sqlSetU + sqlSetD + sqlSetPublic + sqlWhere
-	fmt.Println(sql)
+	// fmt.Println(sql)
 	_, err = g.DB().Exec(gctx.New(), sql)
 	if err != nil {
 		return
@@ -378,7 +380,7 @@ func (s *sUser) UpUserDUTBy(data []*model.UserTraffic) (err error) {
 	sqlWhere = fmt.Sprintf("WHERE `%s` IN (%s)", colId, sqlWhere)
 
 	sql = sql + sqlSetU + sqlSetD + sqlSetPublic + sqlWhere
-	fmt.Println(sql)
+	// fmt.Println(sql)
 	_, err = g.DB().Exec(gctx.New(), sql)
 	if err != nil {
 		return
@@ -388,28 +390,86 @@ func (s *sUser) UpUserDUTBy(data []*model.UserTraffic) (err error) {
 
 }
 
-// 更新用户 7天流量使用数据
-func (s *sUser) UpUserDay7Flow(data []*model.UserTraffic) (err error) {
-	//用户流量使用缓存
-
-	ctx := gctx.New()
-	//用户每天的流量使用情况 (记录7天的)
-	for _, v := range data {
-
-		ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(v.UID), utils.GetDateNowStr())
-		userFlow, err := gcache.Get(ctx, ketStr)
-		if err != nil {
-			return err
-		}
-		err = utils.GcacheSet(ctx, ketStr, userFlow.Int64()+v.Upload+v.Download, 169*time.Hour)
-		if err != nil {
-			return err
-		}
-
+// 更新用户 7天流量使用数据 用户id, 流量, 日期 20240901
+func (s *sUser) UpUserDay7Flow(ctx context.Context, userId int, flow int64, date string) (err error) {
+	ketStr := fmt.Sprintf("USER_%s_%s_FLOW_UPLOAD", strconv.Itoa(userId), date)
+	userFlow, err := gcache.Get(ctx, ketStr)
+	if err != nil {
+		return err
+	}
+	err = utils.GcacheSet(ctx, ketStr, userFlow.Int64()+flow, 169*time.Hour)
+	if err != nil {
+		return err
 	}
 
 	return
+}
 
+// 从文件加载用户 7天流量使用数据到缓存
+func (s *sUser) LoadUserDay7FlowFromFile(ctx context.Context, filename string) error {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// 文件不存在则返回不报错
+			return nil
+		}
+		return err
+	}
+
+	var flows []*model.UserDay7Flow
+	if len(data) > 0 {
+		if err := json.Unmarshal(data, &flows); err != nil {
+			return err
+		}
+	}
+
+	for _, v := range flows {
+		s.UpUserDay7Flow(ctx, v.UserId, v.Flow, v.Date)
+	}
+	return err
+}
+
+// 保存用户 7天流量使用数据 到文件
+func (s *sUser) SaveUserDay7FlowToFile(ctx context.Context, filename string) error {
+
+	cacheKeyS, err := gcache.KeyStrings(ctx)
+	if err != nil {
+		return err
+	}
+
+	var flows []*model.UserDay7Flow
+
+	for _, v := range cacheKeyS {
+		if strings.HasPrefix(v, "USER_") && strings.HasSuffix(v, "_FLOW_UPLOAD") {
+			idDataStr := strings.ReplaceAll(v, "USER_", "")
+			idDataStr = strings.ReplaceAll(idDataStr, "_FLOW_UPLOAD", "")
+
+			idDatas := strings.Split(idDataStr, "_")
+
+			flow, err := gcache.Get(ctx, v)
+			if err != nil {
+				return err
+			}
+
+			userId, err := strconv.Atoi(idDatas[0])
+			if err != nil {
+				return err
+			}
+
+			flows = append(flows, &model.UserDay7Flow{
+				UserId: userId,
+				Flow:   flow.Int64(),
+				Date:   idDatas[1],
+			})
+
+		}
+	}
+
+	bytes, err := json.MarshalIndent(flows, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filename, bytes, 0644)
 }
 
 // 用户登录

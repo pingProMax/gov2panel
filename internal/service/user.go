@@ -57,8 +57,12 @@ type (
 		UpUserUAndDBy(data []*model.UserTraffic) (err error)
 		// 更新用户 u、d、t
 		UpUserDUTBy(data []*model.UserTraffic) (err error)
-		// 更新用户 7天流量使用数据
-		UpUserDay7Flow(data []*model.UserTraffic) (err error)
+		// 更新用户 7天流量使用数据 用户id, 流量, 日期 20240901
+		UpUserDay7Flow(ctx context.Context, userId int, flow int64, date string) (err error)
+		// 从文件加载用户 7天流量使用数据到缓存
+		LoadUserDay7FlowFromFile(ctx context.Context, filename string) error
+		// 保存用户 7天流量使用数据 到文件
+		SaveUserDay7FlowToFile(ctx context.Context, filename string) error
 		// 用户登录
 		Login(userName string, passwd string) (user *entity.V2User, err error)
 		// 获取用户数据
@@ -75,16 +79,17 @@ type (
 		GetUserCountByPlanID(id int) (count int, err error)
 		// 创建 token
 		CreateToken(ctx context.Context, user *entity.V2User) (signedToken string, claims *model.JWTClaims, err error)
+		// 从上下文获取用户信息
 		GetCtxUser(ctx context.Context) *entity.V2User
 		// 启动 把有效用户 存入到内存
 		MSaveToRam() (err error)
 		// 更新用户 流量使用情况2 直接更新缓存（原来有一个直接更新数据库UpUserUAndDBy）
-		MUpUserUAndBy(data []*model.UserTraffic) (err error)
+		MUpUserUAndBy(ctx context.Context, data []*model.UserTraffic) (err error)
 		// 所有数据持久化
 		MSaveAllRam() (err error)
 		// 更新/添加 缓存
 		MUpUserMap(data *model.UserTraffic)
-		// 查询查询数据库更新到缓存
+		// 查询数据库更新到缓存
 		MGetDb2UserMap(uid int) (err error)
 		// 删除 缓存
 		MDelUserMap(id int)

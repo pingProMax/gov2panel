@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	v1 "gov2panel/api/admin/v1"
@@ -19,7 +18,6 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 		setTplAdmin(ctx, "user", nil)
 	case "POST":
 		res = &v1.UserRes{}
-		fmt.Println(req.DS)
 		res.UserList, res.Totle, err = service.User().GetUserList(req, req.Sort, req.Order, req.Offset, req.Limit)
 		return
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gcron"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gview"
 
 	"gov2panel/internal/controller/admin"
@@ -99,7 +100,17 @@ var (
 				panic(err)
 			}
 
-			service.User().MSaveToRam() // 启动 把有效用户 存入到内存
+			// 启动 把有效用户 存入到内存
+			err = service.User().MSaveToRam()
+			if err != nil {
+				panic(err)
+			}
+
+			//启动时 从文件加载用户 7天流量使用数据 到内存
+			err = service.User().LoadUserDay7FlowFromFile(gctx.GetInitCtx(), "./resource/user_day7_flow.json")
+			if err != nil {
+				panic(err)
+			}
 
 			s.Run()
 			return nil

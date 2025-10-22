@@ -11,6 +11,12 @@ type UserInfo struct {
 	V2Plan *entity.V2Plan `json:"plan"`
 }
 
+type UserDay7Flow struct {
+	UserId int    `json:"user_id"`
+	Date   string `json:"date"`
+	Flow   int64  `json:"flow"`
+}
+
 // JWT 令牌的自定义声明
 type JWTClaims struct {
 	UserName string `json:"user_name"`

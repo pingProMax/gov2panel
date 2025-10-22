@@ -137,7 +137,7 @@ func (c *ControllerV1) User(ctx context.Context, req *v1.UserReq) (res *v1.UserR
 func (c *ControllerV1) Push(ctx context.Context, req *v1.PushReq) (res *v1.PushRes, err error) {
 	res = &v1.PushRes{}
 
-	err = service.User().MUpUserUAndBy(req.Data)
+	err = service.User().MUpUserUAndBy(ctx, req.Data)
 	if err != nil {
 		return
 	}
