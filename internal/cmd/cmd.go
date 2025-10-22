@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -104,12 +105,16 @@ var (
 			err = service.User().MSaveToRam()
 			if err != nil {
 				panic(err)
+			} else {
+				fmt.Println("用户缓存成功")
 			}
 
 			//启动时 从文件加载用户 7天流量使用数据 到内存
 			err = service.User().LoadUserDay7FlowFromFile(gctx.GetInitCtx(), "./resource/user_day7_flow.json")
 			if err != nil {
 				panic(err)
+			} else {
+				fmt.Println("用户7天流量记录加载成功")
 			}
 
 			s.Run()
