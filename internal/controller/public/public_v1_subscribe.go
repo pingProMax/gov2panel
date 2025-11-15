@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -111,37 +112,8 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 			// vless://uuid@127.0.0.1:8888?encryption=none&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
 			// vless://78f10ea1-81a4-4bf5-876f-90e3001f37dc@127.0.0.1:8888?encryption=none&flow=xtls-rprx-vision&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
 
-			result = result + fmt.Sprintf(
-				"%s://%s@%s:%s?encryption=%s&flow=%s&security=%s&sni=%s&alpn=%s&fp=%s&pbk=%s&sid=%s&spx=%s&type=%s&serviceName=%s&mode=%s&headerType=%s&quicSecurity=%s&key=%s&host=%s&path=%s&seed=%s&extra=%s&pqv=%s#%s\n",
-				"vless",
-				user.Uuid,
-				service.Host,
-				service.Port,
-				gconv.String(serviceJson["encryption"]),
-				gconv.String(serviceJson["flow"]),
-				gconv.String(serviceJson["security"]),
-				gconv.String(serviceJson["sni"]),
-				gconv.String(serviceJson["alpn"]),
-				gconv.String(serviceJson["fp"]),
-				gconv.String(serviceJson["pbk"]),
-				gconv.String(serviceJson["sid"]),
-				gconv.String(strings.ReplaceAll(gconv.String(serviceJson["spx"]), "$uuid$", user.Uuid)),
-				gconv.String(serviceJson["type"]),
-				gconv.String(serviceJson["serviceName"]),
-				gconv.String(serviceJson["mode"]),
-				gconv.String(serviceJson["headerType"]),
-				gconv.String(serviceJson["quicSecurity"]),
-				gconv.String(serviceJson["key"]),
-				gconv.String(serviceJson["host"]),
-				gconv.String(serviceJson["path"]),
-				gconv.String(serviceJson["seed"]),
-				gconv.String(serviceJson["extra"]),
-				gconv.String(serviceJson["pqv"]),
-				service.Name,
-			)
-
 			// 概述 https://github.com/XTLS/Xray-core/discussions/716
-			// 为什么不用新方法，因为(tcp http 无法导入path？？？)
+			// (tcp http 无法导入path？？？)
 			// 同样 github.com/xtls/libxray 无法将vmess xhttp url解析成json。
 			// 这个bug似乎很久i了, 不理解 故意的？
 			/*
@@ -157,58 +129,58 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 					<tls-specific fields>
 				#$(descriptive-text)
 			*/
-			// resultThis := fmt.Sprintf(
-			// 	"%s://%s@%s:%s?type=%s&encryption=%s&security=%s&path=%s&host=%s&headerType=%s&seed=%s&serviceName=%s&mode=%s&authority=%s&extra=%s&fp=%s&sni=%s&alpn=%s&flow=%s&pbk=%s&sid=%s&pqv=%s&spx=%s#%s",
-			// 	strings.Split(service.Agreement, "/")[1],
-			// 	url.QueryEscape(user.Uuid),
-			// 	service.Host,
-			// 	service.Port,
-			// 	gconv.String(serviceJson["type"]),
-			// 	gconv.String(serviceJson["encryption"]),
-			// 	gconv.String(serviceJson["security"]),
-			// 	url.QueryEscape(gconv.String(serviceJson["path"])),
-			// 	url.QueryEscape(gconv.String(serviceJson["host"])),
-			// 	gconv.String(serviceJson["headerType"]),
-			// 	url.QueryEscape(gconv.String(serviceJson["seed"])),
-			// 	url.QueryEscape(gconv.String(serviceJson["serviceName"])),
-			// 	url.QueryEscape(gconv.String(serviceJson["mode"])),
-			// 	url.QueryEscape(gconv.String(serviceJson["authority"])),
-			// 	url.QueryEscape(gconv.String(serviceJson["extra"])),
-			// 	gconv.String(serviceJson["fp"]),
-			// 	gconv.String(serviceJson["sni"]),
-			// 	url.QueryEscape(gconv.String(serviceJson["alpn"])),
-			// 	gconv.String(serviceJson["flow"]),
-			// 	gconv.String(serviceJson["pbk"]),
-			// 	gconv.String(serviceJson["sid"]),
-			// 	gconv.String(serviceJson["pqv"]),
-			// 	url.QueryEscape(gconv.String(serviceJson["spx"])),
-			// 	service.Name,
-			// )
+			resultThis := fmt.Sprintf(
+				"%s://%s@%s:%s?type=%s&encryption=%s&security=%s&path=%s&host=%s&headerType=%s&seed=%s&serviceName=%s&mode=%s&authority=%s&extra=%s&fp=%s&sni=%s&alpn=%s&flow=%s&pbk=%s&sid=%s&pqv=%s&spx=%s#%s",
+				strings.Split(service.Agreement, "/")[1],
+				url.QueryEscape(user.Uuid),
+				service.Host,
+				service.Port,
+				gconv.String(serviceJson["type"]),
+				gconv.String(serviceJson["encryption"]),
+				gconv.String(serviceJson["security"]),
+				url.QueryEscape(gconv.String(serviceJson["path"])),
+				url.QueryEscape(gconv.String(serviceJson["host"])),
+				gconv.String(serviceJson["headerType"]),
+				url.QueryEscape(gconv.String(serviceJson["seed"])),
+				url.QueryEscape(gconv.String(serviceJson["serviceName"])),
+				url.QueryEscape(gconv.String(serviceJson["mode"])),
+				url.QueryEscape(gconv.String(serviceJson["authority"])),
+				url.QueryEscape(gconv.String(serviceJson["extra"])),
+				gconv.String(serviceJson["fp"]),
+				gconv.String(serviceJson["sni"]),
+				url.QueryEscape(gconv.String(serviceJson["alpn"])),
+				gconv.String(serviceJson["flow"]),
+				gconv.String(serviceJson["pbk"]),
+				gconv.String(serviceJson["sid"]),
+				gconv.String(serviceJson["pqv"]),
+				url.QueryEscape(gconv.String(serviceJson["spx"])),
+				service.Name,
+			)
 
-			// u, _ := url.Parse(resultThis)
+			u, _ := url.Parse(resultThis)
 
-			// // 获取查询参数
-			// query := u.Query()
+			// 获取查询参数
+			query := u.Query()
 
-			// // 删除值为空字符串的参数
-			// for key, values := range query {
-			// 	filtered := values[:0]
-			// 	for _, v := range values {
-			// 		if v != "" {
-			// 			filtered = append(filtered, v)
-			// 		}
-			// 	}
-			// 	if len(filtered) == 0 {
-			// 		query.Del(key)
-			// 	} else {
-			// 		query[key] = filtered
-			// 	}
-			// }
+			// 删除值为空字符串的参数
+			for key, values := range query {
+				filtered := values[:0]
+				for _, v := range values {
+					if v != "" {
+						filtered = append(filtered, v)
+					}
+				}
+				if len(filtered) == 0 {
+					query.Del(key)
+				} else {
+					query[key] = filtered
+				}
+			}
 
-			// // 重新设置 URL 的查询参数
-			// u.RawQuery = query.Encode()
+			// 重新设置 URL 的查询参数
+			u.RawQuery = query.Encode()
 
-			// result = result + u.String() + "\n"
+			result = result + u.String() + "\n"
 
 			//对应的配置文档
 			/*
