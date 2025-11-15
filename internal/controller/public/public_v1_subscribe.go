@@ -112,7 +112,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 			// vless://78f10ea1-81a4-4bf5-876f-90e3001f37dc@127.0.0.1:8888?encryption=none&flow=xtls-rprx-vision&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
 
 			result = result + fmt.Sprintf(
-				"%s://%s@%s:%s?encryption=%s&flow=%s&security=%s&sni=%s&alpn=%s&fp=%s&pbk=%s&sid=%s&spx=%s&type=%s&serviceName=%s&mode=%s&headerType=%s&quicSecurity=%s&key=%s&host=%s&path=%s&seed=%s#%s\n",
+				"%s://%s@%s:%s?encryption=%s&flow=%s&security=%s&sni=%s&alpn=%s&fp=%s&pbk=%s&sid=%s&spx=%s&type=%s&serviceName=%s&mode=%s&headerType=%s&quicSecurity=%s&key=%s&host=%s&path=%s&seed=%s&pqv=%s#%s\n",
 				"vless",
 				user.Uuid,
 				service.Host,
@@ -135,6 +135,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				gconv.String(serviceJson["host"]),
 				gconv.String(serviceJson["path"]),
 				gconv.String(serviceJson["seed"]),
+				gconv.String(serviceJson["pqv"]),
 				service.Name,
 			)
 
