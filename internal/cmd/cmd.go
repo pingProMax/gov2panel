@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -62,7 +63,15 @@ var (
 							panic(err.Error())
 						}
 
-						if r.Get("token").String() != d["api_key"].String() {
+						// 后台api_key 可以多个 用||隔开，用于多面板对接区分或者定期更换
+						apikeyBol := false
+						for _, v := range strings.Split(d["api_key"].String(), "||") {
+							if r.Get("token").String() == v && v != "" {
+								apikeyBol = true
+								break
+							}
+						}
+						if !apikeyBol {
 							r.Response.WriteExit(`{"message": "token is error"}`)
 						}
 
