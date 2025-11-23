@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/url"
 	"os"
 	"strings"
@@ -20,6 +19,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/gogf/gf/v2/util/grand"
 )
 
 func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error) {
@@ -595,9 +595,8 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 // GetRandomString 获取随机字符串，a,b,c,d,e 这样的格式随机获取一个
 func GetRandomString(v string) string {
 	if strings.Contains(v, ",") {
-		ips := strings.Split(v, ",")
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		return ips[r.Intn(len(ips))]
+		vs := strings.Split(v, ",")
+		return vs[grand.Intn(len(vs))]
 	}
 	return v
 }
