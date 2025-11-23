@@ -76,7 +76,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 // 订阅处理
 func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
 	for _, service := range serviceArr {
-		service.Host = GetRandIp(service.Host)
+		service.Host = GetRandomString(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 
 		serviceJson := make(map[string]interface{})
@@ -98,7 +98,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				"host": gconv.String(serviceJson["host"]),
 				"path": gconv.String(serviceJson["path"]),
 				"scy":  gconv.String(serviceJson["scy"]),
-				"fp":   gconv.String(serviceJson["fp"]),
+				"fp":   GetRandomString(gconv.String(serviceJson["fp"])),
 			}
 			ds, err := json.Marshal(s)
 			if err != nil {
@@ -146,14 +146,14 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				url.QueryEscape(gconv.String(serviceJson["mode"])),
 				url.QueryEscape(gconv.String(serviceJson["authority"])),
 				url.QueryEscape(gconv.String(serviceJson["extra"])),
-				gconv.String(serviceJson["fp"]),
+				GetRandomString(gconv.String(serviceJson["fp"])),
 				gconv.String(serviceJson["sni"]),
 				url.QueryEscape(gconv.String(serviceJson["alpn"])),
 				gconv.String(serviceJson["flow"]),
 				gconv.String(serviceJson["pbk"]),
 				gconv.String(serviceJson["sid"]),
 				gconv.String(serviceJson["pqv"]),
-				url.QueryEscape(gconv.String(serviceJson["spx"])),
+				url.QueryEscape(GetRandomString(gconv.String(serviceJson["spx"]))),
 				service.Name,
 			)
 
@@ -284,7 +284,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				gconv.String(serviceJson["security"]),
 				gconv.String(serviceJson["sni"]),
 				gconv.String(serviceJson["alpn"]),
-				gconv.String(serviceJson["fp"]),
+				GetRandomString(gconv.String(serviceJson["fp"])),
 				gconv.String(serviceJson["type"]),
 				gconv.String(serviceJson["headerType"]),
 				gconv.String(serviceJson["host"]),
@@ -400,7 +400,7 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 	}
 
 	for _, service := range serviceArr {
-		service.Host = GetRandIp(service.Host)
+		service.Host = GetRandomString(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 
 		serviceJson := make(map[string]interface{})
@@ -467,7 +467,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 	nodeInfoArr := make([]string, 0)
 
 	for _, service := range serviceArr {
-		service.Host = GetRandIp(service.Host)
+		service.Host = GetRandomString(service.Host)
 		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
@@ -592,13 +592,12 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 	return
 }
 
-// 获取随机IP 127.0.0.1,127.0.0.2,127.0.0.3 这样的格式随机获取一个
-func GetRandIp(ipStr string) string {
-	if strings.Contains(ipStr, ",") {
-		ips := strings.Split(ipStr, ",")
+// GetRandomString 获取随机字符串，a,b,c,d,e 这样的格式随机获取一个
+func GetRandomString(v string) string {
+	if strings.Contains(v, ",") {
+		ips := strings.Split(v, ",")
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		return ips[r.Intn(len(ips))]
 	}
-	return ipStr
-
+	return v
 }
