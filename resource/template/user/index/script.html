@@ -60,6 +60,7 @@
                 // TODO: 更新页面
             } else {
                 alert("没有可用订阅地址，请尝试手动导入，或者联系管理员！")
+                updatePageDomain(domains[0])
             }
             // 异步完成后再恢复按钮
             $btn.css({ color: "green", cursor: "pointer" }).text("检测");

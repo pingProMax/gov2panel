@@ -151,7 +151,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 				url.QueryEscape(gconv.String(serviceJson["alpn"])),
 				gconv.String(serviceJson["flow"]),
 				gconv.String(serviceJson["pbk"]),
-				gconv.String(serviceJson["sid"]),
+				GetRandomString(gconv.String(serviceJson["sid"])),
 				gconv.String(serviceJson["pqv"]),
 				url.QueryEscape(GetRandomString(gconv.String(serviceJson["spx"]))),
 				service.Name,

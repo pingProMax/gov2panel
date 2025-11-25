@@ -72,7 +72,8 @@
   <nav id="navbar-main" class="navbar navbar-horizontal navbar-transparent navbar-main navbar-expand-lg navbar-light">
     <div class="container">
       <a class="navbar-brand" href="/">
-        <img src="/resource/image/brand/white.png">
+        {{.setting.title}}
+        <!-- <img src="/resource/image/brand/white.png"> -->
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
         aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +133,7 @@
       <div class="row align-items-center justify-content-xl-between">
         <div class="col-xl-6">
           <div class="copyright text-center text-xl-left text-muted">
-            &copy; 2023 <a href="/" class="font-weight-bold ml-1" target="_blank">v2ray节点购买</a>
+            &copy; 2026 <a href="/" class="font-weight-bold ml-1" target="_blank">{{.setting.title}}</a>
           </div>
         </div>
         <div class="col-xl-6">
