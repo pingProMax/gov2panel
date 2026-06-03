@@ -131,3 +131,9 @@ func (c *ControllerV1) BatchRoute(ctx context.Context, req *v1.BatchRouteReq) (r
 	err = service.ProxyService().UpBatchRoute(req.Ids, req.RouteId)
 	return
 }
+
+func (c *ControllerV1) ProxyServiceShow(ctx context.Context, req *v1.ProxyServiceShowReq) (res *v1.ProxyServiceShowRes, err error) {
+	res = &v1.ProxyServiceShowRes{}
+	err = service.ProxyService().UpServiceShow(req.Ids, req.Show)
+	return res, err
+}

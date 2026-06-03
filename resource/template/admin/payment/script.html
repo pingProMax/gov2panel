@@ -256,11 +256,13 @@
             field: 'enable',
             title: '是否启用',
             formatter: function (value, row, index) {
-              if (row.enable == 1) {
-                return `是`
+              if (value == -1) {
+                return '<span class="text-danger">禁用</span>'; // -1 显示红色字（这里暂定文本为“禁用”，可自行修改）
+              } else if (value == 1) {
+                return '<span class="text-success">启用</span>'; // 1 显示绿色字
               }
-              return `否`;
-            }
+              return value; // 其他值原样返回
+            },
           },{
             field: 'order_id',
             title: '顺序',

@@ -7,7 +7,7 @@ package admin
 import (
 	"context"
 
-	v1 "gov2panel/api/admin/v1"
+	"gov2panel/api/admin/v1"
 )
 
 type IAdminV1 interface {
@@ -36,6 +36,7 @@ type IAdminV1 interface {
 	OnlineUserCountAndLastPushAt(ctx context.Context, req *v1.OnlineUserCountAndLastPushAtReq) (res *v1.OnlineUserCountAndLastPushAtRes, err error)
 	BatchPlan(ctx context.Context, req *v1.BatchPlanReq) (res *v1.BatchPlanRes, err error)
 	BatchRoute(ctx context.Context, req *v1.BatchRouteReq) (res *v1.BatchRouteRes, err error)
+	ProxyServiceShow(ctx context.Context, req *v1.ProxyServiceShowReq) (res *v1.ProxyServiceShowRes, err error)
 	RechargeRecords(ctx context.Context, req *v1.RechargeRecordsReq) (res *v1.RechargeRecordsRes, err error)
 	RechargeRecordsAdd(ctx context.Context, req *v1.RechargeRecordsAddReq) (res *v1.RechargeRecordsAddRes, err error)
 	RechargeRecordsUpRemarks(ctx context.Context, req *v1.RechargeRecordsUpRemarksReq) (res *v1.RechargeRecordsUpRemarksRes, err error)
@@ -43,6 +44,10 @@ type IAdminV1 interface {
 	ServerRouteAE(ctx context.Context, req *v1.ServerRouteAEReq) (res *v1.ServerRouteAERes, err error)
 	ServerRouteDel(ctx context.Context, req *v1.ServerRouteDelReq) (res *v1.ServerRouteDelRes, err error)
 	ServerRouteAll(ctx context.Context, req *v1.ServerRouteAllReq) (res *v1.ServerRouteAllRes, err error)
+	ServiceRelay(ctx context.Context, req *v1.ServiceRelayReq) (res *v1.ServiceRelayRes, err error)
+	ServiceRelayAE(ctx context.Context, req *v1.ServiceRelayAEReq) (res *v1.ServiceRelayAERes, err error)
+	ServiceRelayDel(ctx context.Context, req *v1.ServiceRelayDelReq) (res *v1.ServiceRelayDelRes, err error)
+	ServiceRelayShow(ctx context.Context, req *v1.ServiceRelayShowReq) (res *v1.ServiceRelayShowRes, err error)
 	Setting(ctx context.Context, req *v1.SettingReq) (res *v1.SettingRes, err error)
 	SettingAE(ctx context.Context, req *v1.SettingAEReq) (res *v1.SettingAERes, err error)
 	SettingDel(ctx context.Context, req *v1.SettingDelReq) (res *v1.SettingDelRes, err error)

@@ -46,6 +46,8 @@ type (
 		UpBatchPlan(ids []int, planIds string) (err error)
 		// 批量更新节点路由
 		UpBatchRoute(ids []int, routeIds string) (err error)
+		// 批量设置节点显示隐藏状态
+		UpServiceShow(ids []int, show int) (err error)
 	}
 )
 

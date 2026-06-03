@@ -18,5 +18,5 @@ gfcli:
   gen:
     dao:
     - link:     "mysql:root:123456@tcp(127.0.0.1:3306)/gov2panel"
-      tables:   "v2_user,v2_plan,v2_coupon,v2_coupon_use,v2_recharge_records,v2_ticket,v2_invitation_records,v2_payment,v2_proxy_service,v2_server_route"
+      tables:   "v2_user,v2_plan,v2_coupon,v2_coupon_use,v2_recharge_records,v2_ticket,v2_invitation_records,v2_payment,v2_proxy_service,v2_server_route,v2_service_relay"
       jsonCase: "Snake"

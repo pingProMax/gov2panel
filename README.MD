@@ -1,7 +1,7 @@
 # GoFrame 开发的v2ray面板
 
-xrayr还尚未合并 https://github.com/XrayR-project/XrayR/pull/673 
-后端需要自己编译：https://github.com/pingProMax/XrayR 
+# 后端对接
+
 
 开发文档:  
 - https://goframe.org/pages/viewpage.action?pageId=1114399  
@@ -17,7 +17,8 @@ xrayr还尚未合并 https://github.com/XrayR-project/XrayR/pull/673
 # 节点
 节点地址   
 ``` json 
-$uuid$ 订阅时会替换成用户的uuid   
+$uuid 在客户端发起订阅时，系统会根据 节点管理-地址 的$uuid,替换成用户的uuid
+$relay[val] 在客户端发起订阅时，系统会根据 节点管理-地址 的$relay[val]-val参数以及客户端的 IP ASN（自治系统号），动态匹配并替换对应的中继节点组
 ```
 
 数据示例(使用时请删除注释)：
@@ -420,7 +421,7 @@ manifest/config/config.yaml
 3、启动项目  
 ``` code
 cd 项目目录
-nohup ./gov2panel(请自行编译) &
+setsid ./gov2panel(请自行编译) &
 检查日志启动无误
 ```
 

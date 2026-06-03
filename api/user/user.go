@@ -7,7 +7,7 @@ package user
 import (
 	"context"
 
-	v1 "gov2panel/api/user/v1"
+	"gov2panel/api/user/v1"
 )
 
 type IUserV1 interface {

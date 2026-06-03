@@ -19,6 +19,8 @@
   <div class="btn-group ml-3" role="group" aria-label="Basic example">
     <button type="button" class="btn btn-info " onclick="AE()">添加</button>
     <button type="button" class="btn btn-primary " onclick="CopyNode()">复制</button>
+    <button type="button" class="btn btn-primary " onclick="UpShow(1)">显示</button>
+    <button type="button" class="btn btn-primary " onclick="UpShow(-1)">隐藏</button>
     <button type="button" class="btn btn-success " onclick="DisplayModal('CoverPlan')">批量分配订阅</button>
     <button type="button" class="btn btn-warning " onclick="DisplayModal('CoverRoute')">批量分配路由</button>
     <button type="button" class="btn btn-danger " onclick="Del()">删除</button>
@@ -488,6 +490,40 @@
 
   }
 
+  //更新服务器显示状态
+  function UpShow(show) {
+    let delData = $table.bootstrapTable('getSelections')
+    if (delData.length == 0) {
+      notify('danger', '请选择！')
+      return
+    }
+    let ids = []
+    delData.forEach(function (v, i) {
+      ids.push(v.service.id)
+    })
+
+    $.ajax({
+      type: "post",
+      url: "/{{.setting.admin_path}}/service/show",
+      data: { 'ids': ids ,'show' :show},
+      dataType: "json",
+      success: function (data) {
+        if (data.code == 0) {
+          notify('success', "删除成功")
+        } else {
+          notify('danger', data.message)
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        notify('danger', errorThrown)
+      },
+      complete: function () {//不管成功还是失败 都会进这个函数
+        $("#table").bootstrapTable('refresh');
+      }
+    });
+
+  }
+
   //批量分配订阅数据提交
   function BatchPlanAjax() {
     let delData = $table.bootstrapTable('getSelections')
@@ -671,11 +707,13 @@
             sortName: 'show',
             title: '是否显示',
             formatter: function (value, row, index) {
-              if (row.service.show == 1) {
-                return `显示`
+              if (value == -1) {
+                return '<span class="text-danger">隐藏</span>'; // -1 显示红色字（这里暂定文本为“禁用”，可自行修改）
+              } else if (value == 1) {
+                return '<span class="text-success">显示</span>'; // 1 显示绿色字
               }
-              return `隐藏`;
-            }
+              return value; // 其他值原样返回
+            },
           }, {
             title: '在线状态',
             formatter: function (value, row, index) {

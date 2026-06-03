@@ -5,12 +5,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	v1 "gov2panel/api/public/v1"
+	"gov2panel/internal/logic/service_relay"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
@@ -34,11 +36,15 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		return
 	}
 
+	clientIp := ghttp.RequestFromCtx(ctx).GetClientIp()
+	asn := service_relay.GetASN(clientIp)
+	fmt.Println(gconv.String(user.Id)+"@gov2panel.subscribe", clientIp, asn)
+
 	result := ""
 
 	//app
 	if req.FlagInfoHide {
-		result = base64Sub(serviceArr, user)
+		result = base64Sub(serviceArr, user, asn)
 		ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
 
 		return nil, nil
@@ -47,11 +53,11 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	switch req.Flag {
 
 	case "1", "2", "6": //v2rayn //v2rayng //nekobox
-		result = V2rayNGSub(serviceArr, user)
+		result = V2rayNGSub(serviceArr, user, asn)
 	case "3": //shadowrocket
-		result = ShadowrocketSub(serviceArr, user)
+		result = ShadowrocketSub(serviceArr, user, asn)
 	case "4": //clash
-		result = ClashSub(serviceArr, user)
+		result = ClashSub(serviceArr, user, asn)
 
 		//https://www.clashverge.dev/guide/url_schemes.html#content-disposition
 		//如果响应头中存在 profile-update-interval 字段，则配置文件的 更新间隔 将被设置为对应的值（单位: 小时）。
@@ -63,9 +69,9 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 
 		ghttp.RequestFromCtx(ctx).Response.WriteExit([]byte(result))
 	case "5": //shadowsocks
-		result = ShadowsocksSub(serviceArr, user)
+		result = ShadowsocksSub(serviceArr, user, asn)
 	default:
-		result = V2rayNGSub(serviceArr, user)
+		result = V2rayNGSub(serviceArr, user, asn)
 	}
 
 	ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
@@ -74,10 +80,29 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 }
 
 // 订阅处理
-func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
+	serviceRelayArr, err := service.ServerRelay().GetServiceRelayListByShow(1)
+	if err != nil {
+		return
+	}
+
 	for _, service := range serviceArr {
-		service.Host = GetRandomString(service.Host)
-		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
+
+		if strings.Contains(service.Host, ",") {
+			service.Host = GetRandomString(service.Host)
+		}
+
+		// 定义中继服务器 $relay[]
+		prefix := "$relay["
+		suffix := "]"
+		// 检查并截取
+		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
+			// 移除前缀和后缀，剩下就是中间的值
+			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
+			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
+		}
+
+		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
 
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
@@ -158,7 +183,6 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 			)
 
 			u, _ := url.Parse(resultThis)
-
 			// 获取查询参数
 			query := u.Query()
 
@@ -299,7 +323,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result
 }
 
 // ShadowrocketSub订阅
-func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 	result = result + fmt.Sprintf("STATUS=↑:%.2fGB,↓:%.2fGB,TOT:%.2fGBExpires:%s\n", utils.BytesToGB(user.U), utils.BytesToGB(user.D), utils.BytesToGB(user.TransferEnable), user.ExpiredAt)
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
 	if isExpired {
@@ -309,13 +333,13 @@ func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (
 		return
 	}
 
-	result = result + base64Sub(serviceArr, user)
+	result = result + base64Sub(serviceArr, user, asn)
 
 	return
 }
 
 // v2rayNG订阅
-func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 
 	//-----剩余流量
 	ps2 := fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D))
@@ -363,13 +387,13 @@ func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (resul
 		return
 	}
 
-	result = result + base64Sub(serviceArr, user)
+	result = result + base64Sub(serviceArr, user, asn)
 
 	return
 }
 
 // Shadowsocks订阅
-func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 	result = result + fmt.Sprintf(
 		"%s://%s@%s:%s#%s\n",
 		"ss",
@@ -399,9 +423,26 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 		return
 	}
 
+	serviceRelayArr, err := service.ServerRelay().GetServiceRelayListByShow(1)
+	if err != nil {
+		return
+	}
+
 	for _, service := range serviceArr {
-		service.Host = GetRandomString(service.Host)
-		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
+		if strings.Contains(service.Host, ",") {
+			service.Host = GetRandomString(service.Host)
+		}
+
+		// 定义中继服务器 $relay[]
+		prefix := "$relay["
+		suffix := "]"
+		// 检查并截取
+		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
+			// 移除前缀和后缀，剩下就是中间的值
+			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
+			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
+		}
+		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
 
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
@@ -443,8 +484,9 @@ func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (r
 	return
 }
 
+// https://wiki.metacubex.one/config/proxies/transport/?h=xhttp
 // Clash订阅
-func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result string) {
+func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
 	if isExpired {
@@ -466,9 +508,27 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 
 	nodeInfoArr := make([]string, 0)
 
+	serviceRelayArr, err := service.ServerRelay().GetServiceRelayListByShow(1)
+	if err != nil {
+		return
+	}
+
 	for _, service := range serviceArr {
-		service.Host = GetRandomString(service.Host)
-		service.Host = strings.ReplaceAll(service.Host, "$uuid$", user.Uuid)
+		if strings.Contains(service.Host, ",") {
+			service.Host = GetRandomString(service.Host)
+		}
+
+		// 定义中继服务器 $relay[]
+		prefix := "$relay["
+		suffix := "]"
+		// 检查并截取
+		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
+			// 移除前缀和后缀，剩下就是中间的值
+			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
+			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
+		}
+
+		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
 
@@ -491,12 +551,23 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 				d["skip-cert-verify"] = false
 			}
 			d["servername"] = gconv.String(serviceJson["sni"])
+			d["client-fingerprint"] = GetRandomString(gconv.String(serviceJson["fp"]))
 			d["network"] = gconv.String(serviceJson["net"]) //传输协议
 			switch gconv.String(serviceJson["net"]) {       //传输协议
+			case "xhttp":
+				d["encryption"] = gconv.String(serviceJson["encryption"])
+				d["xhttp-opts"] = map[string]interface{}{
+					"path": gconv.String(serviceJson["path"]),
+					"host": gconv.String(serviceJson["host"]),
+					"mode": GetRandomString(gconv.String(serviceJson["mode"])),
+				}
+
 			case "ws":
-				d["ws-path"] = ""
-				d["ws-headers"] = map[string]interface{}{
-					"Host": gconv.String(serviceJson["host"]),
+				d["ws-opts"] = map[string]interface{}{
+					"path": gconv.String(serviceJson["path"]),
+					"headers": map[string]interface{}{
+						"Host": gconv.String(serviceJson["host"]),
+					},
 				}
 			case "h2":
 				d["h2-opts"] = map[string]interface{}{
@@ -523,7 +594,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 			d["type"] = "vless"
 			d["uuid"] = user.Uuid
 			d["alterId"] = 0
-			d["cipher"] = gconv.String(serviceJson["scy"]) //加密方式
+			fmt.Println(gconv.String(serviceJson))
 			if gconv.String(serviceJson["tls"]) == "tls" { //tls
 				d["tls"] = true
 				d["skip-cert-verify"] = false
@@ -531,10 +602,20 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User) (result 
 			d["servername"] = gconv.String(serviceJson["sni"])
 			d["network"] = gconv.String(serviceJson["net"]) //传输协议
 			switch gconv.String(serviceJson["net"]) {       //传输协议
+			case "xhttp":
+				d["encryption"] = gconv.String(serviceJson["encryption"])
+				d["xhttp-opts"] = map[string]interface{}{
+					"path": gconv.String(serviceJson["path"]),
+					"host": gconv.String(serviceJson["host"]),
+					"mode": GetRandomString(gconv.String(serviceJson["mode"])),
+				}
+
 			case "ws":
-				d["ws-path"] = ""
-				d["ws-headers"] = map[string]interface{}{
-					"Host": gconv.String(serviceJson["host"]),
+				d["ws-opts"] = map[string]interface{}{
+					"path": gconv.String(serviceJson["path"]),
+					"headers": map[string]interface{}{
+						"Host": gconv.String(serviceJson["host"]),
+					},
 				}
 			case "h2":
 				d["h2-opts"] = map[string]interface{}{
@@ -599,4 +680,36 @@ func GetRandomString(v string) string {
 		return vs[grand.Intn(len(vs))]
 	}
 	return v
+}
+
+// GetRandomRelayByFilter 根据 NameGroup 和 Asn 过滤并随机返回一条数据
+func GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
+
+	if len(m) == 0 {
+		return ""
+	}
+
+	// 1. 定义一个临时切片，用来存放所有符合条件的数据指针
+	var filtered []*entity.V2ServiceRelay
+
+	// 2. 遍历原始切片，进行条件筛选
+	for _, item := range m {
+		if item == nil {
+			continue
+		}
+		// 核心逻辑：只有当 NameGroup 和 Asn 都匹配时，才加入候选池
+		if item.NameGroup == targetNameGroup && strings.Contains(item.Asn, targetAsn) {
+			filtered = append(filtered, item)
+		}
+	}
+
+	// 3. 如果没有找到任何符合条件的数据，直接返回 nil
+	if len(filtered) == 0 {
+		return ""
+	}
+
+	// 4. 从符合条件的数据池中，随机抽取一条
+	// (Go 1.22+ 推荐直接使用 rand.Intn，老版本需要先 rand.Seed)
+	randomIndex := rand.Intn(len(filtered))
+	return filtered[randomIndex].Ip
 }

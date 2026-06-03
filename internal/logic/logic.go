@@ -10,6 +10,7 @@ import (
 	_ "gov2panel/internal/logic/proxy_service"
 	_ "gov2panel/internal/logic/recharge_records"
 	_ "gov2panel/internal/logic/server_route"
+	_ "gov2panel/internal/logic/service_relay"
 	_ "gov2panel/internal/logic/setting"
 	_ "gov2panel/internal/logic/ticket"
 	_ "gov2panel/internal/logic/ticket_message"

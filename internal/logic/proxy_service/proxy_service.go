@@ -378,3 +378,14 @@ func (s *sProxyService) UpBatchRoute(ids []int, routeIds string) (err error) {
 	_, err = db.WhereIn(dao.V2ProxyService.Columns().Id, ids).Update()
 	return
 }
+
+// 批量设置节点显示隐藏状态
+func (s *sProxyService) UpServiceShow(ids []int, show int) (err error) {
+	db := s.Cornerstone.GetDB().Data(
+		g.Map{
+			dao.V2ProxyService.Columns().Show: show,
+		},
+	)
+	_, err = db.WhereIn(dao.V2ProxyService.Columns().Id, ids).Update()
+	return
+}

@@ -1,12 +1,12 @@
 // =================================================================================
-// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT. 
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
 // =================================================================================
 
 package server_api
 
 import (
 	"context"
-	
+
 	"gov2panel/api/server_api/v1"
 )
 
@@ -16,5 +16,3 @@ type IServerApiV1 interface {
 	Push(ctx context.Context, req *v1.PushReq) (res *v1.PushRes, err error)
 	ChangeIP(ctx context.Context, req *v1.ChangeIPReq) (res *v1.ChangeIPRes, err error)
 }
-
-

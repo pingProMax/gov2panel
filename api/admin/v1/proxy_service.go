@@ -65,3 +65,11 @@ type BatchRouteReq struct {
 }
 type BatchRouteRes struct {
 }
+
+type ProxyServiceShowReq struct {
+	g.Meta `path:"/service/show" tags:"ProxyService" method:"post" summary:"更新服务器显示隐藏"`
+	Ids    []int `json:"ids"`
+	Show   int   `json:"show"` // 显示隐藏 1显示 -1隐藏
+}
+type ProxyServiceShowRes struct {
+}

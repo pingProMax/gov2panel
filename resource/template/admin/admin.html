@@ -124,6 +124,13 @@
                 <span class="nav-link-text">路由管理</span>
               </a>
             </li>
+
+            <li class="nav-item">
+              <a class="nav-link {{if eq .path (concat "/" .setting.admin_path "/service_relay")}}active{{end}}" href="/{{.setting.admin_path}}/service_relay" role="button" aria-controls="navbar-dashboards">
+                <i class="ni ni-tie-bow text-primary"></i>
+                <span class="nav-link-text">中继管理</span>
+              </a>
+            </li>
           </ul>
 
           <!-- Divider -->
