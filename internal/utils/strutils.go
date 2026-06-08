@@ -109,3 +109,13 @@ func CheckStr(str string) bool {
 	}
 	return false
 }
+
+// ContainsAny 判断字符串是否包含切片中的任意一个元素
+func ContainsAny(s string, subs []string) bool {
+	for _, sub := range subs {
+		if strings.Contains(s, sub) {
+			return true
+		}
+	}
+	return false
+}

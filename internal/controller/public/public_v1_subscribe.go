@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/url"
@@ -18,6 +19,7 @@ import (
 	"gov2panel/internal/utils"
 
 	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -39,6 +41,14 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	clientIp := ghttp.RequestFromCtx(ctx).GetClientIp()
 	asn := service_relay.GetASN(clientIp)
 	fmt.Println(gconv.String(user.Id)+"@gov2panel.subscribe", clientIp, asn)
+
+	userAgent := ghttp.RequestFromCtx(ctx).UserAgent()
+	userAgentList := strings.Split(g.RequestFromCtx(ctx).GetCtxVar("setting").MapStrStr()["subscribe_user_agent"], "|")
+	if !utils.ContainsAny(userAgent, userAgentList) {
+		err = errors.New("订阅方式已经停用，请提交工单联系管理员！")
+		fmt.Println(gconv.String(user.Id)+"@gov2panel.subscribe", clientIp, asn, userAgent, "订阅方式已经停用，请提交工单联系管理员！")
+		return
+	}
 
 	result := ""
 
@@ -592,16 +602,31 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 
 		case "vless":
 			d["type"] = "vless"
+
+			if gconv.String(serviceJson["security"]) == "reality" {
+				d["tls"] = true
+				d["servername"] = gconv.String(serviceJson["sni"])
+				d["client-fingerprint"] = GetRandomString(gconv.String(serviceJson["fp"]))
+				d["skip-cert-verify"] = false
+				d["sni"] = gconv.String(serviceJson["sni"])
+				d["reality-opts"] = map[string]interface{}{
+					"public-key":             gconv.String(serviceJson["pbk"]),
+					"short-id":               GetRandomString(gconv.String(serviceJson["sid"])),
+					"support-x25519mlkem768": true,
+				}
+			}
+
 			d["uuid"] = user.Uuid
 			d["alterId"] = 0
-			fmt.Println(gconv.String(serviceJson))
+
 			if gconv.String(serviceJson["tls"]) == "tls" { //tls
 				d["tls"] = true
+				d["alpn"] = strings.Split(gconv.String(serviceJson["alpn"]), ",")
 				d["skip-cert-verify"] = false
+				d["servername"] = gconv.String(serviceJson["sni"])
 			}
-			d["servername"] = gconv.String(serviceJson["sni"])
 			d["network"] = gconv.String(serviceJson["net"]) //传输协议
-			switch gconv.String(serviceJson["net"]) {       //传输协议
+			switch gconv.String(d["network"]) {             //传输协议
 			case "xhttp":
 				d["encryption"] = gconv.String(serviceJson["encryption"])
 				d["xhttp-opts"] = map[string]interface{}{
