@@ -14,3 +14,9 @@ type ProxyServiceFlow struct {
 	Name string `json:"name"`
 	Flow int64  `json:"flow"`
 }
+
+// 带url，方便客户端导入
+type ProxyServiceSubInfo struct {
+	V2ProxyService *entity.V2ProxyService `json:"service"`
+	Url            string                 `json:"url"`
+}

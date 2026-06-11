@@ -20,8 +20,10 @@ type (
 		DelServiceRelay(ids []int) error
 		// 批量设置节点显示隐藏状态
 		UpServiceShow(ids []int, show int) (err error)
-		// GetServiceRelayListByShow 获取
+		// GetServiceRelayListByShow 根据启用状态获取列表
 		GetServiceRelayListByShow(show int) (m []*entity.V2ServiceRelay, err error)
+		// GetServiceRelayListByShow 根据启用状态获取列表
+		GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string
 	}
 )
 

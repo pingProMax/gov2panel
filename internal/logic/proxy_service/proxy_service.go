@@ -1,11 +1,13 @@
 package proxy_service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
+	"gov2panel/internal/logic/service_relay"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
 	"gov2panel/internal/service"
@@ -15,6 +17,7 @@ import (
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -388,4 +391,38 @@ func (s *sProxyService) UpServiceShow(ids []int, show int) (err error) {
 	)
 	_, err = db.WhereIn(dao.V2ProxyService.Columns().Id, ids).Update()
 	return
+}
+
+// UserNode 用户获取节点列表
+func (s *sProxyService) UserNode(ctx context.Context, user *entity.V2User) ([]*model.ProxyServiceSubInfo, error) {
+
+	clientIp := ghttp.RequestFromCtx(ctx).GetClientIp()
+	asn := service_relay.GetASN(clientIp)
+	fmt.Println(gconv.String(user.Id)+"@gov2panel.user/node", clientIp, asn)
+
+	v2ProxyServiceList, err := s.GetServiceListByPlanIdAndShow1(user.GroupId)
+	if err != nil {
+		return nil, err
+	}
+	proxyServiceSubInfo := make([]*model.ProxyServiceSubInfo, len(v2ProxyServiceList))
+
+	serviceRelayList, err := service.ServerRelay().GetServiceRelayListByShow(1)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, v := range v2ProxyServiceList {
+		proxyServiceSubInfo[i] = &model.ProxyServiceSubInfo{}
+
+		serviceCopy := *v            // 结构体值拷贝
+		serviceCopy.ServiceJson = "" //脱敏
+		proxyServiceSubInfo[i].V2ProxyService = &serviceCopy
+
+		proxyServiceSubInfo[i].Url, err = s.GetV2rayUrl(ctx, v, user, serviceRelayList, asn)
+		if err != nil {
+			proxyServiceSubInfo[i].Url = err.Error()
+		}
+	}
+
+	return proxyServiceSubInfo, nil
 }

@@ -16,9 +16,12 @@ func (c *ControllerV1) Node(ctx context.Context, req *v1.NodeReq) (res *v1.NodeR
 		setTplUser(ctx, "node", nil)
 	case "POST":
 		res = &v1.NodeRes{}
-
 		user := c.getUser(ctx)
-		res.Data, err = service.ProxyService().GetServiceListByPlanIdAndShow1(user.GroupId)
+
+		res.Data, err = service.ProxyService().UserNode(ctx, user)
+		if err != nil {
+			return
+		}
 
 		return
 	}

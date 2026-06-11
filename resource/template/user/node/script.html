@@ -6,6 +6,34 @@
 <!-- Latest compiled and minified Locales -->
 <script src="/resource/js/bootstrap-table-zh-CN.min.js"></script>
 
+<script src="/resource/js/qrcode.min.js"></script>
+
+
+<div class="modal fade bd-example-modal-lg" id="qrcodeModal" tabindex="-1" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">节点二维码</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <div id="qrcode" style="text-align: center;"></div>
+          </div>
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
   let onlineUserCountAndLastPushAt;
@@ -20,11 +48,11 @@
     $table.bootstrapTable({
       columns: [
           {
-            field: 'name',
+            field: 'service.name',
             title: '名称',
           }, 
           {
-            field: 'agreement',
+            field: 'service.agreement',
             title: '协议',
           }, {
             title: '在线状态',
@@ -47,14 +75,14 @@
                             <span class="status">异常</span>
                           </span>`
               
-              switch (row.state) {
+              switch (row.service.state) {
                 case 1:
-                  if (onlineUserCountAndLastPushAt[row.id] == undefined) {
+                  if (onlineUserCountAndLastPushAt[row.service.id] == undefined) {
                     return noHtmlStr
                   }else{
-                    // let htmlStr = (onlineUserCountAndLastPushAt[row.id][1] || 0) + " | ";
+                    // let htmlStr = (onlineUserCountAndLastPushAt[row.service.id][1] || 0) + " | ";
                     let htmlStr = "";
-                    if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.id][2]) < 300) {
+                    if ((Math.floor(new Date().getTime() / 1000) - onlineUserCountAndLastPushAt[row.service.id][2]) < 300) {
                       htmlStr = htmlStr + okHtmlStr
                     }else{
                       htmlStr = htmlStr + errHtmlStr
@@ -76,24 +104,27 @@
               
             }
           }, {
-            field: 'rate',
+            field: 'service.rate',
             title: '倍率',
           }, {
-            field: 'updated_at',
+            field: 'service.updated_at',
             title: '更新时间',
           }, {
-            field: 'operate',
+            field: 'service.operate',
             title: '操作',
             width:120,
             events: {
               'click #copy_url': function (e, value, row, index) {
-                copy_url(row)
+                copy_text(row.url)
+              },'click #qrcode_url': function (e, value, row, index) {
+                qrcode_url(row.url)
               },
             },
             formatter: function (value, row, index) {
                 return `
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button id="copy_url" type="button" class="btn btn-twitter btn-icon-only" data-toggle="tooltip" data-placement="left" title="复制URL"><span class="btn-inner--icon"><i class="ni ni-single-copy-04"></i></span></button>
+                <button id="qrcode_url" type="button" class="btn btn-primary btn-icon-only" data-toggle="tooltip" data-placement="left" title="二维码"><span class="btn-inner--icon"><i class="fa fa-qrcode" aria-hidden="true"></i></span></button>
               </div>`;
               
             }
@@ -170,67 +201,7 @@
     }
     
   }
-
-
-  function copy_url(params) {
-    var serviceJson = JSON.parse(params.service_json);
-    var url = "";
-    switch (params.agreement) {
-      case "v2ray/vmess":
-        var d = {
-          "v":    "2",
-					"add":  params.host, //链接地址
-					"ps":   params.name, //名字
-					"port": params.port, //端口
-					"id":   "{{.user.Uuid}}",    //uuid
-					"aid":  "0",
-					"net":  serviceJson["net"],
-					"type": serviceJson["type"],
-					"tls":  serviceJson["tls"],
-					"sni":  serviceJson["sni"],
-					"alpn": serviceJson["alpn"],
-					"host": serviceJson["host"],
-					"path": serviceJson["path"],
-					"scy":  serviceJson["scy"],
-					"fp":   serviceJson["fp"],
-        };
-        url = window.btoa(unescape(encodeURIComponent(JSON.stringify(d))));
-        url = "vmess://"+ url;
-        break;
-
-      case "v2ray/vless":
-        url = `vless://{{.user.Uuid}}@${params.host}:${params.port}?encryption=${serviceJson.encryption}&flow=${serviceJson.flow}&security=${serviceJson.security}&sni=${serviceJson.sni}&alpn=${serviceJson.alpn}&fp=${serviceJson.fp}&pbk=${serviceJson.pbk}&sid=${serviceJson.sid}&spx=${serviceJson.spx}&type=${serviceJson.type}&serviceName=${serviceJson.serviceName}&mode=${serviceJson.mode}&headerType=${serviceJson.headerType}&quicSecurity=${serviceJson.quicSecurity}&key=${serviceJson.key}&host=${serviceJson.host}&path=${serviceJson.path}&seed=${serviceJson.seed}#${params.name}`
-        break;
-      
-      case "shadowsocks/ss2022":
-        let pssswd = "{{.user.Uuid}}";
-        if (serviceJson.cypher_method == "2022-blake3-aes-128-gcm") {
-          pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 16))))
-        }
-        if (serviceJson.cypher_method == "2022-blake3-aes-256-gcm") {
-          pssswd = serviceJson.server_key+":"+window.btoa(unescape(encodeURIComponent(pssswd.substring(0, 32))))
-        }
-
-        let str = window.btoa(unescape(encodeURIComponent(serviceJson.cypher_method+":"+pssswd)))
-        str=str.replace("+", "-")
-        str=str.replace("/", "_")
-        str=str.replace("=", "")
-
-        url = `ss://${str}@${params.host}:${params.port}#${params.name}`
-        break;
-
-      case "trojan/trojan":
-        url = `trojan://{{.user.Uuid}}@${params.host}:${params.port}?security=${serviceJson.security}&sni=${serviceJson.sni}&alpn=${serviceJson.alpn}&fp=${serviceJson.fp}&type=${serviceJson.type}&headerType=${serviceJson.headerType}&host=${serviceJson.host}#${params.name}`
-        break;
-    
-      default:
-        break;
-    }
-    console.log(params)
-    console.log(serviceJson)
-    copy_text(url);
-  }
-
+  
   function copy_text(text) {
       let input_dom = document.createElement('input');
       input_dom.value = text;
@@ -240,4 +211,20 @@
       notify('success', "复制成功")
       input_dom.remove();//删除动态创建的节点
   }
+
+  //生成二维码
+  function qrcode_url(text) {
+    $("#qrcode").html("");
+    $('#qrcodeModal').modal('show')
+    new QRCode(document.getElementById("qrcode"), {
+        text: text,
+        width: 300,
+        height: 300,
+        
+    });
+
+      
+  }
+  
+
 </script>

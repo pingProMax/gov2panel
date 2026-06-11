@@ -6,6 +6,7 @@
 package service
 
 import (
+	"context"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/model/model"
@@ -48,6 +49,11 @@ type (
 		UpBatchRoute(ids []int, routeIds string) (err error)
 		// 批量设置节点显示隐藏状态
 		UpServiceShow(ids []int, show int) (err error)
+		// UserNode 用户获取节点列表
+		UserNode(ctx context.Context, user *entity.V2User) ([]*model.ProxyServiceSubInfo, error)
+		// 专门处理订阅的
+		// GetV2rayUrl
+		GetV2rayUrl(ctx context.Context, v2Service *entity.V2ProxyService, user *entity.V2User, v2ServiceRelayList []*entity.V2ServiceRelay, asn string) (v2rayUrl string, err error)
 	}
 )
 

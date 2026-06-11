@@ -6,6 +6,7 @@ import (
 	"gov2panel/internal/logic/cornerstone"
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
+	"math/rand"
 	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -127,5 +128,38 @@ func (s *sServerRelay) GetServiceRelayListByShow(show int) (m []*entity.V2Servic
 	}
 
 	return m, nil
+
+}
+
+// GetServiceRelayListByShow 根据启用状态获取列表
+func (s *sServerRelay) GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
+
+	if len(m) == 0 {
+		return ""
+	}
+
+	// 1. 定义一个临时切片，用来存放所有符合条件的数据指针
+	var filtered []*entity.V2ServiceRelay
+
+	// 2. 遍历原始切片，进行条件筛选
+	for _, item := range m {
+		if item == nil {
+			continue
+		}
+		// 核心逻辑：只有当 NameGroup 和 Asn 都匹配时，才加入候选池
+		if item.NameGroup == targetNameGroup && strings.Contains(item.Asn, targetAsn) {
+			filtered = append(filtered, item)
+		}
+	}
+
+	// 3. 如果没有找到任何符合条件的数据，直接返回 nil
+	if len(filtered) == 0 {
+		return ""
+	}
+
+	// 4. 从符合条件的数据池中，随机抽取一条
+	// (Go 1.22+ 推荐直接使用 rand.Intn，老版本需要先 rand.Seed)
+	randomIndex := rand.Intn(len(filtered))
+	return filtered[randomIndex].Ip
 
 }

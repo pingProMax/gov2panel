@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
-	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -23,7 +21,6 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/gogf/gf/v2/util/grand"
 )
 
 func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error) {
@@ -54,7 +51,7 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 
 	//app
 	if req.FlagInfoHide {
-		result = base64Sub(serviceArr, user, asn)
+		result = base64Sub(ctx, serviceArr, user, asn)
 		ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
 
 		return nil, nil
@@ -63,11 +60,11 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	switch req.Flag {
 
 	case "1", "2", "6": //v2rayn //v2rayng //nekobox
-		result = V2rayNGSub(serviceArr, user, asn)
+		result = V2rayNGSub(ctx, serviceArr, user, asn)
 	case "3": //shadowrocket
-		result = ShadowrocketSub(serviceArr, user, asn)
+		result = ShadowrocketSub(ctx, serviceArr, user, asn)
 	case "4": //clash
-		result = ClashSub(serviceArr, user, asn)
+		result = ClashSub(ctx, serviceArr, user, asn)
 
 		//https://www.clashverge.dev/guide/url_schemes.html#content-disposition
 		//如果响应头中存在 profile-update-interval 字段，则配置文件的 更新间隔 将被设置为对应的值（单位: 小时）。
@@ -78,10 +75,8 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		// ghttp.RequestFromCtx(ctx).Response.Header().Add("profile-web-page-url", "")
 
 		ghttp.RequestFromCtx(ctx).Response.WriteExit([]byte(result))
-	case "5": //shadowsocks
-		result = ShadowsocksSub(serviceArr, user, asn)
 	default:
-		result = V2rayNGSub(serviceArr, user, asn)
+		result = V2rayNGSub(ctx, serviceArr, user, asn)
 	}
 
 	ghttp.RequestFromCtx(ctx).Response.WriteExit(base64.StdEncoding.EncodeToString([]byte(result)))
@@ -90,242 +85,19 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 }
 
 // 订阅处理
-func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
-	serviceRelayArr, err := service.ServerRelay().GetServiceRelayListByShow(1)
+func base64Sub(ctx context.Context, v2ServiceList []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
+	serviceRelayList, err := service.ServerRelay().GetServiceRelayListByShow(1)
 	if err != nil {
 		return
 	}
 
-	for _, service := range serviceArr {
+	for _, v2Service := range v2ServiceList {
 
-		if strings.Contains(service.Host, ",") {
-			service.Host = GetRandomString(service.Host)
+		v2rayUrl, err := service.ProxyService().GetV2rayUrl(ctx, v2Service, user, serviceRelayList, asn)
+		if err != nil {
+			return
 		}
-
-		// 定义中继服务器 $relay[]
-		prefix := "$relay["
-		suffix := "]"
-		// 检查并截取
-		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
-			// 移除前缀和后缀，剩下就是中间的值
-			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
-			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
-		}
-
-		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
-
-		serviceJson := make(map[string]interface{})
-		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
-		switch strings.Split(service.Agreement, "/")[1] {
-		case "vmess":
-			s := map[string]string{
-				"v":    "2",
-				"add":  service.Host, //链接地址
-				"ps":   service.Name, //名字
-				"port": service.Port, //端口
-				"id":   user.Uuid,    //uuid
-				"aid":  "0",
-				"net":  gconv.String(serviceJson["net"]),
-				"type": gconv.String(serviceJson["type"]),
-				"tls":  gconv.String(serviceJson["tls"]),
-				"sni":  gconv.String(serviceJson["sni"]),
-				"alpn": gconv.String(serviceJson["alpn"]),
-				"host": gconv.String(serviceJson["host"]),
-				"path": gconv.String(serviceJson["path"]),
-				"scy":  gconv.String(serviceJson["scy"]),
-				"fp":   GetRandomString(gconv.String(serviceJson["fp"])),
-			}
-			ds, err := json.Marshal(s)
-			if err != nil {
-				return err.Error()
-			}
-
-			result = result + fmt.Sprintf("%s://%s\n", "vmess", base64.StdEncoding.EncodeToString(ds))
-
-		case "vless":
-			// vless://uuid@127.0.0.1:8888?encryption=none&security=reality&sni=sni.com&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
-			// vless://uuid@127.0.0.1:8888?encryption=none&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
-			// vless://78f10ea1-81a4-4bf5-876f-90e3001f37dc@127.0.0.1:8888?encryption=none&flow=xtls-rprx-vision&security=tls&sni=sni.com&alpn=http%2F1.1&fp=qq&pbk=PublicKey&sid=ShortId&spx=SpiderX&type=tcp&headerType=http&host=host.com#vless
-
-			// 概述 https://github.com/XTLS/Xray-core/discussions/716
-			// (tcp http 无法导入path？？？)
-			// 同样 github.com/xtls/libxray 无法将vmess xhttp url解析成json。
-			// 这个bug似乎很久i了, 不理解 故意的？
-			/*
-				protocol://
-					$(uuid)
-					@
-					remote-host
-					:
-					remote-port
-				?
-					<protocol-specific fields>
-					<transport-specific fields>
-					<tls-specific fields>
-				#$(descriptive-text)
-			*/
-			resultThis := fmt.Sprintf(
-				"%s://%s@%s:%s?type=%s&encryption=%s&security=%s&path=%s&host=%s&headerType=%s&seed=%s&serviceName=%s&mode=%s&authority=%s&extra=%s&fp=%s&sni=%s&alpn=%s&flow=%s&pbk=%s&sid=%s&pqv=%s&spx=%s#%s",
-				strings.Split(service.Agreement, "/")[1],
-				url.QueryEscape(user.Uuid),
-				service.Host,
-				service.Port,
-				gconv.String(serviceJson["type"]),
-				gconv.String(serviceJson["encryption"]),
-				gconv.String(serviceJson["security"]),
-				url.QueryEscape(gconv.String(serviceJson["path"])),
-				url.QueryEscape(gconv.String(serviceJson["host"])),
-				gconv.String(serviceJson["headerType"]),
-				url.QueryEscape(gconv.String(serviceJson["seed"])),
-				url.QueryEscape(gconv.String(serviceJson["serviceName"])),
-				GetRandomString(gconv.String(serviceJson["mode"])),
-				url.QueryEscape(gconv.String(serviceJson["authority"])),
-				url.QueryEscape(gconv.String(serviceJson["extra"])),
-				GetRandomString(gconv.String(serviceJson["fp"])),
-				gconv.String(serviceJson["sni"]),
-				url.QueryEscape(gconv.String(serviceJson["alpn"])),
-				gconv.String(serviceJson["flow"]),
-				gconv.String(serviceJson["pbk"]),
-				GetRandomString(gconv.String(serviceJson["sid"])),
-				gconv.String(serviceJson["pqv"]),
-				url.QueryEscape(GetRandomString(gconv.String(serviceJson["spx"]))),
-				service.Name,
-			)
-
-			u, _ := url.Parse(resultThis)
-			// 获取查询参数
-			query := u.Query()
-
-			// 删除值为空字符串的参数
-			for key, values := range query {
-				filtered := values[:0]
-				for _, v := range values {
-					if v != "" {
-						filtered = append(filtered, v)
-					}
-				}
-				if len(filtered) == 0 {
-					query.Del(key)
-				} else {
-					query[key] = filtered
-				}
-			}
-
-			// 重新设置 URL 的查询参数
-			u.RawQuery = query.Encode()
-
-			result = result + u.String() + "\n"
-
-			//对应的配置文档
-			/*
-				{
-				  //https://github.com/XTLS/Xray-core/discussions/716
-				  //订阅用数据
-				  "type": "", //传输方式 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一
-				  "encryption": "", //加密方式， VMess时 默认为 auto；VLESS时 默认为 none；
-				  "security": "",  //底层传输安全，当前可选值有 none、tls、reality；默认为 none，
-				  "path": "", //路径
-				  "host": "", //Host
-				  "headerType": "", //(mKCP) 的伪装头部类型 当前可选值有 none / srtp / utp / wechat-video / dtls / wireguard 默认值为 none ，
-				  "seed": "", //(mKCP) 种子，
-				  "serviceName": "", //(gRPC) 的 ServiceName 不可为空字符串
-				  "mode": "",  // (gRPC) mode gun、multi、guna ；xhtp mode
-				  "authority": "", // (gRPC) authority
-				  "extra": "", // (XHTTP) extra
-				  "fp":"", // LS Client Hello 指纹 若使用 REALITY，此项不可省略
-				  "sni": "", // TLS SNI
-				  "alpn": "",
-				  "flow": "", //XTLS 的流控方式。可选值为 xtls-rprx-vision 等 若使用 若使用 XTLS，此项不可省略，否则无此项。此项不可为空字符串
-				  "pbk": "", //REALITY 的密码，对应配置文件中的 password 项目
-				  "sid": "", //REALITY 的 ID，对应配置文件中的 shortId 项目
-				  "pqv": "", //REALITY 的 ML-DSA-65 公钥，对应配置文件中的 mldsa65Verify 项目
-				  "spx": "", //REALITY 的爬虫，对应配置文件中的 spiderX 项目
-
-				  //后端对接用数据
-				  "xrayConifg":{
-
-				  }
-				}
-
-				{
-				  "type": "tcp",
-				  "encryption": "auto",
-				  "security": "none",
-				  "path": "",
-				  "host": "",
-				  "headerType": "none",
-				  "seed": "",
-				  "serviceName": "",
-				  "mode": "",
-				  "authority": "",
-				  "extra": "",
-				  "fp":"",
-				  "sni": "",
-				  "alpn": "",
-				  "flow": "",
-				  "pbk": "",
-				  "sid": "",
-				  "pqv": "",
-				  "spx": "",
-
-				  "xrayConifg":{
-
-				  }
-				}
-			*/
-
-		case "ss2022":
-			ssPasswd := user.Uuid
-			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-128-gcm" {
-				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
-					gconv.Bytes(user.Uuid[0:16]),
-				)
-			}
-
-			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-256-gcm" {
-				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
-					gconv.Bytes(user.Uuid[0:32]),
-				)
-			}
-
-			str := base64.StdEncoding.EncodeToString(
-				gconv.Bytes(gconv.String(serviceJson["cypher_method"]) + ":" + ssPasswd),
-			)
-			str = strings.ReplaceAll(str, "+", "-")
-			str = strings.ReplaceAll(str, "/", "_")
-			str = strings.ReplaceAll(str, "=", "")
-
-			// ss://base64(加密方式:密码)@地址:端口#别名
-			// ss://OjY4ZDJjNTFmLTUzMTEtNDc2MS1hYTNhLTllNDg1MmYzMGYyNQ==@127.0.0.1:9996#ss2022
-			result = result + fmt.Sprintf(
-				"%s://%s@%s:%s#%s\n",
-				"ss",
-				str,
-				service.Host,
-				service.Port,
-				service.Name,
-			)
-
-		case "trojan":
-			//trojan://密码@地址:端口?security=tls&sni=sni.com&alpn=http%2F1.1&fp=chrome&type=tcp&headerType=none&host=host.com#名字
-
-			result = result + fmt.Sprintf(
-				"%s://%s@%s:%s?security=%s&sni=%s&alpn=%s&fp=%s&type=%s&headerType=%s&host=%s#%s\n",
-				"trojan",
-				user.Uuid,
-				service.Host,
-				service.Port,
-				gconv.String(serviceJson["security"]),
-				gconv.String(serviceJson["sni"]),
-				gconv.String(serviceJson["alpn"]),
-				GetRandomString(gconv.String(serviceJson["fp"])),
-				gconv.String(serviceJson["type"]),
-				gconv.String(serviceJson["headerType"]),
-				gconv.String(serviceJson["host"]),
-				service.Name,
-			)
-
-		}
+		result = result + v2rayUrl + "\n"
 
 	}
 
@@ -333,7 +105,7 @@ func base64Sub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn str
 }
 
 // ShadowrocketSub订阅
-func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
+func ShadowrocketSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 	result = result + fmt.Sprintf("STATUS=↑:%.2fGB,↓:%.2fGB,TOT:%.2fGBExpires:%s\n", utils.BytesToGB(user.U), utils.BytesToGB(user.D), utils.BytesToGB(user.TransferEnable), user.ExpiredAt)
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
 	if isExpired {
@@ -343,13 +115,13 @@ func ShadowrocketSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, a
 		return
 	}
 
-	result = result + base64Sub(serviceArr, user, asn)
+	result = result + base64Sub(ctx, serviceArr, user, asn)
 
 	return
 }
 
 // v2rayNG订阅
-func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
+func V2rayNGSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 
 	//-----剩余流量
 	ps2 := fmt.Sprintf("剩余流量：%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D))
@@ -397,106 +169,14 @@ func V2rayNGSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn st
 		return
 	}
 
-	result = result + base64Sub(serviceArr, user, asn)
-
-	return
-}
-
-// Shadowsocks订阅
-func ShadowsocksSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
-	result = result + fmt.Sprintf(
-		"%s://%s@%s:%s#%s\n",
-		"ss",
-		base64.StdEncoding.EncodeToString(
-			gconv.Bytes("aes-128-gcm:"+user.Uuid),
-		),
-		"127.0.0.1",
-		"80",
-		"剩余流量："+fmt.Sprintf("%.2f GB", utils.BytesToGB(user.TransferEnable-user.U-user.D)),
-	)
-	result = result + fmt.Sprintf(
-		"%s://%s@%s:%s#%s\n",
-		"ss",
-		base64.StdEncoding.EncodeToString(
-			gconv.Bytes("aes-128-gcm:"+user.Uuid),
-		),
-		"127.0.0.1",
-		"80",
-		"套餐到期："+user.ExpiredAt.Format("Y-m-d H:i"),
-	)
-
-	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
-	if isExpired {
-		return
-	}
-	if user.TransferEnable-user.U-user.D <= 0 {
-		return
-	}
-
-	serviceRelayArr, err := service.ServerRelay().GetServiceRelayListByShow(1)
-	if err != nil {
-		return
-	}
-
-	for _, service := range serviceArr {
-		if strings.Contains(service.Host, ",") {
-			service.Host = GetRandomString(service.Host)
-		}
-
-		// 定义中继服务器 $relay[]
-		prefix := "$relay["
-		suffix := "]"
-		// 检查并截取
-		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
-			// 移除前缀和后缀，剩下就是中间的值
-			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
-			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
-		}
-		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
-
-		serviceJson := make(map[string]interface{})
-		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
-		switch strings.Split(service.Agreement, "/")[1] {
-		case "ss2022":
-			ssPasswd := user.Uuid
-			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-128-gcm" {
-				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
-					gconv.Bytes(user.Uuid[0:16]),
-				)
-			}
-
-			if gconv.String(serviceJson["cypher_method"]) == "2022-blake3-aes-256-gcm" {
-				ssPasswd = gconv.String(serviceJson["server_key"]) + ":" + base64.StdEncoding.EncodeToString(
-					gconv.Bytes(user.Uuid[0:32]),
-				)
-			}
-
-			str := base64.StdEncoding.EncodeToString(
-				gconv.Bytes(gconv.String(serviceJson["cypher_method"]) + ":" + ssPasswd),
-			)
-			str = strings.ReplaceAll(str, "+", "-")
-			str = strings.ReplaceAll(str, "/", "_")
-			str = strings.ReplaceAll(str, "=", "")
-
-			// ss://base64(加密方式:密码)@地址:端口#别名
-			// ss://OjY4ZDJjNTFmLTUzMTEtNDc2MS1hYTNhLTllNDg1MmYzMGYyNQ==@127.0.0.1:9996#ss2022
-			result = result + fmt.Sprintf(
-				"%s://%s@%s:%s#%s\n",
-				"ss",
-				str,
-				service.Host,
-				service.Port,
-				service.Name,
-			)
-		}
-	}
+	result = result + base64Sub(ctx, serviceArr, user, asn)
 
 	return
 }
 
 // https://wiki.metacubex.one/config/proxies/transport/?h=xhttp
 // Clash订阅
-func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
+func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *entity.V2User, asn string) (result string) {
 
 	isExpired := user.ExpiredAt.Before(gtime.New(time.Now()))
 	if isExpired {
@@ -525,7 +205,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 
 	for _, service := range serviceArr {
 		if strings.Contains(service.Host, ",") {
-			service.Host = GetRandomString(service.Host)
+			service.Host = utils.GetRandomString(service.Host)
 		}
 
 		// 定义中继服务器 $relay[]
@@ -535,7 +215,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
 			// 移除前缀和后缀，剩下就是中间的值
 			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
-			service.Host = GetRandomRelayByFilter(serviceRelayArr, val, asn)
+			service.Host = getRandomRelayByFilter(serviceRelayArr, val, asn)
 		}
 
 		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
@@ -561,7 +241,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 				d["skip-cert-verify"] = false
 			}
 			d["servername"] = gconv.String(serviceJson["sni"])
-			d["client-fingerprint"] = GetRandomString(gconv.String(serviceJson["fp"]))
+			d["client-fingerprint"] = utils.GetRandomString(gconv.String(serviceJson["fp"]))
 			d["network"] = gconv.String(serviceJson["net"]) //传输协议
 			switch gconv.String(serviceJson["net"]) {       //传输协议
 			case "xhttp":
@@ -569,7 +249,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 				d["xhttp-opts"] = map[string]interface{}{
 					"path": gconv.String(serviceJson["path"]),
 					"host": gconv.String(serviceJson["host"]),
-					"mode": GetRandomString(gconv.String(serviceJson["mode"])),
+					"mode": utils.GetRandomString(gconv.String(serviceJson["mode"])),
 				}
 
 			case "ws":
@@ -606,12 +286,12 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 			if gconv.String(serviceJson["security"]) == "reality" {
 				d["tls"] = true
 				d["servername"] = gconv.String(serviceJson["sni"])
-				d["client-fingerprint"] = GetRandomString(gconv.String(serviceJson["fp"]))
+				d["client-fingerprint"] = utils.GetRandomString(gconv.String(serviceJson["fp"]))
 				d["skip-cert-verify"] = false
 				d["sni"] = gconv.String(serviceJson["sni"])
 				d["reality-opts"] = map[string]interface{}{
 					"public-key":             gconv.String(serviceJson["pbk"]),
-					"short-id":               GetRandomString(gconv.String(serviceJson["sid"])),
+					"short-id":               utils.GetRandomString(gconv.String(serviceJson["sid"])),
 					"support-x25519mlkem768": true,
 				}
 			}
@@ -632,7 +312,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 				d["xhttp-opts"] = map[string]interface{}{
 					"path": gconv.String(serviceJson["path"]),
 					"host": gconv.String(serviceJson["host"]),
-					"mode": GetRandomString(gconv.String(serviceJson["mode"])),
+					"mode": utils.GetRandomString(gconv.String(serviceJson["mode"])),
 				}
 
 			case "ws":
@@ -698,43 +378,7 @@ func ClashSub(serviceArr []*entity.V2ProxyService, user *entity.V2User, asn stri
 	return
 }
 
-// GetRandomString 获取随机字符串，a,b,c,d,e 这样的格式随机获取一个
-func GetRandomString(v string) string {
-	if strings.Contains(v, ",") {
-		vs := strings.Split(v, ",")
-		return vs[grand.Intn(len(vs))]
-	}
-	return v
-}
-
-// GetRandomRelayByFilter 根据 NameGroup 和 Asn 过滤并随机返回一条数据
-func GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
-
-	if len(m) == 0 {
-		return ""
-	}
-
-	// 1. 定义一个临时切片，用来存放所有符合条件的数据指针
-	var filtered []*entity.V2ServiceRelay
-
-	// 2. 遍历原始切片，进行条件筛选
-	for _, item := range m {
-		if item == nil {
-			continue
-		}
-		// 核心逻辑：只有当 NameGroup 和 Asn 都匹配时，才加入候选池
-		if item.NameGroup == targetNameGroup && strings.Contains(item.Asn, targetAsn) {
-			filtered = append(filtered, item)
-		}
-	}
-
-	// 3. 如果没有找到任何符合条件的数据，直接返回 nil
-	if len(filtered) == 0 {
-		return ""
-	}
-
-	// 4. 从符合条件的数据池中，随机抽取一条
-	// (Go 1.22+ 推荐直接使用 rand.Intn，老版本需要先 rand.Seed)
-	randomIndex := rand.Intn(len(filtered))
-	return filtered[randomIndex].Ip
+// getRandomRelayByFilter 因为service.变量重名了，这样处理
+func getRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
+	return service.ServerRelay().GetRandomRelayByFilter(m, targetNameGroup, targetAsn)
 }
