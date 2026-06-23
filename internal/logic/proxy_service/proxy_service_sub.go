@@ -60,8 +60,8 @@ func (s *sProxyService) GetV2rayUrl(
 			"tls":  gconv.String(serviceJson["tls"]),
 			"sni":  gconv.String(serviceJson["sni"]),
 			"alpn": gconv.String(serviceJson["alpn"]),
-			"host": gconv.String(serviceJson["host"]),
-			"path": gconv.String(serviceJson["path"]),
+			"host": utils.GetRandomString(gconv.String(serviceJson["host"])),
+			"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
 			"scy":  gconv.String(serviceJson["scy"]),
 			"fp":   utils.GetRandomString(gconv.String(serviceJson["fp"])),
 		}
@@ -104,8 +104,8 @@ func (s *sProxyService) GetV2rayUrl(
 			gconv.String(serviceJson["type"]),
 			gconv.String(serviceJson["encryption"]),
 			gconv.String(serviceJson["security"]),
-			url.QueryEscape(gconv.String(serviceJson["path"])),
-			url.QueryEscape(gconv.String(serviceJson["host"])),
+			url.QueryEscape(utils.GetRandomString(gconv.String(serviceJson["path"]))),
+			url.QueryEscape(utils.GetRandomString(gconv.String(serviceJson["host"]))),
 			gconv.String(serviceJson["headerType"]),
 			url.QueryEscape(gconv.String(serviceJson["seed"])),
 			url.QueryEscape(gconv.String(serviceJson["serviceName"])),
@@ -123,7 +123,11 @@ func (s *sProxyService) GetV2rayUrl(
 			v2Service.Name,
 		)
 
-		u, _ := url.Parse(resultThis)
+		u, err := url.Parse(resultThis)
+		if err != nil {
+			fmt.Println("订阅生成失败。", v2Service.Name, err)
+			return "", err
+		}
 		// 获取查询参数
 		query := u.Query()
 

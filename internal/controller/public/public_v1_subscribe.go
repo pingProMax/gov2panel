@@ -242,31 +242,31 @@ func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *en
 			}
 			d["servername"] = gconv.String(serviceJson["sni"])
 			d["client-fingerprint"] = utils.GetRandomString(gconv.String(serviceJson["fp"]))
-			d["network"] = gconv.String(serviceJson["net"]) //传输协议
-			switch gconv.String(serviceJson["net"]) {       //传输协议
+			d["encryption"] = gconv.String(serviceJson["encryption"])
+			d["network"] = gconv.String(serviceJson["network"]) //传输协议
+			switch gconv.String(serviceJson["network"]) {       //传输协议
 			case "xhttp":
-				d["encryption"] = gconv.String(serviceJson["encryption"])
 				d["xhttp-opts"] = map[string]interface{}{
-					"path": gconv.String(serviceJson["path"]),
-					"host": gconv.String(serviceJson["host"]),
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
+					"host": utils.GetRandomString(gconv.String(serviceJson["host"])),
 					"mode": utils.GetRandomString(gconv.String(serviceJson["mode"])),
 				}
 
 			case "ws":
 				d["ws-opts"] = map[string]interface{}{
-					"path": gconv.String(serviceJson["path"]),
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
 					"headers": map[string]interface{}{
-						"Host": gconv.String(serviceJson["host"]),
+						"Host": utils.GetRandomString(gconv.String(serviceJson["host"])),
 					},
 				}
 			case "h2":
 				d["h2-opts"] = map[string]interface{}{
-					"host": []string{gconv.String(serviceJson["host"])},
-					"path": gconv.String(serviceJson["path"]),
+					"host": []string{utils.GetRandomString(gconv.String(serviceJson["host"]))},
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
 				}
 			case "grpc":
 				d["grpc-opts"] = map[string]interface{}{
-					"grpc-service-name": gconv.String(serviceJson["path"]),
+					"grpc-service-name": utils.GetRandomString(gconv.String(serviceJson["path"])),
 				}
 
 			}
@@ -275,8 +275,8 @@ func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *en
 				d["network"] = "http"
 				d["http-opts"] = map[string]interface{}{
 					"method":  "GET",
-					"path":    []string{gconv.String(serviceJson["path"])},
-					"headers": map[string]interface{}{"Host": []string{gconv.String(serviceJson["host"])}},
+					"path":    []string{utils.GetRandomString(gconv.String(serviceJson["path"]))},
+					"headers": map[string]interface{}{"Host": []string{utils.GetRandomString(gconv.String(serviceJson["host"]))}},
 				}
 			}
 
@@ -305,41 +305,41 @@ func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *en
 				d["skip-cert-verify"] = false
 				d["servername"] = gconv.String(serviceJson["sni"])
 			}
-			d["network"] = gconv.String(serviceJson["net"]) //传输协议
-			switch gconv.String(d["network"]) {             //传输协议
+			d["encryption"] = gconv.String(serviceJson["encryption"])
+			d["network"] = gconv.String(serviceJson["network"]) //传输协议
+			switch gconv.String(d["network"]) {                 //传输协议
 			case "xhttp":
-				d["encryption"] = gconv.String(serviceJson["encryption"])
 				d["xhttp-opts"] = map[string]interface{}{
-					"path": gconv.String(serviceJson["path"]),
-					"host": gconv.String(serviceJson["host"]),
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
+					"host": utils.GetRandomString(gconv.String(serviceJson["host"])),
 					"mode": utils.GetRandomString(gconv.String(serviceJson["mode"])),
 				}
 
 			case "ws":
 				d["ws-opts"] = map[string]interface{}{
-					"path": gconv.String(serviceJson["path"]),
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
 					"headers": map[string]interface{}{
-						"Host": gconv.String(serviceJson["host"]),
+						"Host": utils.GetRandomString(gconv.String(serviceJson["host"])),
 					},
 				}
 			case "h2":
 				d["h2-opts"] = map[string]interface{}{
-					"host": []string{gconv.String(serviceJson["host"])},
-					"path": gconv.String(serviceJson["path"]),
+					"host": []string{utils.GetRandomString(gconv.String(serviceJson["host"]))},
+					"path": utils.GetRandomString(gconv.String(serviceJson["path"])),
 				}
 			case "grpc":
 				d["grpc-opts"] = map[string]interface{}{
-					"grpc-service-name": gconv.String(serviceJson["path"]),
+					"grpc-service-name": utils.GetRandomString(gconv.String(serviceJson["serviceName"])),
 				}
 
 			}
 
-			if gconv.String(serviceJson["type"]) == "http" { //伪装类型
+			if gconv.String(serviceJson["headerType"]) == "http" { //伪装类型
 				d["network"] = "http"
 				d["http-opts"] = map[string]interface{}{
 					"method":  "GET",
-					"path":    []string{gconv.String(serviceJson["path"])},
-					"headers": map[string]interface{}{"Host": []string{gconv.String(serviceJson["host"])}},
+					"path":    []string{utils.GetRandomString(gconv.String(serviceJson["path"]))},
+					"headers": map[string]interface{}{"Host": []string{utils.GetRandomString(gconv.String(serviceJson["host"]))}},
 				}
 			}
 		case "ss2022":
