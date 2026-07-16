@@ -1,6 +1,7 @@
 package service_relay
 
 import (
+	"context"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/dao"
 	"gov2panel/internal/logic/cornerstone"
@@ -42,6 +43,9 @@ func (s *sServerRelay) GetServiceRelayList(req *v1.ServiceRelayReq, orderBy, ord
 	}
 	if req.Show != 0 {
 		db = db.Where(dao.V2ServiceRelay.Columns().Show, req.Show)
+	}
+	if req.ResolveMode != "" {
+		db = db.Where(dao.V2ServiceRelay.Columns().ResolveMode, req.ResolveMode)
 	}
 
 	// 2. 使用 Clone() 复制一个用于 Count 的对象
@@ -132,7 +136,7 @@ func (s *sServerRelay) GetServiceRelayListByShow(show int) (m []*entity.V2Servic
 }
 
 // GetServiceRelayListByShow 根据启用状态获取列表
-func (s *sServerRelay) GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
+func (s *sServerRelay) GetRandomRelayByFilter(ctx context.Context, m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
 
 	if len(m) == 0 {
 		return ""
@@ -160,6 +164,8 @@ func (s *sServerRelay) GetRandomRelayByFilter(m []*entity.V2ServiceRelay, target
 	// 4. 从符合条件的数据池中，随机抽取一条
 	// (Go 1.22+ 推荐直接使用 rand.Intn，老版本需要先 rand.Seed)
 	randomIndex := rand.Intn(len(filtered))
-	return filtered[randomIndex].Ip
+
+	ip := service.ProxyService().ResolveServiceIP(ctx, filtered[randomIndex].ResolveMode, filtered[randomIndex].Ip)
+	return ip
 
 }

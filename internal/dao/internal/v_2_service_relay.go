@@ -21,28 +21,30 @@ type V2ServiceRelayDao struct {
 
 // V2ServiceRelayColumns defines and stores column names for the table v2_service_relay.
 type V2ServiceRelayColumns struct {
-	Id        string //
-	Ip        string // ip
-	NameGroup string // 组名字
-	Asn       string // asn分组 AS9808|AS4134|AS4837
-	Show      string // 是否启用
-	OrderId   string // 顺序
-	Remarks   string // 备注
-	CreatedAt string //
-	UpdatedAt string //
+	Id          string //
+	Ip          string // ip
+	NameGroup   string // 组名字
+	Asn         string // asn分组 AS9808|AS4134|AS4837
+	Show        string // 是否启用
+	OrderId     string // 顺序
+	Remarks     string // 备注
+	CreatedAt   string //
+	UpdatedAt   string //
+	ResolveMode string // 订阅解析模式
 }
 
 // v2ServiceRelayColumns holds the columns for the table v2_service_relay.
 var v2ServiceRelayColumns = V2ServiceRelayColumns{
-	Id:        "id",
-	Ip:        "ip",
-	NameGroup: "name_group",
-	Asn:       "asn",
-	Show:      "show",
-	OrderId:   "order_id",
-	Remarks:   "remarks",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	Id:          "id",
+	Ip:          "ip",
+	NameGroup:   "name_group",
+	Asn:         "asn",
+	Show:        "show",
+	OrderId:     "order_id",
+	Remarks:     "remarks",
+	CreatedAt:   "created_at",
+	UpdatedAt:   "updated_at",
+	ResolveMode: "resolve_mode",
 }
 
 // NewV2ServiceRelayDao creates and returns a new DAO object for table data access.

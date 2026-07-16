@@ -649,6 +649,18 @@
                     </select>
                   </div>
           `,
+          },{
+            title: `
+                  <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="resolve_mode">
+                      <option selected value="">全部</option>
+                      <option value="Unchanged">原始</option>
+                      <option value="DNS_Random">解析</option>
+                      <option value="DNS_Ipv4">解析ipv4</option>
+                      <option value="DNS_Ipv6">解析ipv6</option>
+                    </select>
+                  </div>
+          `,
           }, {
           }, {
             title: ``,
@@ -724,6 +736,28 @@
               } else if (value == 1) {
                 return '<span class="text-success">显示</span>'; // 1 显示绿色字
               }
+              return value; // 其他值原样返回
+            },
+          },{
+            field: 'service.resolve_mode',
+            sortName: 'resolve_mode',
+            title: '解析模式',
+            formatter: function (value, row, index) {
+              switch (value) {
+                case "Unchanged":
+                  return '<span class="text-danger">默认</span>'; 
+                  break;
+                case "DNS_Random":
+                  return '<span class="text-success">解析</span>'; 
+                  break;
+                case "DNS_Ipv4":
+                  return '<span class="text-success">解析ipv4</span>'; 
+                  break;
+                case "DNS_Ipv6":
+                  return '<span class="text-success">解析ipv6</span>'; 
+                  break;
+              }
+             
               return value; // 其他值原样返回
             },
           }, {

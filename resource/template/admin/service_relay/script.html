@@ -49,17 +49,17 @@
 
             <div class="col">
               <div class="position-relative form-group">
-                <label>顺序</label>
-                <input name="order_id" placeholder="顺序" type="number" class="form-control">
+                <label>订阅解析模式</label>
+                <select name="resolve_mode" class="form-control" data-style="btn-primary">
+                  multiple="multiple" data-none-selected-text="请选择">
+                  <option value="Unchanged">原始</option>
+                  <option value="DNS_Random">解析</option>
+                  <option value="DNS_Ipv4">解析ipv4</option>
+                  <option value="DNS_Ipv6">解析ipv6</option>
+                </select>
               </div>
             </div>
-
-            <div class="col">
-              <div class="position-relative form-group">
-                <label>ASN</label>
-                <input name="asn" placeholder="ASN" type="text" class="form-control">
-              </div>
-            </div>
+            
 
             <div class="col">
               <div class="position-relative form-group">
@@ -81,16 +81,38 @@
 
           </div>
 
-
-          <div class="position-relative form-group">
-            <label>IP</label>
-            <textarea name="ip" class="form-control" rows="5" placeholder="一行一个可以批量添加"></textarea>
+          <div class="row">
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>ASN</label>
+                <input name="asn" placeholder="ASN" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>顺序</label>
+                <input name="order_id" placeholder="顺序" type="number" class="form-control">
+              </div>
+            </div>
           </div>
 
-          <div class="position-relative form-group">
-            <label>备注</label>
-            <textarea name="remarks" class="form-control" rows="2" placeholder="备注"></textarea>
+          <div class="row">
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>IP</label>
+                <textarea name="ip" class="form-control" rows="5" placeholder="一行一个可以批量添加"></textarea>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>备注</label>
+                <textarea name="remarks" class="form-control" rows="5" placeholder="备注"></textarea>
+              </div>
+            </div>
+
           </div>
+
         </form>
       </div>
       <div class="modal-footer">
@@ -355,6 +377,18 @@
                   </div>
           `,
           }, {
+            title: `
+                  <div class="input-group">
+                    <select class="custom-select" data-function="search" data-type="eq" name="resolve_mode">
+                      <option selected value="">全部</option>
+                      <option value="Unchanged">原始</option>
+                      <option value="DNS_Random">解析</option>
+                      <option value="DNS_Ipv4">解析ipv4</option>
+                      <option value="DNS_Ipv6">解析ipv6</option>
+                    </select>
+                  </div>
+          `,
+          }, {
           }, {
           }, {
           }, {
@@ -404,6 +438,28 @@
               }
               return value; // 其他值原样返回
             },
+          },{
+            field: 'resolve_mode',
+            sortName: 'resolve_mode',
+            title: '解析模式',
+            formatter: function (value, row, index) {
+              switch (value) {
+                case "Unchanged":
+                  return '<span class="text-danger">默认</span>'; 
+                  break;
+                case "DNS_Random":
+                  return '<span class="text-success">解析</span>'; 
+                  break;
+                case "DNS_Ipv4":
+                  return '<span class="text-success">解析ipv4</span>'; 
+                  break;
+                case "DNS_Ipv6":
+                  return '<span class="text-success">解析ipv6</span>'; 
+                  break;
+              }
+             
+              return value; // 其他值原样返回
+            },
           }, {
             field: 'order_id',
             sortName: 'order_id',
@@ -415,7 +471,7 @@
             title: '备注',
             // visible: false,//隐藏
           }, {
-            field: 'service.created_at',
+            field: 'created_at',
             sortName: 'created_at',
             title: '创建时间',
             visible: false,//隐藏

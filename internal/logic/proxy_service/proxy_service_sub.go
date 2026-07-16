@@ -38,12 +38,12 @@ func (s *sProxyService) GetV2rayUrl(
 	if strings.HasPrefix(v2Service.Host, prefix) && strings.HasSuffix(v2Service.Host, suffix) {
 		// 移除前缀和后缀，剩下就是中间的值
 		val := v2Service.Host[len(prefix) : len(v2Service.Host)-len(suffix)]
-		v2Service.Host = service.ServerRelay().GetRandomRelayByFilter(v2ServiceRelayList, val, asn)
+		v2Service.Host = service.ServerRelay().GetRandomRelayByFilter(ctx, v2ServiceRelayList, val, asn)
+	} else {
+		v2Service.Host = s.ResolveServiceIP(ctx, v2Service.ResolveMode, v2Service.Host) //解析域名
 	}
 
 	v2Service.Host = strings.ReplaceAll(v2Service.Host, "$uuid", user.Uuid)
-
-	s.ResolveServiceIP(ctx, v2Service) //解析域名
 
 	serviceJson := make(map[string]interface{})
 	err = json.Unmarshal([]byte(v2Service.ServiceJson), &serviceJson)
@@ -274,22 +274,22 @@ func (s *sProxyService) GetV2rayUrl(
 }
 
 // ResolveServiceIP 根据解析模式 解析服务的IP地址
-func (s *sProxyService) ResolveServiceIP(ctx context.Context, v2Service *entity.V2ProxyService) {
+func (s *sProxyService) ResolveServiceIP(ctx context.Context, resolveMode, domain string) string {
 	// 1. 安全过滤：如果不是 DNS 解析模式，直接返回
-	if v2Service.ResolveMode != "DNS_Random" &&
-		v2Service.ResolveMode != "DNS_Ipv4" &&
-		v2Service.ResolveMode != "DNS_Ipv6" {
-		return
+	if resolveMode != "DNS_Random" &&
+		resolveMode != "DNS_Ipv4" &&
+		resolveMode != "DNS_Ipv6" {
+		return domain
 	}
 
-	ips, err := net.LookupIP(v2Service.Host)
+	ips, err := net.LookupIP(domain)
 	if err != nil || len(ips) == 0 {
-		v2Service.Host = "LookupIP err 无法解析的域名"
+		return "LookupIP err 无法解析的域名"
 	}
 
 	//根据不同的解析模式筛选 IP
 	var candidates []net.IP
-	switch v2Service.ResolveMode {
+	switch resolveMode {
 	case "DNS_Random":
 		// 保留所有解析出来的 IP
 		candidates = ips
@@ -314,9 +314,9 @@ func (s *sProxyService) ResolveServiceIP(ctx context.Context, v2Service *entity.
 		// 初始化随机数生成器（Go 1.20+ 之后其实不需要手动 Seed，但写上兼容老版本）
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		randomIndex := r.Intn(len(candidates))
-		v2Service.Host = candidates[randomIndex].String()
+		return candidates[randomIndex].String()
 	} else {
 		// 如果对应模式下没有筛选出任何 IP（比如只要 IPv6 却只解析出了 IPv4）
-		v2Service.Host = "无解析模式的ip"
+		return "无解析模式的ip"
 	}
 }

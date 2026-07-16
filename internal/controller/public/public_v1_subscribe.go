@@ -35,8 +35,6 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("ok")
 	}
 
-	
-
 	user, err := service.User().GetUserByToken(req.Token)
 	if err != nil {
 		return
@@ -227,10 +225,12 @@ func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *en
 		if strings.HasPrefix(service.Host, prefix) && strings.HasSuffix(service.Host, suffix) {
 			// 移除前缀和后缀，剩下就是中间的值
 			val := service.Host[len(prefix) : len(service.Host)-len(suffix)]
-			service.Host = getRandomRelayByFilter(serviceRelayArr, val, asn)
+			service.Host = getRandomRelayByFilter(ctx, serviceRelayArr, val, asn)
+		} else {
+			service.Host = resolveServiceIP(ctx, service) //解析域名
 		}
-
 		service.Host = strings.ReplaceAll(service.Host, "$uuid", user.Uuid)
+
 		serviceJson := make(map[string]interface{})
 		json.Unmarshal([]byte(service.ServiceJson), &serviceJson)
 
@@ -391,6 +391,11 @@ func ClashSub(ctx context.Context, serviceArr []*entity.V2ProxyService, user *en
 }
 
 // getRandomRelayByFilter 因为service.变量重名了，这样处理
-func getRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
-	return service.ServerRelay().GetRandomRelayByFilter(m, targetNameGroup, targetAsn)
+func getRandomRelayByFilter(ctx context.Context, m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string {
+	return service.ServerRelay().GetRandomRelayByFilter(ctx, m, targetNameGroup, targetAsn)
+}
+
+// resolveServiceIP 因为service.变量重名了，这样处理
+func resolveServiceIP(ctx context.Context, v2Service *entity.V2ProxyService) string {
+	return service.ProxyService().ResolveServiceIP(ctx, v2Service.ResolveMode, v2Service.Host) //解析域名
 }

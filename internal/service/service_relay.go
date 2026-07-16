@@ -6,6 +6,7 @@
 package service
 
 import (
+	"context"
 	v1 "gov2panel/api/admin/v1"
 	"gov2panel/internal/model/entity"
 )
@@ -23,7 +24,7 @@ type (
 		// GetServiceRelayListByShow 根据启用状态获取列表
 		GetServiceRelayListByShow(show int) (m []*entity.V2ServiceRelay, err error)
 		// GetServiceRelayListByShow 根据启用状态获取列表
-		GetRandomRelayByFilter(m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string
+		GetRandomRelayByFilter(ctx context.Context, m []*entity.V2ServiceRelay, targetNameGroup string, targetAsn string) string
 	}
 )
 
