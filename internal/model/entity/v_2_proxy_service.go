@@ -24,4 +24,5 @@ type V2ProxyService struct {
 	UpdatedAt   *gtime.Time `json:"updated_at"   orm:"updated_at"   ` //
 	RouteId     string      `json:"route_id"     orm:"route_id"     ` // 所属路由组
 	State       int         `json:"state"        orm:"state"        ` // 节点在线状态，1后端，2在线
+	ResolveMode string      `json:"resolve_mode" orm:"resolve_mode" ` // 订阅解析模式
 }

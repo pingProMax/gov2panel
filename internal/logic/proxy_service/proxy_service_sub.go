@@ -8,8 +8,11 @@ import (
 	"gov2panel/internal/model/entity"
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
+	"math/rand"
+	"net"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gogf/gf/v2/util/gconv"
 )
@@ -39,6 +42,8 @@ func (s *sProxyService) GetV2rayUrl(
 	}
 
 	v2Service.Host = strings.ReplaceAll(v2Service.Host, "$uuid", user.Uuid)
+
+	s.ResolveServiceIP(ctx, v2Service) //解析域名
 
 	serviceJson := make(map[string]interface{})
 	err = json.Unmarshal([]byte(v2Service.ServiceJson), &serviceJson)
@@ -266,4 +271,52 @@ func (s *sProxyService) GetV2rayUrl(
 	}
 
 	return
+}
+
+// ResolveServiceIP 根据解析模式 解析服务的IP地址
+func (s *sProxyService) ResolveServiceIP(ctx context.Context, v2Service *entity.V2ProxyService) {
+	// 1. 安全过滤：如果不是 DNS 解析模式，直接返回
+	if v2Service.ResolveMode != "DNS_Random" &&
+		v2Service.ResolveMode != "DNS_Ipv4" &&
+		v2Service.ResolveMode != "DNS_Ipv6" {
+		return
+	}
+
+	ips, err := net.LookupIP(v2Service.Host)
+	if err != nil || len(ips) == 0 {
+		v2Service.Host = "LookupIP err 无法解析的域名"
+	}
+
+	//根据不同的解析模式筛选 IP
+	var candidates []net.IP
+	switch v2Service.ResolveMode {
+	case "DNS_Random":
+		// 保留所有解析出来的 IP
+		candidates = ips
+	case "DNS_Ipv4":
+		// 仅保留 IPv4
+		for _, ip := range ips {
+			if ip.To4() != nil {
+				candidates = append(candidates, ip)
+			}
+		}
+	case "DNS_Ipv6":
+		// 仅保留 IPv6 (To4 为 nil 且是有效的 IP 即为 IPv6)
+		for _, ip := range ips {
+			if ip.To4() == nil && ip.To16() != nil {
+				candidates = append(candidates, ip)
+			}
+		}
+	}
+
+	// 4. 从筛选后的候选桶中随机选择一个 IP
+	if len(candidates) > 0 {
+		// 初始化随机数生成器（Go 1.20+ 之后其实不需要手动 Seed，但写上兼容老版本）
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		randomIndex := r.Intn(len(candidates))
+		v2Service.Host = candidates[randomIndex].String()
+	} else {
+		// 如果对应模式下没有筛选出任何 IP（比如只要 IPv6 却只解析出了 IPv4）
+		v2Service.Host = "无解析模式的ip"
+	}
 }

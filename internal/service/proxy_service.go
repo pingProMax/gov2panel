@@ -54,6 +54,8 @@ type (
 		// 专门处理订阅的
 		// GetV2rayUrl
 		GetV2rayUrl(ctx context.Context, v2Service *entity.V2ProxyService, user *entity.V2User, v2ServiceRelayList []*entity.V2ServiceRelay, asn string) (v2rayUrl string, err error)
+		// ResolveServiceIP 根据解析模式 解析服务的IP地址
+		ResolveServiceIP(ctx context.Context, v2Service *entity.V2ProxyService)
 	}
 )
 

@@ -26,4 +26,5 @@ type V2ProxyService struct {
 	UpdatedAt   *gtime.Time //
 	RouteId     interface{} // 所属路由组
 	State       interface{} // 节点在线状态，1后端，2在线
+	ResolveMode interface{} // 订阅解析模式
 }

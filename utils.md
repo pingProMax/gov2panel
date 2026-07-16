@@ -58,5 +58,28 @@ SERVER_%s_ONLINE_USER,服务器id
 SERVER_%s_%s_FLOW,服务器id,2023922
 
 
+节点地址   
+``` json 
+$uuid 在客户端发起订阅时，系统会根据 节点管理-地址 的$uuid,替换成用户的uuid
+$relay[val] 在客户端发起订阅时，系统会根据 节点管理-地址 的$relay[val]-val参数以及客户端的 IP ASN（自治系统号），动态匹配并替换对应的中继节点组
+AS9808|AS4134|AS4837
+移动|中国电信|中国联通
+
+订阅解析模式
+如后台节点地址是：example.com，则订阅时的节点地址是：example.com
+<option value="Unchanged">原始</option>
+
+如后台节点地址是：example.com，则订阅时的节点地址是：example.com解析后的ipv4/ipv6
+<option value="DNS_Random">解析</option>
+
+如后台节点地址是：example.com，则订阅时的节点地址是：example.com解析后的ipv4
+<option value="DNS_Ipv4">解析ipv4</option>
+
+如后台节点地址是：example.com，则订阅时的节点地址是：example.com解析后的ipv6
+<option value="DNS_Ipv6">解析ipv6</option>
+```
+
+
+
 gf gen ctrl
 gf gen service

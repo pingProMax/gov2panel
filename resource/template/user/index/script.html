@@ -79,54 +79,60 @@
         return null;
     }
 
-    // 只用 Image 检测域名是否可用
-    function checkDomainStatus(url) {
-        return new Promise((resolve) => {
-            let finished = false;
+    // 只用 Image 检测域名是否可用 方法1
+    // function checkDomainStatus(url) {
+    //     return new Promise((resolve) => {
+    //         let finished = false;
 
-            const done = (ok) => {
-                if (finished) return;
-                finished = true;
-                resolve(ok);
-            };
+    //         const done = (ok) => {
+    //             if (finished) return;
+    //             finished = true;
+    //             resolve(ok);
+    //         };
 
-            const tester = new Image();
-            tester.src = `${url}/favicon.ico?t=${Date.now()}`;
+    //         const tester = new Image();
+    //         tester.src = `${url}/favicon.ico?t=${Date.now()}`;
 
-            tester.onload = () => {
-               done(true)
-            };
+    //         tester.onload = () => {
+    //            done(true)
+    //         };
             
-            tester.onerror = () => {
-                fetch(url, { mode: 'no-cors', method: 'HEAD' })
-                    .then(() => done(true))
-                    .catch(() => done(false));
-            };
+    //         tester.onerror = () => {
+    //             fetch(url, { mode: 'no-cors', method: 'HEAD' })
+    //                 .then(() => done(true))
+    //                 .catch(() => done(false));
+    //         };
 
-            // 超时保护
-            setTimeout(() => done(false), 5000);
-        });
-    }
-
-    // async function checkDomainStatus(url) {
-    //     const controller = new AbortController();
-    //     const timeout = setTimeout(() => controller.abort(), 5000);
-
-    //     try {
-    //         // 尝试发一个轻量级请求
-    //         await fetch(`${url}/favicon.ico`, {
-    //             method: 'HEAD',
-    //             mode: 'no-cors',
-    //             signal: controller.signal
-    //         });
-    //         clearTimeout(timeout);
-    //         return true;
-    //     } catch (e) {
-    //         clearTimeout(timeout);
-    //         return false;
-    //     }
+    //         // 超时保护
+    //         setTimeout(() => done(false), 5000);
+    //     });
     // }
 
+    // 直接跨域请求
+    function checkDomainStatus(url) {
+        return new Promise((resolve) => {
+            const controller = new AbortController();
+
+            const timeout = setTimeout(() => {
+                controller.abort();
+                resolve(false);
+            }, 5000);
+
+            fetch(`${url}/api/subscribe?is_check=true&t=${Date.now()}`, {
+                method: "GET",
+                signal: controller.signal,
+            })
+                .then(res => res.text())
+                .then(text => {
+                    clearTimeout(timeout);
+                    resolve(text.trim() === "ok");
+                })
+                .catch(() => {
+                    clearTimeout(timeout);
+                    resolve(false);
+                });
+        });
+    }
 
     
     // 替换页面里所有 %domain%

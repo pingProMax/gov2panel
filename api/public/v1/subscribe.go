@@ -9,6 +9,7 @@ type SubscribeReq struct {
 	Token        string `json:"token"`
 	Flag         string `json:"flag"`
 	FlagInfoHide bool   `json:"flag_info_hide"`
+	Ischeck      bool   `json:"is_check"` //检查订阅地址是否可用
 }
 
 type SubscribeRes struct {

@@ -35,6 +35,7 @@ type V2ProxyServiceColumns struct {
 	UpdatedAt   string //
 	RouteId     string // 所属路由组
 	State       string // 节点在线状态，1后端，2在线
+	ResolveMode string // 订阅解析模式
 }
 
 // v2ProxyServiceColumns holds the columns for the table v2_proxy_service.
@@ -53,6 +54,7 @@ var v2ProxyServiceColumns = V2ProxyServiceColumns{
 	UpdatedAt:   "updated_at",
 	RouteId:     "route_id",
 	State:       "state",
+	ResolveMode: "resolve_mode",
 }
 
 // NewV2ProxyServiceDao creates and returns a new DAO object for table data access.

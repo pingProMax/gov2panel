@@ -97,8 +97,14 @@
             </div>
             <div class="col">
               <div class="position-relative form-group">
-                <label>倍率</label>
-                <input name="rate" placeholder="倍率" type="number" class="form-control" value="1">
+                <label>订阅解析模式</label>
+                <select name="resolve_mode" class="form-control" data-style="btn-primary">
+                  multiple="multiple" data-none-selected-text="请选择">
+                  <option value="Unchanged">原始</option>
+                  <option value="DNS_Random">解析</option>
+                  <option value="DNS_Ipv4">解析ipv4</option>
+                  <option value="DNS_Ipv6">解析ipv6</option>
+                </select>
               </div>
             </div>
           </div>
@@ -119,6 +125,12 @@
               <div class="position-relative form-group">
                 <label>顺序</label>
                 <input name="order_id" placeholder="顺序" type="number" class="form-control">
+              </div>
+            </div>
+            <div class="col">
+              <div class="position-relative form-group">
+                <label>倍率</label>
+                <input name="rate" placeholder="倍率" type="number" class="form-control" value="1">
               </div>
             </div>
 

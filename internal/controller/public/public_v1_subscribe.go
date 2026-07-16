@@ -25,6 +25,18 @@ import (
 
 func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res *v1.SubscribeRes, err error) {
 	res = &v1.SubscribeRes{}
+
+	// 用来 检查订阅是否可用
+	if req.Ischeck {
+		//允许跨域请求
+		ghttp.RequestFromCtx(ctx).Response.Header().Set("Access-Control-Allow-Origin", "*")
+		ghttp.RequestFromCtx(ctx).Response.Header().Set("Access-Control-Allow-Methods", "GET")
+		ghttp.RequestFromCtx(ctx).Response.Header().Set("Access-Control-Allow-Headers", "*")
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("ok")
+	}
+
+	
+
 	user, err := service.User().GetUserByToken(req.Token)
 	if err != nil {
 		return
@@ -42,8 +54,8 @@ func (c *ControllerV1) Subscribe(ctx context.Context, req *v1.SubscribeReq) (res
 	userAgent := ghttp.RequestFromCtx(ctx).UserAgent()
 	userAgentList := strings.Split(g.RequestFromCtx(ctx).GetCtxVar("setting").MapStrStr()["subscribe_user_agent"], "|")
 	if !utils.ContainsAny(userAgent, userAgentList) {
-		err = errors.New("订阅方式已经停用，请提交工单联系管理员！")
-		fmt.Println(gconv.String(user.Id)+"@gov2panel.subscribe", clientIp, asn, userAgent, "订阅方式已经停用，请提交工单联系管理员！")
+		err = errors.New("使用环境异常，请在客户端中使用。如客户端也出现此消息请提交工单。")
+		fmt.Println(gconv.String(user.Id)+"@gov2panel.subscribe", clientIp, asn, userAgent, "使用环境异常，请在客户端中使用。")
 		return
 	}
 
