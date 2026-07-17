@@ -9,6 +9,8 @@ import (
 	"context"
 	v1 "gov2panel/api/user/v1"
 	"gov2panel/internal/model/entity"
+
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 type (
@@ -25,6 +27,8 @@ type (
 		GetPaymentShowList() (m []*entity.V2Payment, err error)
 		// 支付业务，获取支付url
 		GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (urlStr string, err error)
+		// BepusdtGenerateSignature 生成 MD5 签名
+		BepusdtGenerateSignature(data g.Map, token string) string
 	}
 )
 

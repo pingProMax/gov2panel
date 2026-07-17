@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -25,9 +26,9 @@ func UseOrderNo(planId int, price float64, code string, userID int) string {
 	return fmt.Sprintf("%v-%v-%v-%v-%d", time.Now().Unix(), planId, price, code, userID)
 }
 
-// 充值订单生成 时间戳-充值金额(实际支付的)-payID-用户ID
-func RechargeOrderNo(price float64, payId, userID int) string {
-	return fmt.Sprintf("%v-%v-%v-%d", time.Now().Unix(), price, payId, userID)
+// 充值订单生成 时间戳-充值金额(实际支付的)-用户得到金额-payID-用户ID
+func RechargeOrderNo(payPrice float64, getPrice float64, payId, userID int) string {
+	return fmt.Sprintf("%v-%v-%v-%v-%d", time.Now().Unix(), payPrice, getPrice, payId, userID)
 }
 
 // bytes 转 GB
@@ -54,8 +55,11 @@ func MaskString(input string) string {
 
 // float64 只保留两位小数
 func Decimal(value float64) float64 {
-	value, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", value), 64)
-	return value
+	// 针对正负数采用不同的取整方向
+	if value >= 0 {
+		return math.Floor(value*100) / 100
+	}
+	return math.Ceil(value*100) / 100
 }
 
 // no rows in result set 错误判单

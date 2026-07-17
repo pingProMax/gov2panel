@@ -1,6 +1,9 @@
 <script>
+
     $(function () {
         getCaptcha()
+        inviteCode()
+        
     })
 
     //获取验证码
@@ -81,11 +84,40 @@
 
     }
 
+
+    //处理邀请
+    function inviteCode(){
+        const inputEl = document.getElementById('invite-input');
+
+        // 1. 获取 URL 中的 code 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeFromUrl = urlParams.get('code');
+
+        if (codeFromUrl) {
+            // 2. 如果 URL 带着 code，存入本地并展示
+            localStorage.setItem('my_invite_code', codeFromUrl);
+            inputEl.value = codeFromUrl;
+        } else {
+            // 3. 如果没有，读取本地之前存好的 code
+            const savedCode = localStorage.getItem('my_invite_code');
+            if (savedCode) {
+                inputEl.value = savedCode;
+                // 【新增】如果使用的是本地存储的邀请码，将其设为只读
+                inputEl.readOnly = true; 
+            } else {
+                // 4. 本地和 URL 都没有，可以不显示或显示默认值
+                inputEl.placeholder = "无邀请码";
+            }
+        }
+    }
+
     document.addEventListener('keyup', function(event) {
         if (event.keyCode === 13) {
             // 回车键按下后的操作
             register()
         }
     });
+
+    
 
 </script>

@@ -11,3 +11,11 @@ type EPayNotifyReq struct {
 type EPayNotifyRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 }
+
+type BEpusdtNotifyReq struct {
+	g.Meta `path:"/pay/bepusdt_pay_notify" tags:"Pay" method:"get,post" summary:"bepusdt支付 异步通知"`
+}
+
+type BEpusdtNotifyRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+}

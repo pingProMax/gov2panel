@@ -2,6 +2,8 @@ package payment
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,11 +15,14 @@ import (
 	"gov2panel/internal/service"
 	"gov2panel/internal/utils"
 	"net/url"
+	"sort"
 	"strconv"
-	"time"
+	"strings"
 
+	gfJson "github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/tidwall/gjson"
 )
 
@@ -94,22 +99,29 @@ func (s *sPayment) GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (ur
 		err = errors.New("金额小于0，你充值你奶奶个腿")
 		return
 	}
-	res.Amount = utils.Decimal(res.Amount)
+	res.Amount = utils.Decimal(res.Amount) //只保留两位小数
 
-	HandlingFeeAmount := 0.00
+	HandlingFeeAmount := 0.00 //手续费金额
 	//计算手续费
 	if payment.HandlingFeePercent > 0 { //百分比手续费
 		HandlingFeeAmount = res.Amount * float64(payment.HandlingFeePercent) / 100
+		HandlingFeeAmount = utils.Decimal(HandlingFeeAmount)
 	}
 
 	if payment.HandlingFeeFixed > 0 { //固定手续费
 		HandlingFeeAmount = HandlingFeeAmount + payment.HandlingFeeFixed
+		HandlingFeeAmount = utils.Decimal(HandlingFeeAmount)
 	}
 
-	priceStr := strconv.FormatFloat(res.Amount, 'f', 2, 64)                                                             //金额
-	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, payment.Id, service.User().GetCtxUser(ctx).Id) //订单号 系统用
+	transactionId := utils.RechargeOrderNo(res.Amount+HandlingFeeAmount, res.Amount, payment.Id, service.User().GetCtxUser(ctx).Id) //订单号 系统用
 
-	out_trade_no := strconv.FormatInt(time.Now().UnixNano()/int64(time.Millisecond), 10)
+	payAmountStr := strconv.FormatFloat(res.Amount+HandlingFeeAmount, 'f', 2, 64) //支付金额
+	// 2. 再将字符串解析回 float64
+	payAmount, err := strconv.ParseFloat(payAmountStr, 64)
+	if err != nil {
+		// 处理错误
+		return
+	}
 
 	switch payment.Payment {
 	case "epay":
@@ -121,12 +133,11 @@ func (s *sPayment) GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (ur
 		}
 		addr := fmt.Sprintf("%s/submit.php?", epayConfig.Url.String()) //地址
 
-		urlStr = fmt.Sprintf("money=%s&name=%s&notify_url=%s&out_trade_no=%s&param=%s&pid=%s&return_url=%s",
-			strconv.FormatFloat(res.Amount+HandlingFeeAmount, 'f', 2, 64), //金额
+		urlStr = fmt.Sprintf("money=%s&name=%s&notify_url=%s&out_trade_no=%s&pid=%s&return_url=%s",
+			payAmountStr,  //金额
 			transactionId, //name
 			payment.NotifyDomain+"/pay/e_pay_notify", //服务器异步通知地址
-			out_trade_no, //订单号
-			priceStr+"|"+strconv.Itoa(payment.Id)+"|"+strconv.Itoa(service.User().GetCtxUser(ctx).Id)+"|"+transactionId, //自定义 用户实际得到的金额|支付方式的id|用户id|订单号
+			transactionId,               //订单号
 			epayConfig.Pid.String(),     //pid
 			res.Redirect+"/user/wallet", //页面跳转通知地址
 		)
@@ -145,7 +156,7 @@ func (s *sPayment) GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (ur
 			"app_id=%s&notify_url=%s&out_trade_no=%s&return_url=%s&total_amount=%s",
 			alphaConfig.AppId,
 			url.QueryEscape(payment.NotifyDomain+"/pay/e_pay_notify"),
-			out_trade_no,
+			transactionId,
 			url.QueryEscape(payment.NotifyDomain+"/user/wallet"),
 			strconv.FormatFloat((res.Amount+HandlingFeeAmount)*100, 'f', 2, 64),
 		)
@@ -161,10 +172,75 @@ func (s *sPayment) GetPayUrl(ctx context.Context, res *v1.PayRedirectionReq) (ur
 			jsonStr := r.ReadAllString()
 			urlStr = gjson.Get(jsonStr, "url").String()
 		}
+	case "bepusdt":
 
+		bepUsdtConfig := model.BepUsdtConfig{}
+		err = json.Unmarshal([]byte(payment.Config), &bepUsdtConfig)
+		if err != nil {
+			return
+		}
+
+		addr := fmt.Sprintf("%s/api/v1/order/create-order", bepUsdtConfig.Url.String()) //地址
+
+		requestData := g.Map{
+			"order_id":     transactionId,                                    //商户订单编号（唯一标识）
+			"notify_url":   payment.NotifyDomain + "/pay/bepusdt_pay_notify", //支付结果异步回调地址
+			"redirect_url": res.Redirect + "/user/wallet",                    //支付成功后商户跳转地址
+			"amount":       payAmount,                                        //支付金额（法币金额）；留空或传 0 则进入地址独占模式，收到任意金额均触发回调
+			"name":         transactionId,                                    //商品名称
+			"timeout":      bepUsdtConfig.Timeout,                            //订单超时时间（秒），最低 120 秒
+		}
+
+		// 1. 计算签名
+		signature := s.BepusdtGenerateSignature(requestData, bepUsdtConfig.Key.String())
+		// 2. 将计算好的签名赋值回 map
+		requestData["signature"] = signature
+
+		c := g.Client()
+		c.SetHeader("User-Agent", "gov2panel")
+		if r, err := c.Post(gctx.New(), addr, gfJson.New(requestData).MustToJsonString()); err != nil {
+			err = errors.New(err.Error())
+		} else {
+			defer r.Close()
+			jsonStr := r.ReadAllString()
+			fmt.Println(jsonStr, 77777)
+			urlStr = gjson.Get(jsonStr, "data.payment_url").String()
+		}
 	default:
 		err = errors.New("该支付类型没有实现")
 	}
 
 	return
+}
+
+// BepusdtGenerateSignature 生成 MD5 签名
+func (s *sPayment) BepusdtGenerateSignature(data g.Map, token string) string {
+	var keys []string
+
+	// 第一步：筛选出非空且非 signature 的参数名
+	for k, v := range data {
+		valStr := gconv.String(v) // 使用 GoFrame 的 gconv 安全转换为字符串
+		if k == "signature" || valStr == "" {
+			continue
+		}
+		keys = append(keys, k)
+	}
+
+	// 按参数名 ASCII 码从小到大排序（字典序）
+	sort.Strings(keys)
+
+	// 按 key=value 格式拼接，使用 & 连接
+	var parts []string
+	for _, k := range keys {
+		parts = append(parts, fmt.Sprintf("%s=%s", k, gconv.String(data[k])))
+	}
+	signStr := strings.Join(parts, "&")
+
+	// 第二步：末尾追加 API Token（注意没有 &）
+	signStr += token
+
+	// 对完整字符串进行 MD5 加密并转为小写
+	hasher := md5.New()
+	hasher.Write([]byte(signStr))
+	return hex.EncodeToString(hasher.Sum(nil))
 }

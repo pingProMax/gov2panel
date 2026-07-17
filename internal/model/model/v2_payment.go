@@ -9,6 +9,13 @@ type EpayConfig struct {
 	Key *g.Var
 }
 
+//bepusdt 配置文件
+type BepUsdtConfig struct {
+	Url     *g.Var
+	Key     *g.Var
+	Timeout int //订单超时时间（秒），最低 120 秒
+}
+
 //Alpha支付
 type Alpha struct {
 	AppId       int    `json:"app_id"`

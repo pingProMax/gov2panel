@@ -243,7 +243,7 @@ func (s *sInvitationRecords) CommissionTransferBalance(userId int) (err error) {
 			RechargeName:    "佣金转余额",
 			ConsumptionName: "",
 			Remarks:         "",
-			TransactionId:   utils.RechargeOrderNo(user.CommissionBalance, 0, userId),
+			TransactionId:   utils.RechargeOrderNo(user.CommissionBalance, user.CommissionBalance, 0, userId),
 		}
 		_, err = tx.Ctx(ctx).Model(d.V2RechargeRecords.Table()).Save(rr)
 		if err != nil {

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net/url"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/util/gconv"
 
 	v1 "gov2panel/api/public/v1"
 	"gov2panel/internal/model/entity"
@@ -52,17 +52,17 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 
 	urlData := notify(paramMap)
 
-	paramList := strings.Split(paramMap["param"], "|") //用户实际得到的金额|支付方式的id|用户id|订单号
-	if len(paramList) != 4 {
+	paramList := strings.Split(paramMap["out_trade_no"], "-") //时间戳-充值金额(实际支付的)-用户得到金额-payID-用户ID
+	if len(paramList) != 5 {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢1？")
 	}
-	paymentId, _ := strconv.Atoi(paramList[1])
+	paymentId := gconv.Int(paramList[3])
 	payment, err := service.Payment().GetPaymentById(paymentId)
 	if err != nil {
 		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢2？")
 	}
 
-	usetId, _ := strconv.Atoi(paramList[2])
+	usetId := gconv.Int(paramList[4])
 
 	//{1040 2023091415451087211 1694677507984 wxpay product 2.1 TRADE_SUCCESS 1.00|6|3787 e5615bcd45e87e4ad8173ad60ec6a620 MD5}
 
@@ -82,8 +82,8 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 	}
 
 	//充值
-	num, _ := strconv.ParseFloat(paramList[0], 64)         //用户实际到账金额
-	payNum, _ := strconv.ParseFloat(paramMap["money"], 64) //支付金额
+	num := gconv.Float64(paramList[2])                 //用户实际到账金额
+	payNum := gconv.Float64(paramMap["actual_amount"]) //支付金额
 	err = service.RechargeRecords().SaveRechargeRecords(
 		&entity.V2RechargeRecords{
 			Amount:        num,
@@ -91,7 +91,7 @@ func (c *ControllerV1) EPayNotify(ctx context.Context, req *v1.EPayNotifyReq) (r
 			OperateType:   1,
 			RechargeName:  payment.Name,
 			Remarks:       "",
-			TransactionId: paramList[3],
+			TransactionId: gconv.String(paramMap["out_trade_no"]),
 		},
 		payment.Name,
 		payNum,
@@ -134,4 +134,71 @@ func notify(params map[string]string) string {
 		return err.Error()
 	}
 	return queryStr
+}
+
+func (c *ControllerV1) BEpusdtNotify(ctx context.Context, req *v1.BEpusdtNotifyReq) (res *v1.BEpusdtNotifyRes, err error) {
+
+	r := g.RequestFromCtx(ctx)
+	// rw := r.Response.RawWriter()
+	paramMap := r.GetMap()
+
+	if gconv.Int(paramMap["status"]) != 2 {
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("支付状态不对！")
+	}
+
+	signature := paramMap["signature"]
+
+	// 删除 signature
+	delete(paramMap, "signature")
+
+	paramList := strings.Split(gconv.String(paramMap["order_id"]), "-") //时间戳-充值金额(实际支付的)-用户得到金额-payID-用户ID
+	if len(paramList) != 5 {
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢1？")
+	}
+
+	paymentId := gconv.Int(paramList[3])
+	payment, err := service.Payment().GetPaymentById(paymentId)
+	if err != nil {
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢2？")
+	}
+	usetId := gconv.Int(paramList[4])
+
+	bepUsdtConfig := model.BepUsdtConfig{}
+	err = json.Unmarshal([]byte(payment.Config), &bepUsdtConfig)
+	if err != nil {
+		return
+	}
+
+	//签名
+	bepusdtSigStr := service.Payment().BepusdtGenerateSignature(paramMap, bepUsdtConfig.Key.String())
+
+	//验证签名
+	fmt.Println(signature, bepusdtSigStr, gconv.String(paramMap))
+	if signature != bepusdtSigStr {
+		ghttp.RequestFromCtx(ctx).Response.WriteExit("你你妈妈呢呢3？")
+	}
+
+	//充值
+	num := gconv.Float64(paramList[2])                 //用户实际到账金额
+	payNum := gconv.Float64(paramMap["actual_amount"]) //支付金额
+	err = service.RechargeRecords().SaveRechargeRecords(
+		&entity.V2RechargeRecords{
+			Amount:        num,
+			UserId:        usetId,
+			OperateType:   1,
+			RechargeName:  payment.Name,
+			Remarks:       "",
+			TransactionId: gconv.String(paramMap["order_id"]),
+		},
+		payment.Name,
+		payNum,
+		payment.Id,
+		"",
+	)
+	if err != nil {
+		return
+	}
+
+	ghttp.RequestFromCtx(ctx).Response.WriteExit("success")
+	return
 }
